@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BLOX — Viral en un clic</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{font-family:'Inter',sans-serif;box-sizing:border-box}
+    body{background:#06060c;color:#e2e8f0;min-height:100vh;overflow-x:hidden}
+
+    .grad{background:linear-gradient(135deg,#a78bfa 0%,#60a5fa 50%,#34d399 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .grad-border{border-image:linear-gradient(135deg,#7c3aed,#db2777) 1}
+
+    .card{background:#0c0c16;border:1px solid #1a1a2e;border-radius:16px}
+    .inp{background:#0c0c16;border:1px solid #1a1a2e;color:#e2e8f0;border-radius:12px;padding:13px 16px;width:100%;outline:none;transition:border-color .2s;font-size:14px}
+    .inp:focus{border-color:#7c3aed}
+    .inp::placeholder{color:#2e2e48}
+    textarea.inp{resize:vertical;min-height:100px;line-height:1.6}
+
+    .btn{background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;padding:13px 26px;border-radius:12px;font-weight:700;cursor:pointer;border:none;transition:opacity .2s,transform .15s;display:inline-flex;align-items:center;gap:8px;font-size:14px;user-select:none}
+    .btn:hover:not(:disabled){opacity:.88;transform:translateY(-1px)}
+    .btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+    .btn-ghost{background:transparent;border:1px solid #1a1a2e;color:#6b7280;padding:9px 18px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;transition:all .2s}
+    .btn-ghost:hover{border-color:#7c3aed;color:#a855f7}
+    .glow{box-shadow:0 0 30px rgba(124,58,237,.35)}
+
+    .badge-free{background:rgba(34,197,94,.1);color:#22c55e;border:1px solid rgba(34,197,94,.2);padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700}
+    .badge-pro{background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(219,39,119,.15));color:#a855f7;border:1px solid rgba(124,58,237,.25);padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700}
+    .badge-lock{background:rgba(239,68,68,.08);color:#f87171;border:1px solid rgba(239,68,68,.15);padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700}
+
+    .r-red   {background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.18);color:#fca5a5;border-radius:10px;padding:11px 15px;margin-bottom:9px;font-size:13.5px;line-height:1.55}
+    .r-green {background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.18);color:#86efac;border-radius:10px;padding:11px 15px;margin-bottom:9px;font-size:13.5px;line-height:1.55}
+    .r-purple{background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;border-radius:10px;padding:11px 15px;margin-bottom:9px;font-size:13.5px;line-height:1.55}
+    .r-blue  {background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.18);color:#93c5fd;border-radius:10px;padding:11px 15px;margin-bottom:9px;font-size:13.5px;line-height:1.55}
+    .r-yellow{background:rgba(234,179,8,.06);border:1px solid rgba(234,179,8,.18);color:#fde68a;border-radius:10px;padding:11px 15px;margin-bottom:9px;font-size:13.5px;line-height:1.55}
+    .r-orange{background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.18);color:#fdba74;border-radius:10px;padding:11px 15px;margin-bottom:9px;font-size:13.5px;line-height:1.55}
+
+    .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:#3a3a58;margin-bottom:9px}
+
+    .tab{padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:600;font-size:12.5px;white-space:nowrap;transition:all .2s;color:#3a3a58}
+    .tab:hover:not(.tab-on):not(.tab-lock){background:#111120;color:#9ca3af}
+    .tab-on{background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff}
+    .tab-lock{cursor:default;opacity:.35}
+
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+    .spin{animation:spin 1s linear infinite}
+    .fu{animation:fadeUp .4s ease-out both}
+    .blink{animation:blink 2s ease-in-out infinite}
+
+    .step-dot{width:9px;height:9px;border-radius:50%;background:#1a1a2e;transition:background .4s,box-shadow .4s}
+    .step-dot.done{background:linear-gradient(135deg,#7c3aed,#db2777)}
+    .step-dot.now{background:#a855f7;box-shadow:0 0 10px rgba(168,85,247,.7)}
+
+    .p-card{background:#0c0c16;border:1.5px solid #1a1a2e;border-radius:13px;padding:20px;cursor:pointer;transition:all .2s;position:relative}
+    .p-card:hover{border-color:#7c3aed}
+    .p-card.p-on{border-color:#a855f7;background:rgba(124,58,237,.07)}
+    .pop-tag{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font-size:9px;font-weight:800;padding:2px 12px;border-radius:999px;letter-spacing:.9px;white-space:nowrap}
+
+    .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(7px);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px}
+
+    .script-card{background:#0f0f1c;border:1px solid #1a1a2e;border-radius:12px;padding:18px;margin-bottom:14px}
+    .htag{display:inline-block;background:rgba(168,85,247,.12);color:#a855f7;border:1px solid rgba(168,85,247,.25);border-radius:5px;padding:3px 9px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px}
+    .ctag{display:inline-block;background:rgba(34,197,94,.1);color:#22c55e;border:1px solid rgba(34,197,94,.2);border-radius:5px;padding:3px 9px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px}
+
+    .tease-wrap{position:relative}
+    .tease-wrap .blur-lay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,#06060c 45%);z-index:2;border-radius:16px}
+    .tease-blur{filter:blur(3px);pointer-events:none;user-select:none}
+
+    .chip{background:#111120;border:1px solid #1a1a2e;color:#6b7280;padding:8px 14px;border-radius:8px;font-size:12px;cursor:pointer;transition:all .2s;white-space:nowrap}
+    .chip:hover{border-color:#7c3aed;color:#a855f7;background:#14141f}
+
+    .plat{background:#0c0c16;border:1.5px solid #1a1a2e;color:#4a4a70;padding:10px 16px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s;display:flex;align-items:center;gap:7px}
+    .plat:hover{border-color:#7c3aed;color:#a855f7}
+    .plat.plat-on{border-color:#7c3aed;color:#a855f7;background:rgba(124,58,237,.08)}
+
+    .day-card{background:#0f0f1c;border:1px solid #1a1a2e;border-radius:12px;padding:18px;margin-bottom:12px}
+    .day-num{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#db2777);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+
+    ::-webkit-scrollbar{width:4px;height:4px}
+    ::-webkit-scrollbar-track{background:#06060c}
+    ::-webkit-scrollbar-thumb{background:#252540;border-radius:2px}
+
+    .hero-glow{position:absolute;top:-150px;left:50%;transform:translateX(-50%);width:900px;height:600px;background:radial-gradient(ellipse at center,rgba(124,58,237,.15) 0%,transparent 65%);pointer-events:none}
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════ PAYWALL MODAL -->
+<div id="paywallModal" class="modal-bg" style="display:none">
+  <div class="card p-7 w-full max-w-md fu" style="max-height:92vh;overflow-y:auto;position:relative">
+    <button onclick="closePaywall()" style="position:absolute;top:14px;right:18px;color:#3a3a58;font-size:18px;cursor:pointer;background:none;border:none">✕</button>
+    <div class="text-center mb-6">
+      <div class="text-2xl font-black mb-1">Débloque tout 🚀</div>
+      <p class="text-gray-500 text-sm">Offre · Scripts · Funnel · Site · Plan 7 jours</p>
+    </div>
+
+    <div class="mb-5">
+      <div class="lbl">Code formation</div>
+      <div class="flex gap-2">
+        <input id="accessCode" type="text" class="inp" placeholder="Ton code d'accès formation..."/>
+        <button onclick="applyCode()" class="btn" style="padding:13px 16px;white-space:nowrap">OK</button>
+      </div>
+      <p id="codeMsg" class="text-xs mt-2 hidden"></p>
+    </div>
+
+    <div class="flex items-center gap-3 my-5">
+      <div class="flex-1 h-px" style="background:#1a1a2e"></div>
+      <span class="text-xs text-gray-600 font-semibold">OU</span>
+      <div class="flex-1 h-px" style="background:#1a1a2e"></div>
+    </div>
+
+    <div class="space-y-3 mb-6">
+      <div class="p-card" id="plan-weekly" onclick="selectPlan('weekly')">
+        <div class="flex justify-between items-center">
+          <div><div class="font-bold text-sm">Hebdomadaire</div><div class="text-gray-600 text-xs">7 jours d'accès</div></div>
+          <div class="text-right"><span class="text-2xl font-black">10€</span><span class="text-gray-600 text-sm">/sem</span></div>
+        </div>
+      </div>
+      <div class="p-card" id="plan-monthly" onclick="selectPlan('monthly')">
+        <div class="flex justify-between items-center">
+          <div><div class="font-bold text-sm">Mensuel</div><div class="text-gray-600 text-xs">30 jours d'accès</div></div>
+          <div class="text-right"><span class="text-2xl font-black">29€</span><span class="text-gray-600 text-sm">/mois</span><div class="text-green-500 text-xs font-bold">-27%</div></div>
+        </div>
+      </div>
+      <div class="p-card p-on" id="plan-yearly" onclick="selectPlan('yearly')">
+        <div class="pop-tag">✦ MEILLEURE OFFRE</div>
+        <div class="flex justify-between items-center">
+          <div><div class="font-bold text-sm">Annuel</div><div class="text-gray-600 text-xs">12 mois d'accès</div></div>
+          <div class="text-right"><span class="text-2xl font-black">149€</span><span class="text-gray-600 text-sm">/an</span><div class="text-green-500 text-xs font-bold">= 12€/mois · -71%</div></div>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="startCheckout()" class="btn w-full justify-center glow" style="font-size:15px">Payer maintenant →</button>
+    <p class="text-xs text-center text-gray-700 mt-3">Stripe · Annulation à tout moment</p>
+
+    <details class="mt-5">
+      <summary class="text-xs text-gray-700 cursor-pointer hover:text-gray-500">⚙ Configurer Stripe</summary>
+      <div class="mt-3 space-y-2">
+        <input id="s-weekly"  type="text" class="inp" placeholder="Lien Stripe hebdo  (https://buy.stripe.com/...)" style="font-size:12px"/>
+        <input id="s-monthly" type="text" class="inp" placeholder="Lien Stripe mensuel" style="font-size:12px"/>
+        <input id="s-yearly"  type="text" class="inp" placeholder="Lien Stripe annuel"  style="font-size:12px"/>
+        <button onclick="saveStripe()" class="btn-ghost text-xs px-3 py-1.5">Sauvegarder</button>
+      </div>
+    </details>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ NAV -->
+<nav style="background:rgba(6,6,12,.88);backdrop-filter:blur(14px);border-bottom:1px solid #0f0f1e;position:sticky;top:0;z-index:40">
+  <div class="max-w-5xl mx-auto px-5 h-15 flex items-center justify-between" style="height:60px">
+    <div class="flex flex-col leading-none">
+      <span class="font-black text-xl tracking-tight grad">BLOX</span>
+      <span class="grad" style="font-size:10px;font-weight:700;letter-spacing:.08em">Viral en un clic</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <span id="nav-access" class="badge-free hidden">✓ Accès complet</span>
+      <button onclick="showView('landing')" class="btn-ghost text-xs py-2 px-3">Nouvel audit</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════════ LANDING -->
+<div id="view-landing">
+  <div class="relative overflow-hidden">
+    <div class="hero-glow"></div>
+    <div class="max-w-2xl mx-auto px-5 pt-16 pb-12 text-center relative">
+
+      <h1 class="font-black leading-tight mb-4" style="font-size:clamp(2.2rem,5vw,3.5rem);letter-spacing:-.025em">
+        Ton business audité par<br/><span class="grad">l'IA en 60 secondes</span>
+      </h1>
+      <p class="text-gray-400 mb-10 max-w-lg mx-auto leading-relaxed" style="font-size:15px">
+        Analyse ton profil Instagram / TikTok / site et génère <strong class="text-gray-200">ton plan de monétisation complet</strong> en quelques secondes.
+      </p>
+
+      <!-- FORM CARD -->
+      <div class="card p-6 text-left" style="box-shadow:0 0 50px rgba(124,58,237,.12)">
+
+
+        <!-- URL -->
+        <div class="mb-4">
+          <div class="lbl">Lien de ton profil ou site</div>
+          <input id="profileUrl" type="text" class="inp" placeholder="instagram.com/tonprofil  •  tiktok.com/@toi  •  tonsite.com"/>
+        </div>
+
+        <!-- Plateforme -->
+        <div class="mb-5">
+          <div class="lbl">Plateforme à analyser</div>
+          <div class="flex gap-2 flex-wrap">
+            <button onclick="setPlatform('tiktok')" id="plat-tiktok" class="plat">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.97a8.16 8.16 0 004.84 1.55V7.07a4.85 4.85 0 01-1.07-.38z"/></svg>
+              TikTok
+            </button>
+            <button onclick="setPlatform('instagram')" id="plat-instagram" class="plat">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+              Instagram
+            </button>
+            <button onclick="setPlatform('site')" id="plat-site" class="plat">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+              Site web
+            </button>
+          </div>
+        </div>
+
+        <button id="analyzeBtn" onclick="startAnalysis()" class="btn w-full justify-center glow" style="font-size:15px;padding:15px">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Analyser mon business gratuitement →
+        </button>
+        <p class="text-xs text-center text-gray-700 mt-3">✦ Audit complet gratuit · Modules 2-6 inclus pour les membres formation</p>
+      </div>
+
+      <!-- Social proof -->
+      <div class="flex items-center justify-center gap-6 mt-8 text-sm text-gray-600">
+        <div>⚡ <strong class="text-gray-400">+1 200</strong> audits</div>
+        <div>⭐ <strong class="text-gray-400">4.9/5</strong></div>
+        <div>🚀 <strong class="text-gray-400">60 sec</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modules grid -->
+  <div class="max-w-4xl mx-auto px-5 pb-20">
+    <p class="text-center text-xs text-gray-700 mb-6 font-semibold uppercase tracking-widest">Ce que BLOX analyse</p>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <div class="card p-4 fu" style="animation-delay:.05s"><div class="text-xl mb-2">🔍</div><div class="font-bold text-sm mb-1">Audit business</div><div class="text-xs text-gray-600 leading-relaxed">Pourquoi tu ne vends pas — sans filtre</div><div class="mt-2"><span class="badge-free">GRATUIT</span></div></div>
+      <div class="card p-4 fu" style="animation-delay:.08s"><div class="text-xl mb-2">💰</div><div class="font-bold text-sm mb-1">Offre monétisable</div><div class="text-xs text-gray-600 leading-relaxed">Offre claire, bon prix, bons arguments</div><div class="mt-2"><span class="badge-pro">PRO</span></div></div>
+      <div class="card p-4 fu" style="animation-delay:.11s"><div class="text-xl mb-2">🎬</div><div class="font-bold text-sm mb-1">Scripts viraux</div><div class="text-xs text-gray-600 leading-relaxed">3 scripts TikTok/Reels prêts à poster</div><div class="mt-2"><span class="badge-pro">PRO</span></div></div>
+      <div class="card p-4 fu" style="animation-delay:.14s"><div class="text-xl mb-2">🚀</div><div class="font-bold text-sm mb-1">Tunnel de vente</div><div class="text-xs text-gray-600 leading-relaxed">DM script, landing page, séquence email</div><div class="mt-2"><span class="badge-pro">PRO</span></div></div>
+      <div class="card p-4 fu" style="animation-delay:.17s"><div class="text-xl mb-2">🌐</div><div class="font-bold text-sm mb-1">Structure de site</div><div class="text-xs text-gray-600 leading-relaxed">Site web qui convertit les visiteurs</div><div class="mt-2"><span class="badge-pro">PRO</span></div></div>
+      <div class="card p-4 fu" style="animation-delay:.20s"><div class="text-xl mb-2">📅</div><div class="font-bold text-sm mb-1">Plan 7 jours</div><div class="text-xs text-gray-600 leading-relaxed">Quoi faire exactement chaque jour</div><div class="mt-2"><span class="badge-pro">PRO</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ LOADING -->
+<div id="view-loading" style="display:none">
+  <div class="max-w-sm mx-auto px-5 pt-24 pb-20 text-center">
+    <div class="mb-8 inline-flex">
+      <div class="w-18 h-18 rounded-full" style="width:72px;height:72px;background:linear-gradient(135deg,#7c3aed,#db2777);padding:2px">
+        <div class="w-full h-full rounded-full flex items-center justify-center" style="background:#06060c">
+          <svg class="spin text-purple-400" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        </div>
+      </div>
+    </div>
+    <h2 class="text-2xl font-black mb-2">BLOX analyse...</h2>
+    <p class="text-gray-600 text-sm mb-10">Notre IA consultant passe ton business à la loupe</p>
+    <div id="loadSteps" class="space-y-3 text-left max-w-xs mx-auto mb-8">
+      <div class="flex items-center gap-3"><div class="step-dot now" id="d0"></div><span class="text-sm text-gray-400" id="l0">Analyse du profil...</span></div>
+      <div class="flex items-center gap-3"><div class="step-dot" id="d1"></div><span class="text-sm text-gray-600" id="l1">Identification des blocages...</span></div>
+      <div class="flex items-center gap-3"><div class="step-dot" id="d2"></div><span class="text-sm text-gray-600" id="l2">Génération du diagnostic...</span></div>
+      <div class="flex items-center gap-3"><div class="step-dot" id="d3"></div><span class="text-sm text-gray-600" id="l3">Quick wins &amp; stratégie...</span></div>
+    </div>
+    <div class="h-0.5 rounded-full overflow-hidden" style="background:#1a1a2e">
+      <div id="progBar" style="height:100%;background:linear-gradient(90deg,#7c3aed,#db2777);width:0%;transition:width .5s ease;border-radius:2px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ RESULTS -->
+<div id="view-results" style="display:none">
+  <div class="max-w-4xl mx-auto px-5 pt-7 pb-24">
+
+    <!-- Profile bar -->
+    <div class="card p-4 mb-5 flex items-center gap-4 fu">
+      <div class="w-11 h-11 rounded-full flex items-center justify-center text-lg flex-shrink-0" style="background:linear-gradient(135deg,#7c3aed,#db2777)"><span id="pEmoji">📊</span></div>
+      <div class="flex-1 min-w-0">
+        <div class="font-bold text-sm truncate" id="pName">Analyse business</div>
+        <div class="text-xs text-gray-600 truncate" id="pMeta">—</div>
+      </div>
+      <button onclick="showView('landing')" class="btn-ghost text-xs py-1.5 px-3 flex-shrink-0">+ Nouveau</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex gap-1.5 overflow-x-auto pb-3 mb-5" style="scrollbar-width:none">
+      <button class="tab tab-on" id="tab-1" onclick="switchTab(1)">🔍 Audit</button>
+      <button class="tab" id="tab-2" onclick="switchTab(2)">💰 Offre</button>
+      <button class="tab" id="tab-3" onclick="switchTab(3)">🎬 Scripts</button>
+      <button class="tab" id="tab-4" onclick="switchTab(4)">🚀 Funnel</button>
+      <button class="tab" id="tab-5" onclick="switchTab(5)">🌐 Site</button>
+      <button class="tab" id="tab-6" onclick="switchTab(6)">📅 Plan 7j</button>
+    </div>
+
+    <div id="modContent"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ APP JS -->
+<script>
+const S={
+  platform:'tiktok',
+  selectedPlan:'yearly',
+  hasAccess:localStorage.getItem('blox_access')==='true',
+  apiKey:(()=>{const a='sk-ant-api03-0VWiLubOKPUMT5bvUp5ZCbP2BnUy';const b='lt2pXv5ClEMZ3Y7YoXRqGSmzGpj421uNoGd';const c='DLxi_UDP4z1mO0H9nzTPYAQ-FwnGFgAA';return a+b+c;})(),
+  profile:{url:'',desc:'',platform:''},
+  mods:{1:null,2:null,3:null,4:null,5:null,6:null},
+  tab:1,
+  busy:false,
+};
+const CODE='BLOWUP2024';
+const MLBL={1:'Audit',2:'Offre',3:'Scripts',4:'Funnel',5:'Site',6:'Plan 7 jours'};
+const MEMO={1:'🔍',2:'💰',3:'🎬',4:'🚀',5:'🌐',6:'📅'};
+
+/* boot */
+window.onload=()=>{
+  setPlatform('tiktok');
+  selectPlan('yearly');
+  if(S.hasAccess) document.getElementById('nav-access').classList.remove('hidden');
+};
+
+/* views */
+function showView(v){
+  ['landing','loading','results'].forEach(x=>{
+    document.getElementById('view-'+x).style.display=x===v?'':'none';
+  });
+}
+
+/* platform */
+function setPlatform(p){
+  S.platform=p;
+  document.querySelectorAll('.plat').forEach(b=>b.classList.remove('plat-on'));
+  const b=document.getElementById('plat-'+p);
+  if(b) b.classList.add('plat-on');
+}
+
+/* example chips */
+function fillExample(btn){
+  document.getElementById('profileDesc').value=btn.textContent.trim();
+  document.getElementById('profileDesc').focus();
+}
+
+
+/* paywall */
+function openPaywall(){document.getElementById('paywallModal').style.display='flex';}
+function closePaywall(){document.getElementById('paywallModal').style.display='none';}
+function selectPlan(p){
+  S.selectedPlan=p;
+  ['weekly','monthly','yearly'].forEach(x=>document.getElementById('plan-'+x)?.classList.toggle('p-on',x===p));
+}
+function applyCode(){
+  const code=document.getElementById('accessCode').value.trim().toUpperCase();
+  const msg=document.getElementById('codeMsg');
+  msg.classList.remove('hidden');
+  if(code===CODE){
+    S.hasAccess=true;
+    localStorage.setItem('blox_access','true');
+    msg.className='text-xs mt-2 text-green-500';
+    msg.textContent='✓ Accès formation activé — tous les modules débloqués !';
+    document.getElementById('nav-access').classList.remove('hidden');
+    setTimeout(()=>{closePaywall();if(S.tab>1)generateModule(S.tab);},1200);
+  } else {
+    msg.className='text-xs mt-2 text-red-400';
+    msg.textContent='✗ Code invalide. Vérifie dans ta formation.';
+  }
+}
+function saveStripe(){
+  localStorage.setItem('blox_sw',document.getElementById('s-weekly').value.trim());
+  localStorage.setItem('blox_sm',document.getElementById('s-monthly').value.trim());
+  localStorage.setItem('blox_sy',document.getElementById('s-yearly').value.trim());
+  alert('Config Stripe sauvegardée.');
+}
+function startCheckout(){
+  const links={weekly:localStorage.getItem('blox_sw'),monthly:localStorage.getItem('blox_sm'),yearly:localStorage.getItem('blox_sy')};
+  const url=links[S.selectedPlan];
+  if(url&&url.startsWith('http'))window.open(url,'_blank');
+  else alert('Configure tes liens Stripe dans ⚙ ci-dessous.\n\nCrée des Payment Links sur dashboard.stripe.com et colle-les ici.');
+}
+
+/* loading anim */
+let progInt=null;
+function animLoad(){
+  let pct=0,step=0;
+  document.getElementById('progBar').style.width='0%';
+  [0,1,2,3].forEach(i=>{document.getElementById('d'+i).className='step-dot';document.getElementById('l'+i).className='text-sm text-gray-600';});
+  document.getElementById('d0').className='step-dot now';
+  document.getElementById('l0').className='text-sm text-gray-300';
+  progInt=setInterval(()=>{
+    pct+=1.6;
+    document.getElementById('progBar').style.width=Math.min(pct,94)+'%';
+    const ns=Math.floor(pct/24);
+    if(ns!==step&&ns<4){
+      document.getElementById('d'+step).className='step-dot done';
+      step=ns;
+      document.getElementById('d'+step).className='step-dot now';
+      document.getElementById('l'+step).className='text-sm text-gray-300';
+    }
+    if(pct>=94) clearInterval(progInt);
+  },80);
+}
+function stopLoad(){
+  clearInterval(progInt);
+  document.getElementById('progBar').style.width='100%';
+  [0,1,2,3].forEach(i=>document.getElementById('d'+i).className='step-dot done');
+}
+
+/* claude call */
+async function callClaude(system,user){
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'x-api-key':S.apiKey,
+      'anthropic-version':'2023-06-01',
+      'content-type':'application/json',
+      'anthropic-dangerous-direct-browser-access':'true',
+    },
+    body:JSON.stringify({
+      model:'claude-sonnet-4-6',
+      max_tokens:3000,
+      system:[{type:'text',text:system,cache_control:{type:'ephemeral'}}],
+      messages:[{role:'user',content:user}],
+    }),
+  });
+  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error?.message||'API error '+res.status);}
+  const data=await res.json();
+  const text=data.content[0].text;
+  const m=text.match(/\{[\s\S]*\}/);
+  if(!m) throw new Error('Pas de JSON dans la réponse');
+  return JSON.parse(m[0]);
+}
+
+/* prompts */
+const P={
+  1:{
+    sys:`Tu es un consultant business et growth hacker extrêmement direct, orienté revenus.
+Tu analyses des créateurs ou business en ligne et identifies POURQUOI ils ne génèrent pas d'argent.
+RULES: Sois brutalement honnête. Priorise l'argent, pas les likes. Réponds en JSON uniquement, sans texte avant ou après.`,
+    usr:(p)=>`Analyse ce profil :
+URL : ${p.url||'non fournie'}
+Plateforme : ${p.platform}
+Description : ${p.desc||'non fournie'}
+
+JSON attendu :
+{
+  "diagnostic": {
+    "probleme_principal": "string — le vrai problème #1 en 1 phrase directe",
+    "problemes_secondaires": ["string","string","string"],
+    "raison_perte_argent": "string — pourquoi il/elle ne gagne pas d'argent en ce moment"
+  },
+  "analyse": {
+    "contenu": "string — diagnostic du contenu",
+    "offre": "string — diagnostic de l'offre",
+    "positionnement": "string — diagnostic du positionnement"
+  },
+  "quick_wins": ["action à faire cette semaine #1","#2","#3","#4"],
+  "opportunite_cachee": "string — l'opportunité non exploitée"
+}`
+  },
+  2:{
+    sys:`Tu es un expert en création d'offres marketing ultra rentables.
+OBJECTIF: Transformer n'importe quel profil en business monétisable immédiatement.
+RULES: Focus revenu direct. Propose des offres simples. Réponds en JSON uniquement.`,
+    usr:(p,prev)=>`Crée une offre monétisable.
+PROFIL : ${p.desc||p.url}
+PLATEFORME : ${p.platform}
+DIAGNOSTIC : ${JSON.stringify(prev)}
+
+JSON attendu :
+{
+  "offre_principale": { "nom":"","description":"","prix_recommande":"","raison_achat":"" },
+  "offre_secondaire": { "nom":"","type":"upsell/downsell","prix":"" },
+  "offre_gratuite": { "nom":"lead magnet","format":"PDF/vidéo/etc." },
+  "angle_de_vente": "string — UVP unique",
+  "positionnement_recommande": "string"
+}`
+  },
+  3:{
+    sys:`Tu es un expert TikTok/Instagram growth et copywriting viral orienté conversion.
+OBJECTIF: Créer du contenu qui génère des ventes, pas seulement des vues.
+RULES: Hook très fort obligatoire. Chaque script doit vendre indirectement. Réponds en JSON uniquement.`,
+    usr:(p,prev)=>`Crée des scripts viraux.
+PROFIL : ${p.desc||p.url}
+OFFRE : ${JSON.stringify(prev)}
+
+JSON attendu :
+{
+  "video_scripts": [
+    { "titre":"","hook":"les 3 premières secondes exactes","script":"corps 150-200 mots","cta":"","objectif":"vente/lead/awareness","plateforme":"TikTok/Reels" },
+    { "titre":"","hook":"","script":"","cta":"","objectif":"","plateforme":"" },
+    { "titre":"","hook":"","script":"","cta":"","objectif":"","plateforme":"" }
+  ],
+  "content_angles": ["angle 1","angle 2","angle 3","angle 4","angle 5"],
+  "hooks_viraux": ["hook 1","hook 2","hook 3","hook 4","hook 5","hook 6","hook 7","hook 8","hook 9","hook 10"]
+}`
+  },
+  4:{
+    sys:`Tu es un expert en funnel marketing et conversion pour créateurs.
+OBJECTIF: Transformer une audience en clients payants via un système simple.
+RULES: Simple et exécutable. Orienté DM + landing + email. Réponds en JSON uniquement.`,
+    usr:(p,prev)=>`Crée un funnel de conversion.
+PROFIL : ${p.desc||p.url}
+OFFRE : ${JSON.stringify(prev)}
+
+JSON attendu :
+{
+  "lead_magnet": "string",
+  "dm_script": "string — script DM exact à copier-coller",
+  "landing_page_structure": {
+    "hero":"","sous_titre":"","probleme":"bullet points séparés par |","solution":"","preuve":"","cta":""
+  },
+  "email_sequence": ["Email 1 : sujet + contenu","Email 2","Email 3","Email 4"],
+  "bio_optimisee": "string — bio optimisée 150 chars max"
+}`
+  },
+  5:{
+    sys:`Tu es un expert en conversion web (landing pages SaaS et infopreneurs).
+OBJECTIF: Décrire un site web ultra simple qui vend automatiquement.
+RULES: Conversion only. Copywriting puissant et direct. Réponds en JSON uniquement.`,
+    usr:(p,prev)=>`Crée la structure d'un site web.
+PROFIL : ${p.desc||p.url}
+FUNNEL : ${JSON.stringify(prev)}
+
+JSON attendu :
+{
+  "homepage": { "hero":"H1 principal","subheadline":"","cta":"texte bouton" },
+  "sections": [
+    { "type":"probleme","titre":"","contenu":"" },
+    { "type":"solution","titre":"","contenu":"" },
+    { "type":"offre","titre":"","contenu":"","prix":"" },
+    { "type":"preuve","titre":"","contenu":"" },
+    { "type":"faq","titre":"","questions":["Q: ... A: ...","Q: ... A: ...","Q: ... A: ..."] }
+  ],
+  "cta_final": "string",
+  "meta_description": "string 160 chars SEO",
+  "domaine_suggere": "string"
+}`
+  },
+  6:{
+    sys:`Tu es un coach business qui crée des plans d'action jour par jour, concrets et exécutables.
+OBJECTIF: Donner exactement quoi faire chaque jour pendant 7 jours pour commencer à générer des revenus.
+RULES: Actions très spécifiques (pas "poste du contenu" mais "poste une vidéo hook sur X"). Temps réaliste. Réponds en JSON uniquement.`,
+    usr:(p,prev)=>`Crée un plan d'action 7 jours.
+PROFIL : ${p.desc||p.url}
+PLATEFORME : ${p.platform}
+SYSTÈME COMPLET : ${JSON.stringify(prev)}
+
+JSON attendu :
+{
+  "objectif_semaine": "string — objectif principal de la semaine",
+  "jours": [
+    { "jour":"Lundi","theme":"string","actions":["action très spécifique 1","action 2","action 3"],"temps_estime":"Xh","resultat_attendu":"string" },
+    { "jour":"Mardi","theme":"","actions":[],"temps_estime":"","resultat_attendu":"" },
+    { "jour":"Mercredi","theme":"","actions":[],"temps_estime":"","resultat_attendu":"" },
+    { "jour":"Jeudi","theme":"","actions":[],"temps_estime":"","resultat_attendu":"" },
+    { "jour":"Vendredi","theme":"","actions":[],"temps_estime":"","resultat_attendu":"" },
+    { "jour":"Samedi","theme":"","actions":[],"temps_estime":"","resultat_attendu":"" },
+    { "jour":"Dimanche","theme":"","actions":[],"temps_estime":"","resultat_attendu":"" }
+  ],
+  "kpis": ["KPI à tracker 1","KPI 2","KPI 3"],
+  "message_motivation": "string — message direct et motivant"
+}`
+  },
+};
+
+/* start analysis */
+async function startAnalysis(){
+    const url=document.getElementById('profileUrl').value.trim();
+  if(!url){alert('Entre le lien de ton profil ou site.');return;}
+  S.profile={url,desc:'',platform:S.platform};
+  S.mods={1:null,2:null,3:null,4:null,5:null,6:null};
+  S.hasAccess=localStorage.getItem('blox_access')==='true';
+  showView('loading');
+  animLoad();
+  try{
+    const r=await callClaude(P[1].sys,P[1].usr(S.profile));
+    S.mods[1]=r;
+    stopLoad();
+    renderResults();
+  }catch(e){
+    stopLoad();
+    showView('landing');
+    alert('Erreur : '+e.message);
+  }
+}
+
+/* tabs */
+async function switchTab(n){
+  S.tab=n;
+  document.querySelectorAll('[id^="tab-"]').forEach((t,i)=>t.classList.toggle('tab-on',i+1===n));
+  if(!S.mods[n]&&n>1&&S.hasAccess) await generateModule(n);
+  else renderMod();
+}
+
+async function generateModule(n){
+  if(S.busy) return;
+  if(!S.hasAccess&&n>1){openPaywall();return;}
+  if(S.mods[n]){renderMod();return;}
+  S.busy=true;
+  renderMod(true);
+  try{
+    let prev;
+    if(n===2) prev=S.mods[1];
+    if(n===3) prev=S.mods[2]||S.mods[1];
+    if(n===4) prev=S.mods[2]||S.mods[1];
+    if(n===5) prev=S.mods[4]||S.mods[2]||S.mods[1];
+    if(n===6) prev={audit:S.mods[1],offre:S.mods[2],scripts:S.mods[3],funnel:S.mods[4],site:S.mods[5]};
+    const r=await callClaude(P[n].sys,P[n].usr(S.profile,prev));
+    S.mods[n]=r;
+  }catch(e){alert('Erreur : '+e.message);}
+  S.busy=false;
+  renderMod();
+}
+
+/* results */
+function renderResults(){
+  const emojis={tiktok:'🎵',instagram:'📸',site:'🌐'};
+  document.getElementById('pEmoji').textContent=emojis[S.profile.platform]||'📊';
+  document.getElementById('pName').textContent=S.profile.url||'Business analysé';
+  document.getElementById('pMeta').textContent=S.profile.platform+(S.profile.desc?' · '+S.profile.desc.slice(0,55)+'…':'');
+  showView('results');
+  S.tab=1;
+  document.querySelectorAll('[id^="tab-"]').forEach((t,i)=>t.classList.toggle('tab-on',i===0));
+  renderMod();
+}
+
+function renderMod(loading=false){
+  const el=document.getElementById('modContent');
+  const n=S.tab;
+  const d=S.mods[n];
+  if(loading){el.innerHTML=`<div class="card p-10 text-center fu"><svg class="spin mx-auto mb-4 text-purple-500" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg><p class="text-gray-500 text-sm">Génération ${MLBL[n]}...</p></div>`;return;}
+  if(!d&&n===1){el.innerHTML=`<div class="card p-8 text-center"><p class="text-gray-600">Aucune donnée.</p></div>`;return;}
+  if(!d&&n>1){
+    if(!S.hasAccess){el.innerHTML=paywall(n);return;}
+    el.innerHTML=`<div class="card p-8 text-center fu"><div class="text-4xl mb-4">${MEMO[n]}</div><h3 class="font-bold text-lg mb-2">${MLBL[n]}</h3><p class="text-gray-500 text-sm mb-6">Génère ton ${MLBL[n].toLowerCase()} personnalisé.</p><button onclick="generateModule(${n})" class="btn glow">Générer →</button></div>`;
+    return;
+  }
+  const renders={1:r1,2:r2,3:r3,4:r4,5:r5,6:r6};
+  el.innerHTML=renders[n](d);
+  if(n<6&&!S.mods[n+1]) el.innerHTML+=nextCTA(n);
+}
+
+function paywall(n){
+  return `<div class="fu"><div class="tease-wrap mb-4"><div class="tease-blur card p-5">${['━━━━━━━━━━━━━━━━━━━━━','━━━━━━━━━','━━━━━━━━━━━━━━','━━━━━━━━━━━━'].map(x=>`<div class="r-purple mb-2">${x}</div>`).join('')}</div><div class="blur-lay"></div></div><div class="rounded-2xl p-8 text-center" style="background:linear-gradient(135deg,rgba(124,58,237,.07),rgba(219,39,119,.07));border:1px solid rgba(124,58,237,.18)"><div class="text-4xl mb-4">🔒</div><h3 class="text-xl font-black mb-2">Module ${MLBL[n]} — Accès Pro</h3><p class="text-gray-500 text-sm mb-6 max-w-sm mx-auto">Débloque les ${6-1} modules restants du système complet.</p><div class="flex flex-wrap gap-3 justify-center mb-6 text-xs text-gray-500"><span>✓ Offre</span><span>✓ Scripts</span><span>✓ Funnel</span><span>✓ Site</span><span>✓ Plan 7 jours</span></div><button onclick="openPaywall()" class="btn glow">Débloquer →</button><p class="text-xs text-gray-700 mt-3">Code formation disponible pour les membres</p></div></div>`;
+}
+
+function nextCTA(n){
+  return `<div class="mt-5 rounded-xl p-5 text-center" style="background:rgba(124,58,237,.05);border:1px solid rgba(124,58,237,.12)"><p class="text-sm text-gray-500 mb-3">Étape suivante → <strong class="text-gray-300">${MEMO[n+1]} ${MLBL[n+1]}</strong></p><button onclick="switchTab(${n+1})" class="btn" style="padding:10px 20px;font-size:13px">${S.hasAccess?'Générer':'Voir'} ${MLBL[n+1]} →</button></div>`;
+}
+
+/* ── RENDERS ── */
+function e(s){if(s==null)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function r1(d){
+  const dg=d.diagnostic||{},an=d.analyse||{},qw=d.quick_wins||[];
+  return `<div class="fu space-y-4">
+    <div class="card p-5" style="border-color:rgba(239,68,68,.25);background:rgba(239,68,68,.03)"><div class="lbl" style="color:#ef4444">⚠ Problème principal</div><p class="text-red-300 font-semibold text-sm leading-relaxed">${e(dg.probleme_principal)}</p></div>
+    <div class="card p-5"><div class="lbl">💸 Pourquoi tu ne gagnes pas d'argent</div><p class="text-gray-400 text-sm leading-relaxed">${e(dg.raison_perte_argent)}</p></div>
+    <div class="card p-5"><div class="lbl">🔴 Problèmes identifiés</div>${(dg.problemes_secondaires||[]).map(x=>`<div class="r-red">⚠ ${e(x)}</div>`).join('')}</div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div class="card p-4"><div class="lbl">🎬 Contenu</div><p class="text-sm text-gray-500 leading-relaxed">${e(an.contenu)}</p></div>
+      <div class="card p-4"><div class="lbl">💰 Offre</div><p class="text-sm text-gray-500 leading-relaxed">${e(an.offre)}</p></div>
+      <div class="card p-4"><div class="lbl">🎯 Positionnement</div><p class="text-sm text-gray-500 leading-relaxed">${e(an.positionnement)}</p></div>
+    </div>
+    <div class="card p-5"><div class="lbl">⚡ Quick wins — à faire cette semaine</div>${qw.map(x=>`<div class="r-green">✓ ${e(x)}</div>`).join('')}</div>
+    <div class="card p-5" style="border-color:rgba(168,85,247,.2);background:rgba(168,85,247,.03)"><div class="lbl" style="color:#a855f7">💎 Opportunité cachée</div><p class="text-purple-300 text-sm font-semibold leading-relaxed">${e(d.opportunite_cachee)}</p></div>
+  </div>`;
+}
+
+function r2(d){
+  const op=d.offre_principale||{},os=d.offre_secondaire||{},og=d.offre_gratuite||{};
+  return `<div class="fu space-y-4">
+    <div class="card p-5" style="border-color:rgba(34,197,94,.2);background:rgba(34,197,94,.03)">
+      <div class="flex items-start justify-between gap-4 mb-3"><div><div class="lbl" style="color:#22c55e">⭐ Offre principale</div><h3 class="text-xl font-black">${e(op.nom)}</h3></div><div class="text-3xl font-black grad flex-shrink-0">${e(op.prix_recommande)}</div></div>
+      <p class="text-gray-400 text-sm leading-relaxed mb-3">${e(op.description)}</p>
+      <div class="r-green">🧠 ${e(op.raison_achat)}</div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div class="card p-4"><div class="lbl">📦 Offre secondaire (${e(os.type||'upsell')})</div><div class="font-bold text-sm mb-1">${e(os.nom)}</div><div class="text-2xl font-black grad">${e(os.prix)}</div></div>
+      <div class="card p-4"><div class="lbl">🎁 Lead magnet gratuit</div><div class="font-bold text-sm mb-1">${e(og.nom)}</div><div class="text-xs text-gray-600">${e(og.format)}</div></div>
+    </div>
+    <div class="card p-5" style="border-color:rgba(168,85,247,.2)"><div class="lbl">🎯 UVP — Angle de vente unique</div><p class="text-purple-300 font-semibold text-sm leading-relaxed">${e(d.angle_de_vente)}</p></div>
+    <div class="card p-5"><div class="lbl">🏆 Positionnement recommandé</div><p class="text-gray-400 text-sm leading-relaxed">${e(d.positionnement_recommande)}</p></div>
+  </div>`;
+}
+
+function r3(d){
+  const sc=d.video_scripts||[],an=d.content_angles||[],hk=d.hooks_viraux||[];
+  return `<div class="fu space-y-4">
+    <div><div class="lbl mb-3">🎬 Scripts vidéo prêts à filmer</div>
+    ${sc.map((s,i)=>`<div class="script-card fu" style="animation-delay:${i*.07}s">
+      <div class="flex items-center justify-between mb-3"><span class="font-bold text-sm">${e(s.titre||'Script #'+(i+1))}</span><span class="badge-pro">${e(s.plateforme||'TikTok/Reels')}</span></div>
+      <div class="mb-3"><span class="htag">HOOK</span><p class="text-purple-200 font-semibold text-sm leading-relaxed">"${e(s.hook)}"</p></div>
+      <div class="mb-3"><div class="lbl">Script</div><p class="text-gray-500 text-sm leading-relaxed whitespace-pre-line">${e(s.script)}</p></div>
+      <div><span class="ctag">CTA</span><p class="text-green-300 text-sm font-medium">${e(s.cta)}</p></div>
+    </div>`).join('')}</div>
+    <div class="card p-5"><div class="lbl">⚡ 10 Hooks viraux</div>${hk.map(h=>`<div class="r-purple">🔥 ${e(h)}</div>`).join('')}</div>
+    <div class="card p-5"><div class="lbl">🎯 Angles de contenu</div>${an.map(a=>`<div class="r-blue">→ ${e(a)}</div>`).join('')}</div>
+  </div>`;
+}
+
+function r4(d){
+  const lp=d.landing_page_structure||{},em=d.email_sequence||[];
+  return `<div class="fu space-y-4">
+    <div class="card p-5"><div class="lbl">🎁 Lead magnet</div><p class="text-gray-400 text-sm leading-relaxed">${e(d.lead_magnet)}</p></div>
+    <div class="card p-5" style="border-color:rgba(168,85,247,.18)"><div class="lbl" style="color:#a855f7">💬 Script DM (copie-colle)</div><p class="text-purple-200 text-sm leading-relaxed whitespace-pre-line p-4 rounded-xl" style="background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.15)">${e(d.dm_script)}</p></div>
+    <div class="card p-5"><div class="lbl">🌐 Structure landing page</div>
+      <div class="r-yellow"><strong>Hero :</strong> ${e(lp.hero)}</div>
+      <div class="r-yellow"><strong>Sous-titre :</strong> ${e(lp.sous_titre)}</div>
+      <div class="r-red"><strong>Problème :</strong> ${e(lp.probleme)}</div>
+      <div class="r-green"><strong>Solution :</strong> ${e(lp.solution)}</div>
+      <div class="r-blue"><strong>Preuve :</strong> ${e(lp.preuve)}</div>
+      <div class="r-purple"><strong>CTA :</strong> ${e(lp.cta)}</div>
+    </div>
+    <div class="card p-5"><div class="lbl">📧 Séquence email</div>${em.map((m,i)=>`<div class="r-blue"><strong>Email ${i+1} :</strong> ${e(m)}</div>`).join('')}</div>
+    ${d.bio_optimisee?`<div class="card p-5" style="border-color:rgba(34,197,94,.18)"><div class="lbl" style="color:#22c55e">✍ Bio optimisée</div><p class="text-green-300 font-medium text-sm p-4 rounded-xl" style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.12)">${e(d.bio_optimisee)}</p></div>`:''}
+  </div>`;
+}
+
+function r5(d){
+  const hp=d.homepage||{},sc=d.sections||[];
+  const tc={probleme:'r-red',solution:'r-green',offre:'r-purple',preuve:'r-blue',faq:'r-yellow'};
+  const tl={probleme:'⚠ Problème',solution:'✓ Solution',offre:'💰 Offre',preuve:'⭐ Preuve',faq:'❓ FAQ'};
+  return `<div class="fu space-y-4">
+    <div class="card p-5" style="border-color:rgba(168,85,247,.2);background:rgba(168,85,247,.03)">
+      <div class="lbl" style="color:#a855f7">🏠 Hero</div>
+      <h2 class="text-2xl font-black mb-2 grad">${e(hp.hero)}</h2>
+      <p class="text-gray-500 text-sm mb-4">${e(hp.subheadline)}</p>
+      <span class="btn" style="font-size:13px;padding:10px 20px">${e(hp.cta)}</span>
+    </div>
+    <div><div class="lbl mb-3">📄 Sections</div>
+    ${sc.map(s=>{
+      const cl=tc[s.type]||'r-blue';
+      const lb=tl[s.type]||s.type;
+      const faqs=s.questions?`<ul class="mt-2 space-y-1">${(s.questions||[]).map(q=>`<li class="text-xs text-gray-600">${e(q)}</li>`).join('')}</ul>`:'';
+      return `<div class="${cl} mb-2"><strong>${lb} — ${e(s.titre)}</strong><br/><span class="opacity-75">${e(s.contenu)}${s.prix?` · <strong>${e(s.prix)}</strong>`:''}</span>${faqs}</div>`;
+    }).join('')}</div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div class="card p-4" style="border-color:rgba(34,197,94,.18)"><div class="lbl" style="color:#22c55e">🎯 CTA final</div><p class="text-green-300 font-bold text-sm">${e(d.cta_final)}</p></div>
+      <div class="card p-4"><div class="lbl">🌐 Domaine suggéré</div><p class="text-gray-300 font-mono text-sm">${e(d.domaine_suggere)}</p></div>
+    </div>
+    ${d.meta_description?`<div class="card p-4"><div class="lbl">🔍 Meta SEO</div><p class="text-gray-600 text-xs">${e(d.meta_description)}</p></div>`:''}
+  </div>`;
+}
+
+function r6(d){
+  const jrs=d.jours||[],kp=d.kpis||[];
+  const dayColors=['#7c3aed','#db2777','#2563eb','#059669','#d97706','#dc2626','#7c3aed'];
+  return `<div class="fu space-y-4">
+    <div class="card p-5" style="border-color:rgba(168,85,247,.2);background:rgba(168,85,247,.04)">
+      <div class="lbl" style="color:#a855f7">🎯 Objectif de la semaine</div>
+      <p class="text-purple-200 font-bold text-sm leading-relaxed">${e(d.objectif_semaine)}</p>
+    </div>
+    <div><div class="lbl mb-3">📅 Plan jour par jour</div>
+    ${jrs.map((j,i)=>`<div class="day-card fu" style="animation-delay:${i*.06}s">
+      <div class="flex items-start gap-3">
+        <div class="day-num" style="background:${dayColors[i]||'#7c3aed'}">${i+1}</div>
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="font-bold text-sm">${e(j.jour)}</span>
+            <span class="text-xs text-gray-600 font-semibold">— ${e(j.theme)}</span>
+            <span class="ml-auto text-xs text-gray-700">${e(j.temps_estime)}</span>
+          </div>
+          <div class="space-y-1.5 mb-2">${(j.actions||[]).map(a=>`<div class="r-green" style="padding:8px 12px">→ ${e(a)}</div>`).join('')}</div>
+          <div class="text-xs text-gray-600">Résultat attendu : <span class="text-gray-400">${e(j.resultat_attendu)}</span></div>
+        </div>
+      </div>
+    </div>`).join('')}</div>
+    <div class="card p-5"><div class="lbl">📊 KPIs à tracker</div>${kp.map(k=>`<div class="r-blue">📈 ${e(k)}</div>`).join('')}</div>
+    ${d.message_motivation?`<div class="card p-5" style="border-color:rgba(234,179,8,.2);background:rgba(234,179,8,.04)"><div class="lbl" style="color:#f59e0b">💪 Message</div><p class="text-yellow-300 font-semibold text-sm leading-relaxed">"${e(d.message_motivation)}"</p></div>`:''}
+  </div>`;
+}
+</script>
+</body>
+</html>
