@@ -871,7 +871,7 @@
       <!-- Input Card -->
       <div class="card p-6 text-left glow-card max-w-xl mx-auto">
         <label class="section-lbl">Entre ton @ ou lien TikTok</label>
-        <input id="profileUrl" type="text" class="inp mb-5" placeholder="@toncompte ou tiktok.com/@toi" />
+        <input id="profileUrl" type="text" class="inp mb-5" placeholder="@toncompte" />
         <!-- hidden fields kept for compat -->
         <input id="profileDesc" type="hidden" value="" />
         <button id="analyzeBtn" onclick="startAnalysis()" class="btn w-full justify-center glow-btn text-base">
@@ -1262,7 +1262,6 @@ window.onload = () => {
     setTimeout(() => alert('🎉 Accès Élite activé ! Tous tes modules sont débloqués.'), 500);
   }
 
-  if (!S.apiKey) openApiModal();
   selectPlan('yearly');
   initFunnelEmailListener();
   // Admin: click logo 5 times to show API button
