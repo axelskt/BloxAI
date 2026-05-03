@@ -1197,6 +1197,12 @@
 
 <!-- ═══════════════════════════════════════════════════════════ JS APP -->
 <script>
+// Attrape toute erreur JS et l'affiche
+window.onerror = function(msg, src, line, col, err) {
+  alert('❌ ERREUR JS ligne ' + line + ': ' + msg);
+  return false;
+};
+
 /* ── State ── */
 const S = {
   platform: 'instagram',
@@ -1264,13 +1270,19 @@ window.onload = () => {
 
   selectPlan('yearly');
   initFunnelEmailListener();
-  // Admin: click logo 5 times to show API button
+
+  // Bind bouton analyser
+  const analyzeBtn = document.getElementById('analyzeBtn');
+  if (analyzeBtn) analyzeBtn.addEventListener('click', startAnalysis);
+
+  // Admin: click logo 5 fois pour voir le bouton API
   let _logoClicks = 0;
-  const logoWrap = document.querySelector('nav div[onclick]');
+  const logoWrap = document.querySelector('nav div[onclick]') || document.querySelector('nav div');
   if (logoWrap) logoWrap.addEventListener('click', () => {
     _logoClicks++;
     if (_logoClicks >= 5) {
-      document.getElementById('navAdminBtn').style.display = 'block';
+      const adminBtn = document.getElementById('navAdminBtn');
+      if (adminBtn) adminBtn.style.display = 'block';
       _logoClicks = 0;
     }
   });
