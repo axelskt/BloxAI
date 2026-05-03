@@ -1197,12 +1197,6 @@
 
 <!-- ═══════════════════════════════════════════════════════════ JS APP -->
 <script>
-// Attrape toute erreur JS et l'affiche
-window.onerror = function(msg, src, line, col, err) {
-  alert('❌ ERREUR JS ligne ' + line + ': ' + msg);
-  return false;
-};
-
 /* ── State ── */
 const S = {
   platform: 'instagram',
@@ -1692,7 +1686,6 @@ Réponds UNIQUEMENT avec ce JSON :
 
 /* ── START ANALYSIS ── */
 function startAnalysis() {
-  alert('✅ JS OK — bouton cliqué');
   const input = document.getElementById('profileUrl');
   const url = input ? input.value.trim() : '';
   if (!url) {
@@ -3424,7 +3417,6 @@ function startPlanCheckout(plan) {
   window.open(url, '_blank');
 }
 
-function startPayCheckout() { startPlanCheckout(_payPlan); } // legacy wrapper
 
 function payScrollToPricing() {
   const anchor = document.getElementById('pricingAnchor');
