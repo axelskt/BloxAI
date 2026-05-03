@@ -572,6 +572,35 @@
           <div style="font-size:11px;color:#6b7280">Accès complet jusqu'au <span id="trialEndDate" style="color:#e2e8f0;font-weight:600"></span> — puis choisis ton plan.</div>
         </div>
 
+        <!-- Before / After -->
+        <div style="margin-bottom:28px">
+          <div style="text-align:center;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#6b7280;margin-bottom:14px">Ce que ça change concrètement</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <!-- AVANT -->
+            <div style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.15);border-radius:14px;padding:18px 16px">
+              <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#f87171;margin-bottom:12px">😓 Avant BLOX</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:13px;color:#6b7280;display:flex;gap:8px;align-items:flex-start"><span style="color:#ef4444;flex-shrink:0">✗</span>Tu postes au feeling sans stratégie</div>
+                <div style="font-size:13px;color:#6b7280;display:flex;gap:8px;align-items:flex-start"><span style="color:#ef4444;flex-shrink:0">✗</span>Tu ne sais pas quoi dire dans tes vidéos</div>
+                <div style="font-size:13px;color:#6b7280;display:flex;gap:8px;align-items:flex-start"><span style="color:#ef4444;flex-shrink:0">✗</span>Des heures perdues à chercher des idées</div>
+                <div style="font-size:13px;color:#6b7280;display:flex;gap:8px;align-items:flex-start"><span style="color:#ef4444;flex-shrink:0">✗</span>Pas d'offre claire ni de tunnel</div>
+                <div style="font-size:13px;color:#6b7280;display:flex;gap:8px;align-items:flex-start"><span style="color:#ef4444;flex-shrink:0">✗</span>Tu regardes les autres scaler sans toi</div>
+              </div>
+            </div>
+            <!-- APRÈS -->
+            <div style="background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.18);border-radius:14px;padding:18px 16px">
+              <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#4ade80;margin-bottom:12px">🚀 Avec BLOX</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:13px;color:#c4c2de;display:flex;gap:8px;align-items:flex-start"><span style="color:#22c55e;flex-shrink:0">✓</span>Audit complet de ton compte en 60 sec</div>
+                <div style="font-size:13px;color:#c4c2de;display:flex;gap:8px;align-items:flex-start"><span style="color:#22c55e;flex-shrink:0">✓</span>Scripts viraux prêts à tourner</div>
+                <div style="font-size:13px;color:#c4c2de;display:flex;gap:8px;align-items:flex-start"><span style="color:#22c55e;flex-shrink:0">✓</span>30 jours de contenu planifiés</div>
+                <div style="font-size:13px;color:#c4c2de;display:flex;gap:8px;align-items:flex-start"><span style="color:#22c55e;flex-shrink:0">✓</span>Offre + funnel de vente générés</div>
+                <div style="font-size:13px;color:#c4c2de;display:flex;gap:8px;align-items:flex-start"><span style="color:#22c55e;flex-shrink:0">✓</span>Tu sais exactement quoi faire demain</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Hero -->
         <div class="text-center mb-8">
           <h1 style="font-size:26px;font-weight:900;color:#fff;line-height:1.25;margin-bottom:12px">
@@ -841,8 +870,8 @@
 
       <!-- Input Card -->
       <div class="card p-6 text-left glow-card max-w-xl mx-auto">
-        <label class="section-lbl">Entre ton lien TikTok</label>
-        <input id="profileUrl" type="text" class="inp mb-5" placeholder="tiktok.com/@toi" />
+        <label class="section-lbl">Entre ton @ ou lien TikTok</label>
+        <input id="profileUrl" type="text" class="inp mb-5" placeholder="@toncompte ou tiktok.com/@toi" />
         <!-- hidden fields kept for compat -->
         <input id="profileDesc" type="hidden" value="" />
         <button id="analyzeBtn" onclick="startAnalysis()" class="btn w-full justify-center glow-btn text-base">
@@ -1652,7 +1681,6 @@ Réponds UNIQUEMENT avec ce JSON :
 
 /* ── START ANALYSIS ── */
 function startAnalysis() {
-  if (!S.apiKey) { openApiModal(); return; }
   const url = document.getElementById('profileUrl').value.trim();
   if (!url) {
     document.getElementById('profileUrl').focus();
@@ -1666,6 +1694,7 @@ function startAnalysis() {
 }
 
 async function runAnalysis() {
+  if (!S.apiKey) { openApiModal(); return; }
   const url  = S._pendingUrl || '';
   const desc = '';
   S.profile = { url, desc, platform: S.platform, contentStyle: S.contentStyle };
