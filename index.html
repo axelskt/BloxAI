@@ -1227,10 +1227,10 @@ window.onload = () => {
   // LS redirige vers blox.iamanager.fr?activated=pro ou ?activated=elite après paiement
   const params = new URLSearchParams(window.location.search);
   const activated = params.get('activated');
-  if (activated === 'pro') {
-    localStorage.setItem('blowup_access', 'pro');
+  if (activated === 'elite') {
+    localStorage.setItem('blowup_access', 'elite');
     history.replaceState({}, '', window.location.pathname);
-    setTimeout(() => alert('🎉 Accès Pro activé ! Tous tes modules sont débloqués.'), 500);
+    setTimeout(() => alert('🎉 Accès Élite activé ! Tous tes modules sont débloqués.'), 500);
   }
 
   if (!S.apiKey) openApiModal();
