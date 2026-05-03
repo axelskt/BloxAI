@@ -271,7 +271,7 @@
 
     <!-- Access code -->
     <div class="mb-5">
-      <label class="section-lbl">Code d'accès formation <span style="font-weight:400;color:#6b7280">(Pro gratuit ou 10€/mois Pro)</span></label>
+      <label class="section-lbl">Code d'accès formation <span style="font-weight:400;color:#6b7280">(membres IA LEBD → 9,99€/mois)</span></label>
       <div class="flex gap-2">
         <input id="accessCode" type="text" class="inp" placeholder="Entre ton code formation..." />
         <button onclick="applyCode()" class="btn" style="padding:14px 18px;white-space:nowrap">Valider</button>
@@ -733,7 +733,7 @@
               <li class="fi-elite"><span class="fi">⚡</span>Support prioritaire + accès bêta</li>
             </ul>
             <div style="text-align:center;font-size:11px;color:#6b7280;margin-top:8px">
-              💡 Membre formation ? Entre le code <strong style="color:#f97316">FORMATION10</strong> ci-dessus → Pro à 10€/mois
+              💡 Membre IA LEBD ? Entre le code <strong style="color:#f97316">IALEBD</strong> ci-dessus → Pro à 9,99€/mois
             </div>
 
             <!-- AvatarAds live preview teaser -->
@@ -789,10 +789,10 @@
               <input id="lsEliteM" type="text" class="inp" placeholder="Élite Mensuel  54,99€/mois" style="font-size:11px;padding:10px 14px;border-color:rgba(249,115,22,.3)" />
               <input id="lsEliteY" type="text" class="inp" placeholder="Élite Annuel   39,99€/mois → 479,88€/an" style="font-size:11px;padding:10px 14px;border-color:rgba(249,115,22,.3)" />
             </div>
-            <div class="section-lbl" style="color:#f97316">Offre Formation (code <strong>FORMATION10</strong>)</div>
+            <div class="section-lbl" style="color:#f97316">Offre Formation (code <strong>IALEBD</strong>)</div>
             <div style="background:rgba(249,115,22,.05);border:1px solid rgba(249,115,22,.15);border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:11px;color:#6b7280;line-height:1.7">
               Crée un produit <strong style="color:#f97316">Pro Formation</strong> dans LS à 10€/mois avec un coupon LS (optionnel).<br/>
-              Colle le lien checkout ici. Quand un membre entre le code <code style="color:#f97316">FORMATION10</code>, il est redirigé vers ce checkout Pro.
+              Quand un membre entre le code <code style="color:#f97316">IALEBD</code>, il est redirigé vers le checkout Pro formation à 9,99€/mois.
             </div>
             <div class="space-y-2 mb-5">
               <input id="lsProFormation" type="text" class="inp" placeholder="Lien checkout Pro Formation  10€/mois" style="font-size:11px;padding:10px 14px;border-color:rgba(249,115,22,.3)" />
@@ -1202,8 +1202,8 @@ const S = {
   generating: false,
 };
 
-const FORMATION_CODE       = 'BLOWUP2024';   // free full access (formation members)
-const FORMATION_PROMO_CODE = 'FORMATION10';  // 10€/mois Pro — redirige vers checkout LS dédié
+const FORMATION_CODE       = 'BLOWUP2024';   // free full access (internal/test)
+const FORMATION_PROMO_CODE = 'IALEBD';       // 9,99€/mois Pro — membres formation IA LEBD
 
 /* ── Access level ──
    'free'    → audit TikTok only (module 1, TikTok platform only)
@@ -1335,17 +1335,12 @@ function applyCode() {
     }, 1200);
 
   } else if (code === FORMATION_PROMO_CODE) {
-    // Code promo formation : redirige vers checkout Pro à 10€/mois
-    const baseUrl = localStorage.getItem('ls_pro_formation') || '';
-    if (!baseUrl) {
-      msg.className = 'text-xs mt-2 text-yellow-400';
-      msg.textContent = '✓ Code valide ! Configure le lien formation dans ⚙ (ls_pro_formation).';
-      return;
-    }
+    // Code promo formation IA LEBD : redirige vers checkout Pro 9,99€/mois
+    const baseUrl = 'https://iamanager.lemonsqueezy.com/checkout/buy/fa14807f-888b-42e5-8f08-66cab4ab74eb';
     const email = localStorage.getItem('blowup_email') || '';
     const emailParam = email ? '?checkout[email]=' + encodeURIComponent(email) : '';
     msg.className = 'text-xs mt-2 text-green-500';
-    msg.textContent = '✓ Code valide ! Redirection vers l\'offre formation (10€/mois)…';
+    msg.textContent = '✓ Code membre valide ! Redirection vers l\'offre formation (9,99€/mois)…';
     setTimeout(() => window.open(baseUrl + emailParam, '_blank'), 800);
 
   } else {
