@@ -1184,6 +1184,10 @@ const S = {
   generating: false,
 };
 
+// Checkout links Formation — hardcodés, non affichés dans l'UI
+const LS_FORMATION_PRO   = 'https://iamanager.lemonsqueezy.com/checkout/buy/fa14807f-888b-42e5-8f08-66cab4ab74eb';
+const LS_FORMATION_ELITE = 'https://app.lemonsqueezy.com/share/1024203';
+
 const FORMATION_CODE       = 'BLOWUP2024';   // free full access (internal/test)
 
 /* ── Access level ──
@@ -1219,6 +1223,21 @@ const MOD_EMOJI  = { 1:'🔍', 2:'💰', 3:'🎬', 4:'🔗', 5:'🌐', 6:'📅',
 
 /* ── Boot ── */
 window.onload = () => {
+  // ── Activation post-paiement Lemon Squeezy ──
+  // LS redirige vers blox.iamanager.fr?activated=pro ou ?activated=elite après paiement
+  const params = new URLSearchParams(window.location.search);
+  const activated = params.get('activated');
+  if (activated === 'pro' || activated === 'elite') {
+    localStorage.setItem('blowup_access', activated);
+    // Nettoie l'URL sans recharger la page
+    history.replaceState({}, '', window.location.pathname);
+    // Affiche un message de bienvenue
+    setTimeout(() => {
+      const plan = activated === 'elite' ? 'Élite' : 'Pro';
+      alert('🎉 Accès ' + plan + ' activé ! Bienvenue sur BLOX.');
+    }, 500);
+  }
+
   if (!S.apiKey) openApiModal();
   selectPlan('yearly');
   initFunnelEmailListener();
