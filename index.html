@@ -1052,16 +1052,12 @@
         <div class="faq-body">Non. BLOX n'a besoin d'aucune connexion à tes réseaux sociaux. Tu entres simplement ton lien de profil. L'IA fait le reste — sans accès à tes données privées.</div>
       </details>
       <details class="faq-det">
-        <summary>La différence entre Starter, Pro et Élite ? <span class="faq-ico">▾</span></summary>
-        <div class="faq-body">Starter inclut l'audit + offre + scripts. Pro débloque tout : funnel, site web, calendrier 30j, Spy Concurrent, Hashtags Optimisés et Analyse Vidéo. Élite ajoute AvatarAds, Audit Concurrent approfondi et ShortClip pour découper tes vidéos longues en shorts automatiquement.</div>
-      </details>
-      <details class="faq-det">
         <summary>Je peux annuler quand je veux ? <span class="faq-ico">▾</span></summary>
         <div class="faq-body">Oui, sans engagement sur les formules mensuelles. Tu annules en 1 clic depuis ton espace Lemon Squeezy. Sur les formules annuelles, tu bénéficies d'une <strong>garantie satisfait ou remboursé de 14 jours</strong>.</div>
       </details>
       <details class="faq-det">
         <summary>Qu'est-ce qu'AvatarAds ? <span class="faq-ico">▾</span></summary>
-        <div class="faq-body">AvatarAds (Élite) est le module qui génère des scripts de publicité vidéo sans que tu aies besoin de te filmer. L'IA crée le script complet, le brief créatif pour un avatar IA (HeyGen, D-ID…), et des variantes A/B prêtes pour TikTok Ads et Meta Ads. Tu produis des pubs pro sans studio, sans te montrer.</div>
+        <div class="faq-body">AvatarAds (Élite) est le module qui génère des scripts de publicité vidéo sans que tu aies besoin de te filmer. L'IA crée le script complet, le brief créatif pour un avatar IA, et des variantes A/B prêtes pour TikTok Ads et Meta Ads. Tu produis des pubs pro sans studio, sans te montrer.</div>
       </details>
       <details class="faq-det">
         <summary>BLOX fonctionne pour quelle niche ? <span class="faq-ico">▾</span></summary>
@@ -2204,6 +2200,39 @@ function renderModule1(d) {
       <div class="section-lbl" style="color:#a855f7">💎 Opportunité cachée</div>
       <p class="text-purple-300 text-sm leading-relaxed font-medium">${esc(d.opportunite_cachee||'—')}</p>
     </div>
+
+    <!-- AvatarAds promo — paid users only -->
+    ${hasProAccess() ? `
+    <div style="background:linear-gradient(135deg,rgba(249,115,22,.08),rgba(239,68,68,.05));border:1px solid rgba(249,115,22,.3);border-radius:16px;padding:22px 24px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#f97316,#ef4444);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🤖</div>
+        <div>
+          <div style="font-size:13px;font-weight:800;color:#f97316;text-transform:uppercase;letter-spacing:.8px">Le type de contenu qui cartonne en ce moment</div>
+          <div style="font-size:11px;color:#6b7280;margin-top:1px">Utilisé par les créateurs qui scalent le plus vite</div>
+        </div>
+      </div>
+      <p style="font-size:14px;color:#e2e8f0;line-height:1.7;margin-bottom:14px">
+        Les <strong style="color:#f97316">pubs vidéo avec avatar IA</strong> convertissent 2 à 3× mieux que les contenus organiques classiques — et tu n'as pas besoin de te filmer. Tu fournis le script, l'avatar fait la vidéo. Résultat : des pubs pro en quelques minutes, à moindre coût, qui tournent pendant que tu dors.
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
+        <div style="background:#111120;border:1px solid #1e1e30;border-radius:10px;padding:10px 12px;text-align:center">
+          <div style="font-size:18px;font-weight:900;color:#f97316">2-3×</div>
+          <div style="font-size:11px;color:#6b7280;margin-top:2px">meilleur taux de conversion</div>
+        </div>
+        <div style="background:#111120;border:1px solid #1e1e30;border-radius:10px;padding:10px 12px;text-align:center">
+          <div style="font-size:18px;font-weight:900;color:#f97316">0€</div>
+          <div style="font-size:11px;color:#6b7280;margin-top:2px">de studio ou de caméra</div>
+        </div>
+        <div style="background:#111120;border:1px solid #1e1e30;border-radius:10px;padding:10px 12px;text-align:center">
+          <div style="font-size:18px;font-weight:900;color:#f97316">5 min</div>
+          <div style="font-size:11px;color:#6b7280;margin-top:2px">pour générer une pub complète</div>
+        </div>
+      </div>
+      ${hasEliteAccess()
+        ? `<button onclick="switchTab(8)" style="width:100%;padding:13px;border-radius:11px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-weight:800;font-size:14px;cursor:pointer;border:none">Générer mes AvatarAds →</button>`
+        : `<button onclick="openPaywall()" style="width:100%;padding:13px;border-radius:11px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-weight:800;font-size:14px;cursor:pointer;border:none">Débloquer AvatarAds — Élite →</button>`
+      }
+    </div>` : ''}
   </div>`;
 }
 
@@ -2501,7 +2530,7 @@ Réponds UNIQUEMENT avec ce JSON :
   },
 
   8: {
-    system: `Tu es un expert en publicité vidéo IA (TikTok Ads, Meta Ads) spécialisé dans la création de contenu avec des avatars numériques (TikTok Symphony, HeyGen, Synthesia).
+    system: `Tu es un expert en publicité vidéo IA (TikTok Ads, Meta Ads) spécialisé dans la création de contenu avec des avatars numériques.
 OBJECTIF : Créer des pubs vidéo complètes sans que le créateur ait besoin d'apparaître à l'écran.
 RULES :
 - Scripts ultra-courts et percutants (15-30 sec pour TikTok/Reels)
@@ -2861,7 +2890,7 @@ function renderModule8(d) {
 
     <!-- Ads scripts -->
     <div>
-      <div class="section-lbl">🎬 Scripts publicitaires (prêts pour TikTok Symphony / HeyGen)</div>
+      <div class="section-lbl">🎬 Scripts publicitaires (prêts pour avatar IA)</div>
       ${ads.map((ad,i) => `
       <div class="script-card" style="border-color:rgba(249,115,22,.2)">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
