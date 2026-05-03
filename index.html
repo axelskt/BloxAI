@@ -1266,8 +1266,8 @@ window.onload = () => {
   initFunnelEmailListener();
   // Admin: click logo 5 times to show API button
   let _logoClicks = 0;
-  const logo = document.querySelector('nav .grad');
-  if (logo) logo.addEventListener('click', () => {
+  const logoWrap = document.querySelector('nav div[onclick]');
+  if (logoWrap) logoWrap.addEventListener('click', () => {
     _logoClicks++;
     if (_logoClicks >= 5) {
       document.getElementById('navAdminBtn').style.display = 'block';
@@ -1680,16 +1680,27 @@ Réponds UNIQUEMENT avec ce JSON :
 
 /* ── START ANALYSIS ── */
 function startAnalysis() {
-  const url = document.getElementById('profileUrl').value.trim();
+  const input = document.getElementById('profileUrl');
+  const url = input ? input.value.trim() : '';
   if (!url) {
-    document.getElementById('profileUrl').focus();
-    document.getElementById('profileUrl').style.borderColor = '#7c3aed';
-    setTimeout(() => document.getElementById('profileUrl').style.borderColor = '', 1500);
+    if (input) {
+      input.focus();
+      input.placeholder = '⚠️ Entre ton @compte TikTok d\'abord !';
+      input.style.borderColor = '#a855f7';
+      input.style.boxShadow = '0 0 0 3px rgba(168,85,247,0.25)';
+      setTimeout(() => {
+        input.placeholder = '@toncompte';
+        input.style.borderColor = '';
+        input.style.boxShadow = '';
+      }, 2500);
+    }
     return;
   }
   S._pendingUrl = url;
-  // Show platform + style steps in funnel before launching analysis
-  openFunnelStep('0a');
+  // Ouvre le funnel — étape plateforme
+  const modal = document.getElementById('funnelModal');
+  if (modal) modal.style.display = 'block';
+  showFunnelStep('0a');
 }
 
 async function runAnalysis() {
