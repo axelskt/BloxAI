@@ -1227,15 +1227,10 @@ window.onload = () => {
   // LS redirige vers blox.iamanager.fr?activated=pro ou ?activated=elite après paiement
   const params = new URLSearchParams(window.location.search);
   const activated = params.get('activated');
-  if (activated === 'pro' || activated === 'elite') {
-    localStorage.setItem('blowup_access', activated);
-    // Nettoie l'URL sans recharger la page
+  if (activated === 'pro') {
+    localStorage.setItem('blowup_access', 'pro');
     history.replaceState({}, '', window.location.pathname);
-    // Affiche un message de bienvenue
-    setTimeout(() => {
-      const plan = activated === 'elite' ? 'Élite' : 'Pro';
-      alert('🎉 Accès ' + plan + ' activé ! Bienvenue sur BLOX.');
-    }, 500);
+    setTimeout(() => alert('🎉 Accès Pro activé ! Tous tes modules sont débloqués.'), 500);
   }
 
   if (!S.apiKey) openApiModal();
