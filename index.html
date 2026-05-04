@@ -208,6 +208,12 @@
     .f-ans { width:100%; padding:14px 20px; text-align:left; border-radius:12px; background:#111120; border:1.5px solid #1e1e30; color:#e2e8f0; font-size:15px; font-weight:500; cursor:pointer; transition:all .2s; margin-bottom:10px; }
     .f-ans:hover { border-color:#7c3aed; background:rgba(124,58,237,.08); }
     .f-ans.selected { border-color:#a855f7; background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(219,39,119,.15)); color:#fff; font-weight:700; }
+    .f-ans-2line { display:flex;align-items:center;gap:14px;padding:14px 18px;margin-bottom:0; }
+    .f-ans-texts { display:flex;flex-direction:column;gap:2px; }
+    .f-ans-texts strong { font-size:15px;font-weight:700;color:#e2e8f0; }
+    .f-ans-texts em { font-size:12px;font-weight:400;color:#6b7280;font-style:normal; }
+    .f-ans-2line.selected .f-ans-texts strong { color:#fff; }
+    .f-ans-2line.selected .f-ans-texts em { color:#c4b5fd; }
 
     /* Funnel nav button */
     .f-btn { width:100%; padding:16px; border-radius:14px; background:linear-gradient(135deg,#7c3aed,#db2777); color:#fff; font-weight:800; font-size:16px; cursor:pointer; border:none; transition:opacity .2s, transform .15s; }
@@ -361,26 +367,28 @@
     <div class="funnel-step" id="fStep0a">
       <div class="f-prog-bar"><div class="f-prog-fill" style="width:15%"></div></div>
       <div class="text-center mb-8">
-        <div style="font-size:48px;margin-bottom:14px">📱</div>
-        <h2 class="text-white text-2xl font-black mb-3">Tu es sur quelle plateforme ?</h2>
-        <p class="text-gray-500 text-sm">L'IA adapte toute l'analyse à ta plateforme.</p>
+        <div style="font-size:48px;margin-bottom:14px">🚀</div>
+        <h2 class="text-white text-2xl font-black mb-3">Où en es-tu aujourd'hui ?</h2>
+        <p class="text-gray-500 text-sm">L'IA personnalise ton plan selon ta situation.</p>
       </div>
-      <div id="platBtns" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px">
-        <button class="f-ans" id="fp-tiktok" onclick="selectFunnelPlat('tiktok')">🎵 TikTok</button>
-        <button class="f-ans" id="fp-instagram" onclick="selectFunnelPlat('instagram')">
-          📸 Instagram
-          <span id="fp-instagram-lock" style="display:none;font-size:10px;font-weight:700;background:rgba(168,85,247,.2);color:#a855f7;border-radius:99px;padding:2px 7px;margin-left:6px">Starter</span>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px">
+        <button class="f-ans f-ans-2line" id="flvl-zero" onclick="selectFunnelLevel('zero')">
+          <span style="font-size:18px">🌱</span>
+          <span class="f-ans-texts"><strong>Je n'ai encore rien posté</strong><em>Je pars de zéro</em></span>
         </button>
-        <button class="f-ans" id="fp-youtube" onclick="selectFunnelPlat('youtube')">
-          ▶ YouTube
-          <span id="fp-youtube-lock" style="display:none;font-size:10px;font-weight:700;background:rgba(168,85,247,.2);color:#a855f7;border-radius:99px;padding:2px 7px;margin-left:6px">Starter</span>
+        <button class="f-ans f-ans-2line" id="flvl-start" onclick="selectFunnelLevel('start')">
+          <span style="font-size:18px">📲</span>
+          <span class="f-ans-texts"><strong>J'ai posté quelques vidéos</strong><em>Mais sans vraie stratégie</em></span>
         </button>
-        <button class="f-ans" id="fp-site" onclick="selectFunnelPlat('site')">
-          🌐 Site web
-          <span id="fp-site-lock" style="display:none;font-size:10px;font-weight:700;background:rgba(168,85,247,.2);color:#a855f7;border-radius:99px;padding:2px 7px;margin-left:6px">Starter</span>
+        <button class="f-ans f-ans-2line" id="flvl-grind" onclick="selectFunnelLevel('grind')">
+          <span style="font-size:18px">📈</span>
+          <span class="f-ans-texts"><strong>Je poste régulièrement</strong><em>Mais je stagne</em></span>
+        </button>
+        <button class="f-ans f-ans-2line" id="flvl-pro" onclick="selectFunnelLevel('pro')">
+          <span style="font-size:18px">💰</span>
+          <span class="f-ans-texts"><strong>Je suis déjà monétisé</strong><em>Je veux passer au niveau supérieur</em></span>
         </button>
       </div>
-      <button class="f-btn" id="fBtnPlat" onclick="funnelStep('0b')" disabled>Continuer →</button>
     </div>
 
     <!-- ── STEP 0b : Style de contenu ── -->
@@ -394,7 +402,6 @@
       <button class="f-ans" id="fcs-faceless" onclick="selectFunnelStyle('faceless')">🎭 Non — je reste faceless</button>
       <button class="f-ans" id="fcs-camera"   onclick="selectFunnelStyle('camera')">🎥 Oui — face caméra</button>
       <button class="f-ans" id="fcs-both"     onclick="selectFunnelStyle('both')">✨ Les deux selon les vidéos</button>
-      <button class="f-btn mt-6" id="fBtnStyle" onclick="launchFunnelAnalysis()" disabled>Analyser mon compte →</button>
     </div>
 
     <!-- ── STEP 1: Loading / generating plan ── -->
@@ -1199,7 +1206,8 @@
 <script>
 /* ── State ── */
 const S = {
-  platform: 'instagram',
+  platform: 'tiktok',
+  level: null,            // 'zero' | 'start' | 'grind' | 'pro'
   contentStyle: 'both',   // 'faceless' | 'camera' | 'both'
   selectedPlan: 'yearly',
   apiKey: localStorage.getItem('blowup_api_key') || '',
@@ -1710,7 +1718,12 @@ function startAnalysis() {
 }
 
 async function runAnalysis() {
-  if (!S.apiKey) { openApiModal(); return; }
+  if (!S.apiKey) {
+    closeFunnel();
+    showView('landing');
+    setTimeout(() => openApiModal(), 100);
+    return;
+  }
   const url  = S._pendingUrl || '';
   const desc = '';
   S.profile = { url, desc, platform: S.platform, contentStyle: S.contentStyle };
@@ -3131,6 +3144,16 @@ function selectFunnelPlat(p) {
   document.getElementById('fBtnPlat').disabled = false;
 }
 
+function selectFunnelLevel(v) {
+  S.level = v;
+  ['zero','start','grind','pro'].forEach(k => {
+    const b = document.getElementById('flvl-'+k);
+    if (b) b.classList.toggle('selected', k === v);
+  });
+  // Auto-advance after brief visual feedback
+  setTimeout(() => showFunnelStep('0b'), 220);
+}
+
 function selectFunnelStyle(style) {
   S.contentStyle = style;
   ['faceless','camera','both'].forEach(s => {
@@ -3139,7 +3162,8 @@ function selectFunnelStyle(style) {
   });
   const btn = document.getElementById('fcs-'+style);
   if (btn) btn.classList.add('selected');
-  document.getElementById('fBtnStyle').disabled = false;
+  // Auto-launch analysis after brief visual feedback
+  setTimeout(() => launchFunnelAnalysis(), 280);
 }
 
 async function launchFunnelAnalysis() {
