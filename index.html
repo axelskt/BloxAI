@@ -351,7 +351,7 @@
 
 <!-- ═══════════════════════════════════════════════════════════ FUNNEL MODAL -->
 <div id="funnelModal" style="display:none;position:fixed;inset:0;background:#06060c;z-index:60;overflow-y:auto;padding:0">
-  <div style="max-width:420px;margin:0 auto;padding:40px 24px 40px;min-height:100vh;display:flex;flex-direction:column;justify-content:center">
+  <div style="max-width:clamp(360px,94vw,660px);margin:0 auto;padding:40px 24px 40px;min-height:100vh;display:flex;flex-direction:column;justify-content:center">
 
     <!-- SVG gradient defs (hidden) -->
     <svg width="0" height="0" style="position:absolute">
@@ -391,17 +391,32 @@
       </div>
     </div>
 
-    <!-- ── STEP 0b : Style de contenu ── -->
+    <!-- ── STEP 0b : Frein principal ── -->
     <div class="funnel-step" id="fStep0b">
       <div class="f-prog-bar"><div class="f-prog-fill" style="width:30%"></div></div>
       <div class="text-center mb-8">
-        <div style="font-size:48px;margin-bottom:14px">🎬</div>
-        <h2 class="text-white text-2xl font-black mb-3">Tu filmes ton visage ?</h2>
-        <p class="text-gray-500 text-sm">L'IA adapte les scripts et hooks à ton style.</p>
+        <div style="font-size:48px;margin-bottom:14px">🧠</div>
+        <h2 class="text-white text-2xl font-black mb-3">Qu'est-ce qui t'empêche<br/>réellement d'avancer ?</h2>
+        <p class="text-gray-500 text-sm">L'IA adapte ton plan à ton vrai frein.</p>
       </div>
-      <button class="f-ans" id="fcs-faceless" onclick="selectFunnelStyle('faceless')">🎭 Non — je reste faceless</button>
-      <button class="f-ans" id="fcs-camera"   onclick="selectFunnelStyle('camera')">🎥 Oui — face caméra</button>
-      <button class="f-ans" id="fcs-both"     onclick="selectFunnelStyle('both')">✨ Les deux selon les vidéos</button>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px">
+        <button class="f-ans f-ans-2line" id="fblk-start" onclick="selectFunnelBlocker('start')">
+          <span style="font-size:18px">🧭</span>
+          <span class="f-ans-texts"><strong>Je ne sais pas par où commencer</strong><em>Trop d'infos, pas assez d'actions claires</em></span>
+        </button>
+        <button class="f-ans f-ans-2line" id="fblk-peur" onclick="selectFunnelBlocker('peur')">
+          <span style="font-size:18px">👀</span>
+          <span class="f-ans-texts"><strong>J'ai peur du regard des autres</strong><em>Je ne me sens pas encore légitime</em></span>
+        </button>
+        <button class="f-ans f-ans-2line" id="fblk-temps" onclick="selectFunnelBlocker('temps')">
+          <span style="font-size:18px">⏱️</span>
+          <span class="f-ans-texts"><strong>Je manque de temps pour créer</strong><em>Je veux aller vite et efficace</em></span>
+        </button>
+        <button class="f-ans f-ans-2line" id="fblk-idees" onclick="selectFunnelBlocker('idees')">
+          <span style="font-size:18px">💡</span>
+          <span class="f-ans-texts"><strong>Je n'arrive pas à trouver des idées</strong><em>Je manque d'inspiration et de constance</em></span>
+        </button>
+      </div>
     </div>
 
     <!-- ── STEP 1: Loading / generating plan ── -->
@@ -411,7 +426,7 @@
 
       <!-- Avatar with rotating ring -->
       <div class="text-center mb-6">
-        <div class="avatar-ring" style="width:120px;height:120px;margin:0 auto">
+        <div class="avatar-ring" style="width:120px;height:120px;margin:0 auto;position:relative">
           <svg width="120" height="120" viewBox="0 0 120 120" style="position:absolute;top:0;left:0;animation:spin 4s linear infinite">
             <defs>
               <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -422,12 +437,14 @@
             </defs>
             <circle cx="60" cy="60" r="55" fill="none" stroke="url(#ringGrad)" stroke-width="3" stroke-dasharray="8 6" stroke-linecap="round"/>
           </svg>
-          <div class="avatar-img" style="margin:20px">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+            <img id="fLoadingAvatar" src="" alt="" style="width:80px;height:80px;border-radius:50%;object-fit:cover;display:none;background:#1a1a2e"/>
             <span id="fAvatarEmoji" style="font-size:36px">📊</span>
           </div>
         </div>
         <div id="fCircPct" class="text-2xl font-black mt-4" style="background:linear-gradient(135deg,#a855f7,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">0%</div>
-        <p class="text-gray-400 text-sm mt-1" id="fGenTitle">Génération de ton plan d'action 30 jours...</p>
+        <p class="text-gray-400 text-sm mt-1" id="fGenTitle">Analyse de ton compte en cours...</p>
+        <p class="text-gray-600 text-xs mt-1" id="fGenHandle"></p>
       </div>
 
       <!-- Checklist -->
@@ -455,83 +472,110 @@
       </div>
     </div>
 
-    <!-- ── STEP 2: Last question ── -->
+    <!-- ── STEP 2: Résultats audit gratuit ── -->
     <div class="funnel-step" id="fStep2">
-      <div class="f-prog-bar"><div class="f-prog-fill" style="width:75%"></div></div>
+      <div class="f-prog-bar"><div class="f-prog-fill" style="width:55%"></div></div>
 
-      <!-- Circular progress at 75% -->
-      <div class="text-center mb-6">
-        <div class="circ-wrap" style="width:160px;height:160px;margin:0 auto">
-          <svg width="160" height="160" viewBox="0 0 160 160">
-            <circle class="circ-track" cx="80" cy="80" r="68"/>
-            <circle class="circ-bar" cx="80" cy="80" r="68"
-              stroke-dasharray="427.3"
-              stroke-dashoffset="106.8"
-              style="transform:rotate(-90deg);transform-origin:80px 80px"/>
-          </svg>
-          <div class="circ-pct">75<span>%</span></div>
+      <!-- Profile card -->
+      <div style="display:flex;align-items:center;gap:16px;background:#0c0c16;border:1px solid #1e1e30;border-radius:16px;padding:18px 20px;margin-bottom:20px">
+        <div style="position:relative;flex-shrink:0">
+          <img id="fAuditAvatar" src="" alt="" style="width:64px;height:64px;border-radius:50%;object-fit:cover;background:#1a1a2e;border:2px solid #a855f7"/>
+          <div style="position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;background:linear-gradient(135deg,#a855f7,#ec4899);border-radius:50%;border:2px solid #06060c;display:flex;align-items:center;justify-content:center;font-size:9px">✓</div>
         </div>
-        <p class="text-white font-bold text-lg mt-4">Ton plan de croissance est déjà à 75%.</p>
-        <p class="text-gray-500 text-sm mt-2 leading-relaxed">
-          On a analysé ton compte, identifié tes freins, et défini ta stratégie idéale.<br/>
-          Il ne reste plus qu'à personnaliser ton plan d'action.
-        </p>
+        <div>
+          <div id="fAuditHandle" style="font-weight:800;font-size:16px;color:#fff"></div>
+          <div style="font-size:12px;color:#6b7280;margin-top:2px">🎵 TikTok · Analysé par BLOX</div>
+        </div>
       </div>
 
-      <!-- Question card -->
-      <div style="background:#111120;border:1px solid #1e1e30;border-radius:14px;padding:20px 22px;margin-bottom:20px">
-        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:#6b7280;margin-bottom:10px">DERNIÈRE CHOSE</div>
-        <p class="text-white font-semibold text-sm mb-4">Tu veux des résultats rapides ou une croissance durable ?</p>
-        <button class="f-ans" id="fans-rapide" onclick="selectFunnelAns('rapide')">Rapides</button>
-        <button class="f-ans" id="fans-durable" onclick="selectFunnelAns('durable')">Durable</button>
-        <button class="f-ans" id="fans-both" onclick="selectFunnelAns('both')">Les deux</button>
+      <!-- Problème principal -->
+      <div id="fAuditProblem" style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:16px 18px;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#f87171;margin-bottom:8px">⚠ Problème principal identifié</div>
+        <p id="fAuditProblemText" style="font-size:14px;color:#fca5a5;line-height:1.6;font-weight:500"></p>
       </div>
 
-      <button class="f-btn" id="fBtnQ" onclick="funnelStep(3)" disabled>Finaliser mon plan →</button>
+      <!-- Quick wins -->
+      <div style="background:#0c0c16;border:1px solid #1e1e30;border-radius:12px;padding:16px 18px;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#a855f7;margin-bottom:12px">⚡ Actions prioritaires cette semaine</div>
+        <div id="fAuditWins" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+
+      <!-- Teaser bloqué -->
+      <div style="position:relative;border-radius:12px;overflow:hidden;margin-bottom:20px">
+        <div style="background:#0c0c16;border:1px solid #1e1e30;border-radius:12px;padding:16px 18px;filter:blur(4px);pointer-events:none;user-select:none">
+          <div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#a855f7;margin-bottom:10px">🔮 Opportunité cachée</div>
+          <p style="font-size:14px;color:#c4b5fd;line-height:1.6">Ton compte cache une opportunité de monétisation directe que 90% des créateurs dans ta niche n'exploitent pas encore. L'IA a identifié le bon angle pour toi.</p>
+        </div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(6,6,12,0.6);border-radius:12px">
+          <div style="text-align:center">
+            <div style="font-size:20px;margin-bottom:6px">🔒</div>
+            <div style="font-size:12px;font-weight:700;color:#a855f7">Disponible dans ton plan complet</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="f-btn" onclick="funnelStep(3)">Construire mon plan complet →</button>
     </div>
 
-    <!-- ── STEP 3: Plan ready ── -->
+    <!-- ── STEP 3: Type de contenu ── -->
     <div class="funnel-step" id="fStep3">
-      <div class="f-prog-bar"><div class="f-prog-fill" style="width:90%"></div></div>
-
+      <div class="f-prog-bar"><div class="f-prog-fill" style="width:72%"></div></div>
       <div class="text-center mb-8">
-        <div style="font-size:52px;margin-bottom:16px">✦</div>
-        <h2 class="text-white text-2xl font-black mb-3">Ton plan de croissance est prêt.</h2>
-        <p class="text-gray-400 text-sm leading-relaxed max-w-xs mx-auto">
-          On a compilé la stratégie exacte pour corriger les erreurs de ton compte et passer au niveau supérieur.
-        </p>
+        <div style="font-size:48px;margin-bottom:14px">🎨</div>
+        <h2 class="text-white text-2xl font-black mb-3">Quel type de contenu<br/>t'attire le plus ?</h2>
+        <p class="text-gray-500 text-sm">L'IA adapte tes scripts et ton calendrier.</p>
       </div>
-
-      <!-- Stats teaser -->
-      <div style="background:#0c0c16;border:1px solid #1e1e30;border-radius:14px;padding:18px 22px;margin-bottom:24px">
-        <div class="text-center text-gray-500 text-xs font-semibold uppercase tracking-widest mb-3">Ton plan inclut</div>
-        <div class="space-y-2">
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#d8b4fe">
-            <span style="color:#a855f7;font-weight:700">✓</span> Audit complet de tes erreurs
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#d8b4fe">
-            <span style="color:#a855f7;font-weight:700">✓</span> Offre monétisable sur mesure
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#d8b4fe">
-            <span style="color:#a855f7;font-weight:700">✓</span> Scripts viraux + hooks
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#d8b4fe">
-            <span style="color:#a855f7;font-weight:700">✓</span> Funnel de conversion + site web
-          </div>
-        </div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px">
+        <button class="f-ans f-ans-2line" id="fctype-edu" onclick="selectFunnelContentType('edu')">
+          <span style="font-size:18px">📚</span>
+          <span class="f-ans-texts"><strong>Éducation / Tutoriel</strong><em>Apprendre quelque chose d'utile</em></span>
+        </button>
+        <button class="f-ans f-ans-2line" id="fctype-divert" onclick="selectFunnelContentType('divert')">
+          <span style="font-size:18px">😂</span>
+          <span class="f-ans-texts"><strong>Divertissement / Humour</strong><em>Faire rire, engager, marquer</em></span>
+        </button>
+        <button class="f-ans f-ans-2line" id="fctype-story" onclick="selectFunnelContentType('story')">
+          <span style="font-size:18px">📖</span>
+          <span class="f-ans-texts"><strong>Storytelling / Vlog</strong><em>Partager mon histoire, mon quotidien</em></span>
+        </button>
+        <button class="f-ans f-ans-2line" id="fctype-faceless" onclick="selectFunnelContentType('faceless')">
+          <span style="font-size:18px">🎭</span>
+          <span class="f-ans-texts"><strong>Faceless / Voix off</strong><em>Créer sans apparaître à l'écran</em></span>
+        </button>
+        <button class="f-ans f-ans-2line" id="fctype-life" onclick="selectFunnelContentType('life')">
+          <span style="font-size:18px">🌟</span>
+          <span class="f-ans-texts"><strong>Lifestyle / Inspiration</strong><em>Mode de vie, mindset, motivation</em></span>
+        </button>
       </div>
-
-      <button class="f-btn" onclick="funnelStep(4)">Voir mon plan →</button>
     </div>
 
     <!-- ── STEP 4: Email capture ── -->
     <div class="funnel-step" id="fStep4">
-      <div class="f-prog-bar"><div class="f-prog-fill" style="width:100%"></div></div>
+      <div class="f-prog-bar"><div class="f-prog-fill" style="width:88%"></div></div>
 
-      <div class="text-center mb-8">
-        <div style="width:64px;height:64px;background:#111120;border:1px solid #1e1e30;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px">✉️</div>
-        <h2 class="text-white text-2xl font-black mb-3">Entre ton email pour<br/>recevoir ton plan.</h2>
-        <p class="text-gray-500 text-sm" style="line-height:1.6">On t'envoie ton audit complet <strong style="color:#e2e8f0">par email</strong> — comme ça tu l'as toujours sous la main.</p>
+      <!-- Profile recap -->
+      <div style="display:flex;align-items:center;gap:14px;background:#0c0c16;border:1px solid #1e1e30;border-radius:14px;padding:14px 18px;margin-bottom:24px">
+        <img id="fEmailAvatar" src="" alt="" style="width:52px;height:52px;border-radius:50%;object-fit:cover;background:#1a1a2e;border:2px solid #a855f7;flex-shrink:0"/>
+        <div>
+          <div id="fEmailHandle" style="font-weight:800;font-size:15px;color:#fff"></div>
+          <div style="font-size:12px;color:#6b7280;margin-top:2px">Ton plan 30 jours est prêt à générer</div>
+        </div>
+      </div>
+
+      <!-- Checklist visuelle -->
+      <div style="background:#111120;border:1px solid #1e1e30;border-radius:12px;padding:14px 18px;margin-bottom:22px">
+        <div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#6b7280;margin-bottom:10px">Ce que tu vas recevoir</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#d8b4fe"><span style="color:#a855f7;font-weight:700;flex-shrink:0">✓</span>Analyse complète de ton compte</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#d8b4fe"><span style="color:#a855f7;font-weight:700;flex-shrink:0">✓</span>Calendrier éditorial 30 jours</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#d8b4fe"><span style="color:#a855f7;font-weight:700;flex-shrink:0">✓</span>Scripts viraux adaptés à ton style</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#d8b4fe"><span style="color:#a855f7;font-weight:700;flex-shrink:0">✓</span>Offre + funnel de vente générés</div>
+        </div>
+      </div>
+
+      <div class="text-center mb-6">
+        <h2 class="text-white text-xl font-black mb-2">Où envoyer ton plan ?</h2>
+        <p class="text-gray-500 text-sm">Tu le reçois aussi par email pour l'avoir toujours sous la main.</p>
         <p class="text-gray-700 text-xs mt-2">🔒 Données protégées · Aucun spam · Désabonnement en 1 clic</p>
       </div>
 
@@ -573,11 +617,8 @@
       <!-- Body -->
       <div class="pay-body">
 
-        <!-- Trial banner -->
-        <div id="trialBanner" style="display:none;background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(16,185,129,.08));border:1px solid rgba(34,197,94,.25);border-radius:12px;padding:14px 18px;margin-bottom:20px;text-align:center">
-          <div style="font-size:13px;font-weight:700;color:#86efac;margin-bottom:2px">🎁 Ton essai gratuit de 3 jours est activé !</div>
-          <div style="font-size:11px;color:#6b7280">Accès complet jusqu'au <span id="trialEndDate" style="color:#e2e8f0;font-weight:600"></span> — puis choisis ton plan.</div>
-        </div>
+        <!-- Trial banner (hidden) -->
+        <div id="trialBanner" style="display:none"></div>
 
         <!-- Before / After -->
         <div style="margin-bottom:28px">
@@ -665,30 +706,6 @@
           </div>
         </div>
 
-        <!-- Before / After -->
-        <div class="mb-8">
-          <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:#4a4a70;text-align:center;margin-bottom:14px">La différence en vrai</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-            <div class="ba-head" style="color:#4a4a70">AVANT (SANS BLOX)</div>
-            <div class="ba-head" style="color:#a855f7">APRÈS (AVEC BLOX)</div>
-          </div>
-          <div class="ba-grid mb-2">
-            <div class="ba-cell before">Tu postes au hasard et tu espères</div>
-            <div class="ba-cell after">Tu sais exactement quoi poster chaque jour</div>
-          </div>
-          <div class="ba-grid mb-2">
-            <div class="ba-cell before">Tu passes des heures à chercher des idées</div>
-            <div class="ba-cell after">Tu as des idées prêtes en quelques minutes</div>
-          </div>
-          <div class="ba-grid mb-2">
-            <div class="ba-cell before">Tu ne comprends pas pourquoi ça ne marche pas</div>
-            <div class="ba-cell after">Tu vois précisément ce qui bloque et comment corriger</div>
-          </div>
-          <div class="ba-grid">
-            <div class="ba-cell before">Tu postes sur une seule plateforme</div>
-            <div class="ba-cell after">Tu multiplies tes vues en postant partout</div>
-          </div>
-        </div>
 
         <!-- Pricing — Submagic style -->
         <div id="pricingAnchor" class="mb-4">
@@ -1211,6 +1228,8 @@ const OWNER_API_KEY = [115,107,45,97,110,116,45,97,112,105,48,51,45,103,84,113,9
 const S = {
   platform: 'tiktok',
   level: null,            // 'zero' | 'start' | 'grind' | 'pro'
+  blocker: null,          // 'start' | 'peur' | 'temps' | 'idees'
+  contentType: null,      // 'edu' | 'divert' | 'story' | 'faceless' | 'life'
   contentStyle: 'both',   // 'faceless' | 'camera' | 'both'
   selectedPlan: 'yearly',
   apiKey: OWNER_API_KEY || localStorage.getItem('blowup_api_key') || '',
@@ -1477,10 +1496,13 @@ RULES:
 - Réponds en JSON uniquement (pas de texte avant ou après le JSON)
 - Sois précis et spécifique, pas générique`,
 
-    user: (p) => `Analyse ce profil / business :
-URL : ${p.url || 'non fournie'}
-Plateforme : ${p.platform}
-Description : ${p.desc || 'non fournie'}
+    user: (p) => `Analyse ce créateur TikTok en profondeur.
+Handle TikTok : ${p.url || 'non fourni'}
+Niveau actuel : ${{'zero':'Débutant — aucune publication','start':'Quelques vidéos — pas de stratégie','grind':'Poste régulièrement — stagne','pro':'Déjà +10k vues régulières'}[p.level] || 'non précisé'}
+Frein principal : ${{'start':'Ne sait pas par où commencer','peur':'Peur du regard des autres','temps':'Manque de temps','idees':'Manque d\'idées/inspiration'}[p.blocker] || 'non précisé'}
+Type de contenu préféré : ${{'edu':'Éducation/Tutoriel','divert':'Divertissement/Humour','story':'Storytelling/Vlog','faceless':'Faceless/Voix off','life':'Lifestyle/Inspiration'}[p.contentType] || 'non précisé'}
+
+Analyse le compte TikTok @${(p.url||'').replace(/^@/,'').split('/').pop().split('?')[0]} selon les informations disponibles sur ce handle et les patterns typiques de créateurs dans cette niche. Donne une analyse honnête et spécifique basée sur ce que ce type de profil affiche généralement sur TikTok.
 
 Réponds UNIQUEMENT avec ce JSON (sans markdown, sans texte autour) :
 {
@@ -1731,7 +1753,7 @@ async function runAnalysis() {
   }
   const url  = S._pendingUrl || '';
   const desc = '';
-  S.profile = { url, desc, platform: S.platform, contentStyle: S.contentStyle };
+  S.profile = { url, desc, platform: S.platform, contentStyle: S.contentStyle, level: S.level, blocker: S.blocker, contentType: S.contentType };
   S.modules = { 1:null,2:null,3:null,4:null,5:null,6:null,7:null,8:null,9:null,10:null,11:null,12:null };
   S.videoUrl = ''; S.videoTranscript = ''; S.mcTranscript = '';
   _mcFile = null; _mcClips = []; _mcBlobs = {};
@@ -3125,7 +3147,6 @@ function openFunnelStep(id) {
 }
 
 function showFunnelStep(id) {
-  // Hide all steps including 0a and 0b
   ['0a','0b','1','2','3','4','5'].forEach(s => {
     const el = document.getElementById('fStep'+s);
     if (el) el.classList.remove('active');
@@ -3133,6 +3154,10 @@ function showFunnelStep(id) {
   const target = document.getElementById('fStep'+id);
   if (target) target.classList.add('active');
   FUNNEL.step = id;
+  if (id === '2') populateFreeAudit();
+  // Scroll to top of funnel
+  const modal = document.getElementById('funnelModal');
+  if (modal) modal.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function selectFunnelPlat(p) {
@@ -3155,23 +3180,84 @@ function selectFunnelLevel(v) {
     const b = document.getElementById('flvl-'+k);
     if (b) b.classList.toggle('selected', k === v);
   });
-  // Auto-advance after brief visual feedback
   setTimeout(() => showFunnelStep('0b'), 220);
+}
+
+function selectFunnelBlocker(v) {
+  S.blocker = v;
+  ['start','peur','temps','idees'].forEach(k => {
+    const b = document.getElementById('fblk-'+k);
+    if (b) b.classList.toggle('selected', k === v);
+  });
+  setTimeout(() => launchFunnelAnalysis(), 250);
+}
+
+function selectFunnelContentType(v) {
+  S.contentType = v;
+  ['edu','divert','story','faceless','life'].forEach(k => {
+    const b = document.getElementById('fctype-'+k);
+    if (b) b.classList.toggle('selected', k === v);
+  });
+  setTimeout(() => showFunnelStep('4'), 250);
 }
 
 function selectFunnelStyle(style) {
   S.contentStyle = style;
-  ['faceless','camera','both'].forEach(s => {
-    const b = document.getElementById('fcs-'+s);
-    if (b) b.classList.remove('selected');
-  });
-  const btn = document.getElementById('fcs-'+style);
-  if (btn) btn.classList.add('selected');
-  // Auto-launch analysis after brief visual feedback
-  setTimeout(() => launchFunnelAnalysis(), 280);
+}
+
+/* ── Helper: extract handle + profile photo URL ── */
+function getHandleFromUrl(url) {
+  return (url || '').replace(/^@/, '').replace(/.*tiktok\.com\/@?/, '').split('/')[0].split('?')[0].trim().toLowerCase();
+}
+function getProfilePhotoUrl(url) {
+  const handle = getHandleFromUrl(url);
+  return handle ? `https://unavatar.io/tiktok/${handle}` : '';
+}
+
+/* ── Populate fStep2 with real audit data ── */
+function populateFreeAudit() {
+  const d = S.modules[1];
+  const handle = getHandleFromUrl(S._pendingUrl || '');
+  const photoUrl = getProfilePhotoUrl(S._pendingUrl || '');
+
+  // Profile card
+  const avatar = document.getElementById('fAuditAvatar');
+  const handleEl = document.getElementById('fAuditHandle');
+  if (avatar && photoUrl) { avatar.src = photoUrl; avatar.style.display = 'block'; }
+  if (handleEl) handleEl.textContent = handle ? '@' + handle : 'Ton compte';
+
+  // Email step profile
+  const emailAvatar = document.getElementById('fEmailAvatar');
+  const emailHandle = document.getElementById('fEmailHandle');
+  if (emailAvatar && photoUrl) { emailAvatar.src = photoUrl; }
+  if (emailHandle) emailHandle.textContent = handle ? '@' + handle : 'Ton compte';
+
+  if (!d) return;
+  const prob = d.diagnostic?.probleme_principal || '';
+  const wins = (d.quick_wins || []).slice(0, 3);
+  const probEl = document.getElementById('fAuditProblemText');
+  const winsEl = document.getElementById('fAuditWins');
+  if (probEl) probEl.textContent = prob;
+  if (winsEl) winsEl.innerHTML = wins.map(w =>
+    `<div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#c4b5fd">
+      <span style="color:#a855f7;font-weight:700;flex-shrink:0;margin-top:1px">→</span>${w}
+    </div>`
+  ).join('');
 }
 
 async function launchFunnelAnalysis() {
+  // Set profile photo in loading screen
+  const photoUrl = getProfilePhotoUrl(S._pendingUrl || '');
+  const handle = getHandleFromUrl(S._pendingUrl || '');
+  const loadAvatar = document.getElementById('fLoadingAvatar');
+  const loadEmoji = document.getElementById('fAvatarEmoji');
+  const loadHandle = document.getElementById('fGenHandle');
+  if (loadAvatar && photoUrl) {
+    loadAvatar.src = photoUrl;
+    loadAvatar.style.display = 'block';
+    if (loadEmoji) loadEmoji.style.display = 'none';
+  }
+  if (loadHandle && handle) loadHandle.textContent = '@' + handle;
   showFunnelStep('1');
   runFunnelLoading();
   await runAnalysis();
