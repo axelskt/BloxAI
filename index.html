@@ -3529,7 +3529,6 @@ function buildRecapEmailHTML(email, d, profile) {
   const opp     = d?.opportunite_cachee || '';
   const plat    = profile?.platform || 'ta plateforme';
   const url     = profile?.url || '';
-  let email   = localStorage.getItem('blowup_email') || '';
   const emailParam = email ? ('?checkout[email]=' + encodeURIComponent(email)) : '';
   const payURL  = (localStorage.getItem('ls_yearly')  || '#') + emailParam;
   const weekURL = (localStorage.getItem('ls_weekly')  || '#') + emailParam;
