@@ -385,8 +385,8 @@
           <span class="f-ans-texts"><strong>Je poste régulièrement</strong><em>Mais je stagne</em></span>
         </button>
         <button class="f-ans f-ans-2line" id="flvl-pro" onclick="selectFunnelLevel('pro')">
-          <span style="font-size:18px">💰</span>
-          <span class="f-ans-texts"><strong>Je suis déjà monétisé</strong><em>Je veux passer au niveau supérieur</em></span>
+          <span style="font-size:18px">🔥</span>
+          <span class="f-ans-texts"><strong>Je fais déjà +10k vues régulièrement</strong><em>Je veux passer au niveau supérieur</em></span>
         </button>
       </div>
     </div>
@@ -1204,13 +1204,16 @@
 
 <!-- ═══════════════════════════════════════════════════════════ JS APP -->
 <script>
+/* ── Owner API key — remplace '' par ta clé Anthropic ── */
+const OWNER_API_KEY = '';
+
 /* ── State ── */
 const S = {
   platform: 'tiktok',
   level: null,            // 'zero' | 'start' | 'grind' | 'pro'
   contentStyle: 'both',   // 'faceless' | 'camera' | 'both'
   selectedPlan: 'yearly',
-  apiKey: localStorage.getItem('blowup_api_key') || '',
+  apiKey: OWNER_API_KEY || localStorage.getItem('blowup_api_key') || '',
   profile: { url: '', desc: '', platform: '', contentStyle: 'both' },
   modules: { 1:null, 2:null, 3:null, 4:null, 5:null, 6:null, 7:null, 8:null, 9:null, 10:null, 11:null, 12:null },
   subtitleStyle: 'hormozi',   // style de sous-titres pour module 10
@@ -1718,6 +1721,8 @@ function startAnalysis() {
 }
 
 async function runAnalysis() {
+  // Refresh key in case owner key was set or admin saved one
+  if (!S.apiKey) S.apiKey = OWNER_API_KEY || localStorage.getItem('blowup_api_key') || '';
   if (!S.apiKey) {
     closeFunnel();
     showView('landing');
