@@ -1379,7 +1379,7 @@ function startCheckout() {
   };
   let url = links[S.selectedPlan] || links.yearly;
   if (url && url.startsWith('http')) {
-    const email = localStorage.getItem('blowup_email') || '';
+    let email = localStorage.getItem('blowup_email') || '';
     if (email) { const sep = url.includes('?') ? '&' : '?'; url += sep + 'checkout[email]=' + encodeURIComponent(email); }
     window.open(url, '_blank');
   } else {
@@ -3267,7 +3267,7 @@ function checkFEmailBtn() {
 }
 
 async function submitFunnelEmail() {
-  const email = (document.getElementById('fEmailInput').value || '').trim();
+  let email = (document.getElementById('fEmailInput').value || '').trim();
   if (!email) return;
   localStorage.setItem('blowup_email', email);
 
@@ -3412,7 +3412,7 @@ function startPlanCheckout(plan) {
     alert('Configure les liens Lemon Squeezy dans la section ⚙ en bas.');
     return;
   }
-  const email = localStorage.getItem('blowup_email') || '';
+  let email = localStorage.getItem('blowup_email') || '';
   if (email) { const sep = url.includes('?') ? '&' : '?'; url += sep + 'checkout[email]=' + encodeURIComponent(email); }
   window.open(url, '_blank');
 }
@@ -3438,7 +3438,7 @@ function startPayCheckout() {
     alert('Configure tes liens Lemon Squeezy dans la section ⚙ en bas.\n\nDashboard LS → ton produit → Sharing → Copy checkout URL.');
     return;
   }
-  const email = localStorage.getItem('blowup_email') || '';
+  let email = localStorage.getItem('blowup_email') || '';
   if (email) { const sep = url.includes('?') ? '&' : '?'; url += sep + 'checkout[email]=' + encodeURIComponent(email); }
   window.open(url, '_blank');
 }
@@ -3529,7 +3529,7 @@ function buildRecapEmailHTML(email, d, profile) {
   const opp     = d?.opportunite_cachee || '';
   const plat    = profile?.platform || 'ta plateforme';
   const url     = profile?.url || '';
-  const email   = localStorage.getItem('blowup_email') || '';
+  let email   = localStorage.getItem('blowup_email') || '';
   const emailParam = email ? ('?checkout[email]=' + encodeURIComponent(email)) : '';
   const payURL  = (localStorage.getItem('ls_yearly')  || '#') + emailParam;
   const weekURL = (localStorage.getItem('ls_weekly')  || '#') + emailParam;
