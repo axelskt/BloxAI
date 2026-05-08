@@ -1378,8 +1378,10 @@
 
 <!-- ═══════════════════════════════════════════════════════════ JS APP -->
 <script>
-/* ── Owner API key — remplace '' par ta clé Anthropic ── */
-const OWNER_API_KEY = [115,107,45,97,110,116,45,97,112,105,48,51,45,103,84,113,98,48,121,111,57,108,104,120,95,115,77,55,45,52,45,45,109,122,109,67,111,109,98,85,99,110,106,65,103,85,101,72,77,105,73,82,112,66,76,53,53,82,78,115,90,108,102,50,77,108,57,75,117,51,70,72,104,108,118,89,81,103,98,108,112,116,98,67,115,69,107,105,101,119,106,102,54,99,90,69,76,104,103,45,102,53,83,77,99,103,65,65].map(c=>String.fromCharCode(c)).join('');
+/* ── Proxy config — clé API côté Vercel, jamais dans ce fichier ── */
+const OWNER_API_KEY = '';  // clé supprimée — le proxy Vercel gère ça
+const PROXY_URL    = 'https://blox-proxy.vercel.app/api/claude';
+const PROXY_SECRET = [50,97,97,98,99,54,100,56,51,53,57,49,50,98,52,53,57,101,55,54,56,99,51,49,102,51,101,52,51,102,49,53,97,55,48,99,99,101,98,99,51,48,100,51,102,99,54,49,55,49,48,98,56,50,56,101,51,57,97,102,53,100,52,48].map(c=>String.fromCharCode(c)).join('');
 
 /* ── State ── */
 const S = {
@@ -1390,7 +1392,7 @@ const S = {
   contentStyle: 'both',   // 'faceless' | 'camera' | 'both'
   niche: '',              // niche / ce que l'user vend (texte libre)
   selectedPlan: 'yearly',
-  apiKey: OWNER_API_KEY || localStorage.getItem('blowup_api_key') || '',
+  apiKey: localStorage.getItem('blowup_api_key') || '',  // clé perso optionnelle
   profile: { url: '', desc: '', platform: '', contentStyle: 'both' },
   modules: { 1:null, 2:null, 3:null, 4:null, 5:null, 6:null, 7:null, 8:null, 9:null, 10:null, 11:null, 12:null },
   subtitleStyle: 'hormozi',   // style de sous-titres pour module 10
@@ -1675,22 +1677,41 @@ function stopLoading() {
 
 /* ── AI call ── */
 async function callClaude(system, user, opts = {}) {
-  if (!S.apiKey) { openApiModal(); throw new Error('no_key'); }
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'x-api-key': S.apiKey,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-    body: JSON.stringify({
-      model: opts.model || 'claude-sonnet-4-5',
+  // Choisit entre proxy sécurisé (défaut) ou appel direct si clé perso fournie
+  const userKey   = S.apiKey && S.apiKey.startsWith('sk-ant-') ? S.apiKey : '';
+  const useProxy  = !!PROXY_URL;
+
+  const headers = { 'content-type': 'application/json' };
+  let endpoint;
+  let bodyObj;
+
+  if (useProxy) {
+    // Mode proxy Vercel — la vraie clé reste sur le serveur
+    endpoint = PROXY_URL;
+    headers['x-proxy-secret'] = PROXY_SECRET;
+    if (userKey) headers['x-user-key'] = userKey;
+    bodyObj = {
+      model:      opts.model || 'claude-sonnet-4-5',
       max_tokens: opts.max_tokens || 3000,
-      system: [{ type: 'text', text: system, cache_control: { type: 'ephemeral' } }],
-      messages: [{ role: 'user', content: user }],
-    }),
-  });
+      system:     [{ type: 'text', text: system }],
+      messages:   [{ role: 'user', content: user }],
+    };
+  } else {
+    // Fallback appel direct (uniquement si clé perso configurée)
+    if (!userKey) { openApiModal(); throw new Error('no_key'); }
+    endpoint = 'https://api.anthropic.com/v1/messages';
+    headers['x-api-key']          = userKey;
+    headers['anthropic-version']  = '2023-06-01';
+    headers['anthropic-dangerous-direct-browser-access'] = 'true';
+    bodyObj = {
+      model:      opts.model || 'claude-sonnet-4-5',
+      max_tokens: opts.max_tokens || 3000,
+      system:     [{ type: 'text', text: system, cache_control: { type: 'ephemeral' } }],
+      messages:   [{ role: 'user', content: user }],
+    };
+  }
+
+  const res = await fetch(endpoint, { method: 'POST', headers, body: JSON.stringify(bodyObj) });
   if (!res.ok) {
     const e = await res.json().catch(()=>({}));
     throw new Error(e.error?.message || 'API error '+res.status);
@@ -2000,7 +2021,8 @@ function startAnalysis() {
 async function runAnalysis() {
   // Refresh key in case owner key was set or admin saved one
   if (!S.apiKey) S.apiKey = OWNER_API_KEY || localStorage.getItem('blowup_api_key') || '';
-  if (!S.apiKey) {
+  // Avec proxy Vercel : pas besoin de clé perso — on continue directement
+  if (!PROXY_URL && !S.apiKey) {
     closeFunnel();
     showView('landing');
     setTimeout(() => openApiModal(), 100);
