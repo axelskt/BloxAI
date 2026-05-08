@@ -1398,21 +1398,34 @@ async function saveLeadToSupabase(email, profileData, auditData) {
   } catch(e) { /* non-blocking */ }
 }
 
-const LS_FORMATION_PRO   = 'https://iamanager.lemonsqueezy.com/checkout/buy/fa14807f-888b-42e5-8f08-66cab4ab74eb';
-const LS_FORMATION_ELITE = 'https://app.lemonsqueezy.com/share/1024203';
+/* ── Lemon Squeezy checkout links — BloxAI ── */
+const LS = {
+  starter_m: 'https://iamanagers.lemonsqueezy.com/checkout/buy/b262a82b-094c-4bd8-80e4-4a040c9611a3',
+  starter_y: 'https://iamanagers.lemonsqueezy.com/checkout/buy/12a7ba48-a6ef-4e71-88f0-12571a7a42bc',
+  pro_m:     'https://iamanagers.lemonsqueezy.com/checkout/buy/f4e68ec0-c76e-461c-b10b-a6d0064662e3',
+  pro_y:     'https://iamanagers.lemonsqueezy.com/checkout/buy/9549c308-ef46-4e6b-b911-21af3553c05c',
+  elite_m:   'https://iamanagers.lemonsqueezy.com/checkout/buy/d60d7465-9d61-4f46-b902-8d646ccd6bc0',
+  elite_y:   'https://iamanagers.lemonsqueezy.com/checkout/buy/26f27657-2523-440f-83a2-cac2831034a2',
+  formation: 'https://iamanagers.lemonsqueezy.com/checkout/buy/4f2ed14a-632a-4581-9b90-1a695164098d',
+};
+// Legacy — kept for compat
+const LS_FORMATION_PRO   = LS.formation;
+const LS_FORMATION_ELITE = LS.elite_y;
 
 const FORMATION_CODE       = 'BLOWUP2024';   // free full access (internal/test)
 
 /* ── Access level ──
    'free'    → audit TikTok only (module 1, TikTok platform only)
+   'starter' → paid Starter (modules 1-3: Audit, Offre, Scripts)
    'trial'   → 3-day full access (all modules)
-   'pro'     → paid subscription (modules 1-7 incl. Spy Concurrent)
-   'elite'   → paid subscription (modules 1-9 incl. AvatarAds + Audit Concurrent)
+   'pro'     → paid Pro (modules 1-7 incl. Spy Concurrent)
+   'elite'   → paid Élite (all modules incl. AvatarAds + Audit Concurrent + ShortClip)
 */
 function getAccessLevel() {
   const stored = localStorage.getItem('blowup_access') || '';
   if (stored === 'elite') return 'elite';
   if (stored === 'true' || stored === 'pro') return 'pro';
+  if (stored === 'starter') return 'starter';
   const trialStart = localStorage.getItem('blowup_trial_start');
   if (trialStart) {
     const days = (Date.now() - parseInt(trialStart)) / 86400000;
@@ -1420,9 +1433,10 @@ function getAccessLevel() {
   }
   return 'free';
 }
-function hasProAccess()   { const l = getAccessLevel(); return l === 'pro' || l === 'trial' || l === 'elite'; }
-function hasEliteAccess() { return getAccessLevel() === 'elite'; }
-function isTrialActive()  { return getAccessLevel() === 'trial'; }
+function hasStarterAccess() { const l = getAccessLevel(); return l === 'starter' || l === 'pro' || l === 'trial' || l === 'elite'; }
+function hasProAccess()     { const l = getAccessLevel(); return l === 'pro' || l === 'trial' || l === 'elite'; }
+function hasEliteAccess()   { return getAccessLevel() === 'elite'; }
+function isTrialActive()    { return getAccessLevel() === 'trial'; }
 
 function startTrial() {
   if (!localStorage.getItem('blowup_trial_start')) {
@@ -1436,14 +1450,29 @@ const MOD_EMOJI  = { 1:'🔍', 2:'💰', 3:'🎬', 4:'🔗', 5:'🌐', 6:'📅',
 
 /* ── Boot ── */
 window.onload = () => {
+  // ── Seed LS links in localStorage (used by admin panel display) ──
+  if (!localStorage.getItem('ls_starter_m')) localStorage.setItem('ls_starter_m', LS.starter_m);
+  if (!localStorage.getItem('ls_starter_y')) localStorage.setItem('ls_starter_y', LS.starter_y);
+  if (!localStorage.getItem('ls_pro_m'))     localStorage.setItem('ls_pro_m',     LS.pro_m);
+  if (!localStorage.getItem('ls_pro_y'))     localStorage.setItem('ls_pro_y',     LS.pro_y);
+  if (!localStorage.getItem('ls_elite_m'))   localStorage.setItem('ls_elite_m',   LS.elite_m);
+  if (!localStorage.getItem('ls_elite_y'))   localStorage.setItem('ls_elite_y',   LS.elite_y);
+
   // ── Activation post-paiement Lemon Squeezy ──
-  // LS redirige vers blox.iamanager.fr?activated=pro ou ?activated=elite après paiement
   const params = new URLSearchParams(window.location.search);
   const activated = params.get('activated');
   if (activated === 'elite') {
     localStorage.setItem('blowup_access', 'elite');
     history.replaceState({}, '', window.location.pathname);
-    setTimeout(() => alert('🎉 Accès Élite activé ! Tous tes modules sont débloqués.'), 500);
+    setTimeout(() => { alert('🎉 Accès Élite activé ! Tous tes modules sont débloqués.'); }, 500);
+  } else if (activated === 'pro') {
+    localStorage.setItem('blowup_access', 'pro');
+    history.replaceState({}, '', window.location.pathname);
+    setTimeout(() => { alert('✦ Accès Pro activé ! Tes modules sont débloqués.'); }, 500);
+  } else if (activated === 'starter') {
+    localStorage.setItem('blowup_access', 'starter');
+    history.replaceState({}, '', window.location.pathname);
+    setTimeout(() => { alert('🚀 Accès Starter activé ! Tu peux maintenant analyser toutes tes plateformes.'); }, 500);
   }
 
   selectPlan('yearly');
@@ -1961,10 +1990,12 @@ async function switchTab(n) {
 /* ── Generate module ── */
 async function generateModule(n) {
   if (S.generating) return;
-  const needsPro   = (n >= 2 && n <= 7) || n === 10 || n === 12;
-  const needsElite = n === 8 || n === 9 || n === 11;
-  if (needsPro   && !hasProAccess())   { openPaywall(); return; }
-  if (needsElite && !hasEliteAccess()) { openPaywall(); return; }
+  const needsStarter = n === 2 || n === 3;
+  const needsPro     = (n >= 4 && n <= 7) || n === 10 || n === 12;
+  const needsElite   = n === 8 || n === 9 || n === 11;
+  if (needsStarter && !hasStarterAccess()) { openPaywall(); return; }
+  if (needsPro     && !hasProAccess())     { openPaywall(); return; }
+  if (needsElite   && !hasEliteAccess())   { openPaywall(); return; }
   if (S.modules[n]) { renderModuleContent(); return; }
 
   S.generating = true;
@@ -3801,16 +3832,17 @@ function setBilling(type) {
 }
 
 function startPlanCheckout(plan) {
-  const b = _payBilling;
-  const keyMap = {
-    starter_monthly: 'ls_starter_m', starter_yearly: 'ls_starter_y',
-    pro_monthly:     'ls_pro_m',     pro_yearly:     'ls_pro_y',
-    elite_monthly:   'ls_elite_m',   elite_yearly:   'ls_elite_y',
+  const b = _payBilling === 'yearly' ? 'y' : 'm';
+  // Hardcoded links — priorité sur localStorage (admin override possible)
+  const hardcoded = {
+    starter_m: LS.starter_m, starter_y: LS.starter_y,
+    pro_m:     LS.pro_m,     pro_y:     LS.pro_y,
+    elite_m:   LS.elite_m,   elite_y:   LS.elite_y,
   };
-  const key = keyMap[plan + '_' + b];
-  let url = localStorage.getItem(key) || '';
-  if (!url || !url.startsWith('http')) {
-    alert('Configure les liens Lemon Squeezy dans la section ⚙ en bas.');
+  const lsKey = `ls_${plan}_${b}`;
+  let url = localStorage.getItem(lsKey) || hardcoded[`${plan}_${b}`] || '';
+  if (!url) {
+    alert('Lien de paiement non configuré pour ce plan.');
     return;
   }
   let email = localStorage.getItem('blowup_email') || '';
@@ -3938,8 +3970,8 @@ function buildRecapEmailHTML(email, d, profile) {
   const faibles = (d?.points_faibles || []).slice(0, 2);
   const url     = profile?.url || '';
   const emailParam = email ? ('?checkout[email]=' + encodeURIComponent(email)) : '';
-  const starterURL = (localStorage.getItem('ls_starter_y') || localStorage.getItem('ls_starter_m') || 'https://bloxai.fr') + emailParam;
-  const proURL     = (localStorage.getItem('ls_pro_y')     || localStorage.getItem('ls_pro_m')     || 'https://bloxai.fr') + emailParam;
+  const starterURL = (localStorage.getItem('ls_starter_y') || LS.starter_y) + emailParam;
+  const proURL     = (localStorage.getItem('ls_pro_y')     || LS.pro_y)     + emailParam;
 
   const scoreColor = score >= 7 ? '#4ade80' : score >= 5 ? '#facc15' : '#f87171';
   const winItems = wins.map(w =>
