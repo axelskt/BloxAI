@@ -175,10 +175,14 @@
 
     .plan-features { list-style:none; padding:0; margin:0; border-top:1px solid #1e1e30; padding-top:14px; }
     .plan-features li { display:flex; align-items:flex-start; gap:8px; font-size:12px; color:#9ca3af; padding:5px 0; line-height:1.4; }
-    .plan-features li .fi { flex-shrink:0; width:16px; text-align:center; margin-top:1px; }
+    .plan-features li .fi { flex-shrink:0; width:16px; text-align:center; margin-top:2px; }
     .plan-features li.fi-on  { color:#e2e8f0; }
     .plan-features li.fi-off { color:#3f3f5a; }
     .plan-features li.fi-elite { color:#f97316; }
+    .plan-features li .fi-label { display:flex; flex-direction:column; gap:1px; }
+    .plan-features li .fi-label strong { font-size:12px; font-weight:700; line-height:1.3; }
+    .plan-features li .fi-label em { font-style:normal; font-size:11px; color:#6b7280; line-height:1.3; }
+    .plan-features li.fi-elite .fi-label em { color:#c2773a; }
 
     /* Payment trust */
     .trust-badge { display:inline-flex; align-items:center; gap:4px; background:#111120; border:1px solid #1e1e30; border-radius:8px; padding:6px 12px; font-size:11px; color:#6b7280; font-weight:600; }
@@ -636,9 +640,20 @@
       </div>
 
       <!-- Recommandation -->
-      <div id="fAuditRecommandation" style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.22);border-radius:12px;padding:14px 16px;margin-bottom:20px">
+      <div id="fAuditRecommandation" style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.22);border-radius:12px;padding:14px 16px;margin-bottom:12px">
         <div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#4ade80;margin-bottom:8px">💡 Recommandation</div>
         <p id="fAuditRecommandationText" style="font-size:14px;color:#86efac;line-height:1.6;font-weight:500"></p>
+      </div>
+
+      <!-- AvatarAds teaser (uniquement si faceless ou pas de caméra) -->
+      <div id="fAvatarAdsTeaser" style="display:none;background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px 16px;margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:22px;flex-shrink:0">🤖</span>
+          <div>
+            <div style="font-size:11px;font-weight:800;color:#f97316;margin-bottom:3px">Et si ton avatar IA parlait à ta place ?</div>
+            <div style="font-size:12px;color:#9ca3af;line-height:1.5">Génère des pubs vidéo professionnelles avec un avatar IA — sans caméra, sans montage, en 5 minutes. Disponible avec le plan Élite.</div>
+          </div>
+        </div>
       </div>
 
       <button class="f-btn" onclick="funnelStep(3)">Construire mon plan complet →</button>
@@ -886,11 +901,11 @@
             <button class="plan-cta plan-cta-pro" onclick="startPlanCheckout('pro')">Choisir Pro →</button>
             <ul class="plan-features">
               <li class="fi-on"><span class="fi">✓</span>Tout le Starter</li>
-              <li class="fi-on"><span class="fi" style="color:#a855f7">✓</span><strong>Funnel de conversion</strong> — étapes, accroches, CTA</li>
-              <li class="fi-on"><span class="fi" style="color:#a855f7">✓</span><strong>Site web qui vend</strong> — landing page prête à intégrer</li>
-              <li class="fi-on"><span class="fi" style="color:#a855f7">✓</span><strong>Calendrier éditorial 30 jours</strong> — un post par jour, clé en main</li>
-              <li class="fi-on"><span class="fi" style="color:#a855f7">✓</span><strong>Spy Concurrent</strong> — analyse 3 comptes, extrais leurs hooks</li>
-              <li class="fi-on"><span class="fi" style="color:#a855f7">✓</span><strong>Analyse Vidéo Virale</strong> — décode ce qui cartonne dans ta niche</li>
+              <li class="fi-on"><span class="fi" style="color:#a855f7;margin-top:3px">✓</span><div class="fi-label"><strong>Funnel de conversion</strong><em>Étapes, accroches, CTA</em></div></li>
+              <li class="fi-on"><span class="fi" style="color:#a855f7;margin-top:3px">✓</span><div class="fi-label"><strong>Site web qui vend</strong><em>Landing page prête à intégrer</em></div></li>
+              <li class="fi-on"><span class="fi" style="color:#a855f7;margin-top:3px">✓</span><div class="fi-label"><strong>Calendrier éditorial 30 jours</strong><em>Un post par jour, clé en main</em></div></li>
+              <li class="fi-on"><span class="fi" style="color:#a855f7;margin-top:3px">✓</span><div class="fi-label"><strong>Spy Concurrent</strong><em>Analyse 3 comptes, extrais leurs hooks</em></div></li>
+              <li class="fi-on"><span class="fi" style="color:#a855f7;margin-top:3px">✓</span><div class="fi-label"><strong>Analyse Vidéo Virale</strong><em>Décode ce qui cartonne dans ta niche</em></div></li>
               <li class="fi-off"><span class="fi">✗</span>AvatarAds · Audit Concurrent · ShortClip</li>
             </ul>
           </div>
@@ -908,10 +923,10 @@
             <button class="plan-cta plan-cta-elite" onclick="startPlanCheckout('elite')">Choisir Élite →</button>
             <ul class="plan-features">
               <li class="fi-on"><span class="fi">✓</span>Tout le Pro</li>
-              <li class="fi-elite"><span class="fi">🤖</span><strong>AvatarAds</strong> — scripts pubs vidéo avec avatar IA, sans te filmer</li>
-              <li class="fi-elite"><span class="fi">🔬</span><strong>Audit Concurrent</strong> — décortique un concurrent, scripts à adapter</li>
-              <li class="fi-elite"><span class="fi">✂️</span><strong>ShortClip</strong> — vidéo longue → shorts découpés automatiquement</li>
-              <li class="fi-elite"><span class="fi">⚡</span>Support prioritaire + accès bêta aux nouvelles features</li>
+              <li class="fi-elite"><span class="fi" style="margin-top:3px">🤖</span><div class="fi-label"><strong>AvatarAds</strong><em>Scripts pubs vidéo avec avatar IA, sans te filmer</em></div></li>
+              <li class="fi-elite"><span class="fi" style="margin-top:3px">🔬</span><div class="fi-label"><strong>Audit Concurrent</strong><em>Décortique un concurrent, scripts à adapter</em></div></li>
+              <li class="fi-elite"><span class="fi" style="margin-top:3px">✂️</span><div class="fi-label"><strong>ShortClip</strong><em>Vidéo longue → shorts découpés automatiquement</em></div></li>
+              <li class="fi-elite"><span class="fi" style="margin-top:3px">⚡</span><div class="fi-label"><strong>Support prioritaire</strong><em>Accès bêta aux nouvelles features</em></div></li>
             </ul>
 
             <!-- AvatarAds teaser -->
@@ -3661,6 +3676,10 @@ function populateFreeAudit() {
   if (recEl) recEl.textContent = recommandation;
   const recWrap = document.getElementById('fAuditRecommandation');
   if (recWrap) recWrap.style.display = recommandation ? 'block' : 'none';
+
+  // AvatarAds teaser — toujours visible après l'audit
+  const avatarTeaser = document.getElementById('fAvatarAdsTeaser');
+  if (avatarTeaser) avatarTeaser.style.display = 'block';
 }
 
 async function launchFunnelAnalysis() {
