@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BLOX — Viral en un clic</title>
+  <title>BloxAI — Viral en un clic</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.10.1/dist/ffmpeg.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -136,7 +136,8 @@
     .save-tag { display:inline-block; background:rgba(34,197,94,.2); color:#22c55e; font-size:10px; font-weight:800; padding:2px 7px; border-radius:99px; margin-left:6px; }
 
     /* ── Plan cards ── */
-    .plan-card { background:#0c0c16; border:1.5px solid #1e1e30; border-radius:18px; padding:22px 20px; margin-bottom:12px; position:relative; transition:border-color .2s; }
+    .plan-card { background:#0c0c16; border:1.5px solid #1e1e30; border-radius:18px; padding:22px 20px; position:relative; transition:border-color .2s; }
+    @media(min-width:600px){ #pricingGrid { grid-template-columns:1fr 1fr 1fr !important; align-items:start; } }
     .plan-card:hover { border-color:#2a2a42; }
     .plan-card.plan-pro { border-color:rgba(168,85,247,.5); background:linear-gradient(160deg,rgba(124,58,237,.06),rgba(219,39,119,.04)); }
     .plan-card.plan-elite { border-color:rgba(249,115,22,.4); background:rgba(249,115,22,.03); }
@@ -255,7 +256,7 @@
 <div id="apiModal" class="modal-bg" style="display:none">
   <div class="card p-8 w-full max-w-md fade-up">
     <div class="text-center mb-6">
-      <div class="text-3xl font-black grad mb-2">⚡ BLOX</div>
+      <div class="text-3xl font-black grad mb-2">⚡ BloxAI</div>
       <p class="text-gray-400 text-sm">Entre ta clé API Anthropic pour activer l'IA</p>
     </div>
     <label class="section-lbl">Clé API Anthropic</label>
@@ -419,6 +420,30 @@
       </div>
     </div>
 
+    <!-- ── STEP 0c : Style de contenu ── -->
+    <div class="funnel-step" id="fStep0c">
+      <div class="f-prog-bar"><div class="f-prog-fill" style="width:45%"></div></div>
+      <div class="text-center mb-8">
+        <div style="font-size:48px;margin-bottom:14px">🎬</div>
+        <h2 class="text-white text-2xl font-black mb-3">Tu filmes ton visage ?</h2>
+        <p class="text-gray-500 text-sm">L'IA adapte tes scripts et hooks à ton style.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px">
+        <button class="f-ans f-ans-2line" id="fcs-faceless" onclick="selectFunnelStyle('faceless')">
+          <span style="font-size:18px">🎭</span>
+          <span class="f-ans-texts"><strong>Non — je reste faceless</strong><em>Voix off, sous-titres, avatar IA</em></span>
+        </button>
+        <button class="f-ans f-ans-2line" id="fcs-camera" onclick="selectFunnelStyle('camera')">
+          <span style="font-size:18px">🎥</span>
+          <span class="f-ans-texts"><strong>Oui — face caméra</strong><em>Je montre mon visage dans mes vidéos</em></span>
+        </button>
+        <button class="f-ans f-ans-2line" id="fcs-both" onclick="selectFunnelStyle('both')">
+          <span style="font-size:18px">✨</span>
+          <span class="f-ans-texts"><strong>Les deux selon les vidéos</strong><em>Je varie selon le contenu</em></span>
+        </button>
+      </div>
+    </div>
+
     <!-- ── STEP 1: Loading / generating plan ── -->
     <div class="funnel-step" id="fStep1">
       <!-- Top progress -->
@@ -484,7 +509,7 @@
         </div>
         <div>
           <div id="fAuditHandle" style="font-weight:800;font-size:16px;color:#fff"></div>
-          <div style="font-size:12px;color:#6b7280;margin-top:2px">🎵 TikTok · Analysé par BLOX</div>
+          <div style="font-size:12px;color:#6b7280;margin-top:2px">🎵 TikTok · Analysé par BloxAI</div>
         </div>
       </div>
 
@@ -626,7 +651,7 @@
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
             <!-- AVANT -->
             <div style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.15);border-radius:14px;padding:18px 16px">
-              <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#f87171;margin-bottom:12px">😓 Avant BLOX</div>
+              <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#f87171;margin-bottom:12px">😓 Avant BloxAI</div>
               <div style="display:flex;flex-direction:column;gap:8px">
                 <div style="font-size:13px;color:#6b7280;display:flex;gap:8px;align-items:flex-start"><span style="color:#ef4444;flex-shrink:0">✗</span>Tu postes au feeling sans stratégie</div>
                 <div style="font-size:13px;color:#6b7280;display:flex;gap:8px;align-items:flex-start"><span style="color:#ef4444;flex-shrink:0">✗</span>Tu ne sais pas quoi dire dans tes vidéos</div>
@@ -637,7 +662,7 @@
             </div>
             <!-- APRÈS -->
             <div style="background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.18);border-radius:14px;padding:18px 16px">
-              <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#4ade80;margin-bottom:12px">🚀 Avec BLOX</div>
+              <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#4ade80;margin-bottom:12px">🚀 Avec BloxAI</div>
               <div style="display:flex;flex-direction:column;gap:8px">
                 <div style="font-size:13px;color:#c4c2de;display:flex;gap:8px;align-items:flex-start"><span style="color:#22c55e;flex-shrink:0">✓</span>Audit complet de ton compte en 60 sec</div>
                 <div style="font-size:13px;color:#c4c2de;display:flex;gap:8px;align-items:flex-start"><span style="color:#22c55e;flex-shrink:0">✓</span>Scripts viraux prêts à tourner</div>
@@ -665,43 +690,43 @@
           <div class="feat-card">
             <div class="feat-icon">📄</div>
             <div>
-              <div style="font-weight:700;font-size:14px;color:#fff;margin-bottom:4px">Scripts Prêts à Tourner</div>
-              <div style="font-size:13px;color:#6b7280;line-height:1.5">Remplis les blancs. Tourne. Publie. Pas besoin de réfléchir.</div>
+              <div style="font-weight:700;font-size:14px;color:#fff;margin-bottom:4px">Scripts Viraux Prêts à Tourner</div>
+              <div style="font-size:13px;color:#6b7280;line-height:1.5">Hooks percutants + scripts adaptés à ta niche générés en quelques secondes — copie, tourne, publie.</div>
             </div>
           </div>
           <div class="feat-card">
             <div class="feat-icon">📅</div>
             <div>
-              <div style="font-weight:700;font-size:14px;color:#fff;margin-bottom:4px">Calendrier éditorial 30 jours</div>
-              <div style="font-size:13px;color:#6b7280;line-height:1.5">30 jours de contenu planifiés : hooks, formats, créneaux. Tu sais exactement quoi poster chaque jour.</div>
+              <div style="font-weight:700;font-size:14px;color:#fff;margin-bottom:4px">Calendrier Éditorial 30 Jours</div>
+              <div style="font-size:13px;color:#6b7280;line-height:1.5">30 jours de contenu planifiés avec les bons hooks et créneaux. Fini de se demander quoi poster.</div>
             </div>
           </div>
           <div class="feat-card">
             <div class="feat-icon">🕵️</div>
             <div>
-              <div style="font-weight:700;font-size:14px;color:#fff;margin-bottom:4px">Spy Concurrent <span style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:800;margin-left:4px">PRO</span></div>
-              <div style="font-size:13px;color:#6b7280;line-height:1.5">3 comptes d'inspiration analysés + 10 hooks adaptés à ton style (faceless ou face caméra).</div>
+              <div style="font-weight:700;font-size:14px;color:#fff;margin-bottom:4px">Spy Concurrent</div>
+              <div style="font-size:13px;color:#6b7280;line-height:1.5">Analyse 3 comptes qui cartonnent dans ta niche — extrais leurs patterns viraux et adapte-les à ton style.</div>
             </div>
           </div>
           <div class="feat-card" style="border-color:rgba(249,115,22,.25);background:rgba(249,115,22,.04)">
             <div class="feat-icon" style="border-color:rgba(249,115,22,.3)">🤖</div>
             <div>
-              <div style="font-weight:700;font-size:14px;color:#fff;margin-bottom:4px">AvatarAds <span style="background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:800;margin-left:4px">ÉLITE</span></div>
-              <div style="font-size:13px;color:#6b7280;line-height:1.5">Crée des pubs vidéo sans te filmer — scripts + brief créatif + variantes A/B prêts pour TikTok Ads & Meta Ads.</div>
+              <div style="font-weight:700;font-size:14px;color:#fff;margin-bottom:4px">AvatarAds</div>
+              <div style="font-size:13px;color:#6b7280;line-height:1.5">Génère des scripts de pubs vidéo pour ton business avec avatar IA — sans te filmer, sans studio, en 5 minutes.</div>
             </div>
           </div>
           <div class="feat-card" style="border-color:rgba(249,115,22,.25);background:rgba(249,115,22,.04)">
             <div class="feat-icon" style="border-color:rgba(249,115,22,.3)">🔬</div>
             <div>
-              <div style="font-weight:700;font-size:14px;color:#fff;margin-bottom:4px">Audit Concurrent <span style="background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:800;margin-left:4px">ÉLITE</span></div>
-              <div style="font-size:13px;color:#6b7280;line-height:1.5">Analyse approfondie d'un concurrent direct — patterns, gaps, scripts adaptés à ton profil.</div>
+              <div style="font-weight:700;font-size:14px;color:#fff;margin-bottom:4px">Audit Concurrent</div>
+              <div style="font-size:13px;color:#6b7280;line-height:1.5">Audit complet d'un concurrent direct — ce qui marche, ce qu'il rate, et les hooks à adapter.</div>
             </div>
           </div>
           <div class="feat-card" style="border-color:rgba(249,115,22,.25);background:rgba(249,115,22,.04)">
             <div class="feat-icon" style="border-color:rgba(249,115,22,.3)">✂️</div>
             <div>
-              <div style="font-weight:700;font-size:14px;color:#fff;margin-bottom:4px">ShortClip <span style="background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:800;margin-left:4px">ÉLITE</span></div>
-              <div style="font-size:13px;color:#6b7280;line-height:1.5">Upload une vidéo longue → l'IA identifie les meilleurs moments → FFmpeg les découpe automatiquement en shorts. Directement dans ton navigateur.</div>
+              <div style="font-weight:700;font-size:14px;color:#fff;margin-bottom:4px">ShortClip</div>
+              <div style="font-size:13px;color:#6b7280;line-height:1.5">Importe une longue vidéo, l'IA repère les meilleurs moments et les découpe automatiquement en shorts.</div>
             </div>
           </div>
         </div>
@@ -717,6 +742,9 @@
               <button id="tbYearly" class="tb-btn tb-active" onclick="setBilling('yearly')">Annuel <span class="save-tag">Économise -27%</span></button>
             </div>
           </div>
+
+          <!-- 3-col grid on desktop -->
+          <div id="pricingGrid" style="display:grid;grid-template-columns:1fr;gap:12px">
 
           <!-- STARTER -->
           <div class="plan-card" id="plan-starter">
@@ -779,15 +807,24 @@
               <li class="fi-elite"><span class="fi">⚡</span>Support prioritaire + accès bêta</li>
             </ul>
 
-            <!-- AvatarAds live preview teaser -->
+            <!-- AvatarAds live preview -->
             <div class="avatar-teaser">
-              <div class="avatar-teaser-title">🤖 Aperçu AvatarAds — ce que ça générerait pour ton compte</div>
-              <div class="avatar-teaser-line avatar-teaser-blur" id="avatarTeaserHook">Hook : <em>"Stop. Si tu fais encore ça sur TikTok, tu perds de l'argent chaque semaine."</em></div>
-              <div class="avatar-teaser-line avatar-teaser-blur" id="avatarTeaserScript">Script : Avatar regarde caméra, ton chaleureux, 18 sec — présente le problème principal de ton compte en 3 phrases directes, puis CTA vers le lien en bio.</div>
-              <div class="avatar-teaser-line avatar-teaser-blur" id="avatarTeaserBrief">Brief Avatar IA : Femme 25-35 ans, fond épuré sombre, débit modéré avec pause après le hook, regard fixe caméra, micro-sourire à la fin.</div>
-              <div style="text-align:center;margin-top:8px;font-size:11px;color:#f97316;font-weight:600">🔓 Débloque Élite pour voir ton script complet</div>
+              <div class="avatar-teaser-title">🤖 Exemple AvatarAds — Aperçu ce que ça génère</div>
+              <!-- Video demo placeholder -->
+              <div style="border-radius:10px;overflow:hidden;margin-bottom:10px;background:#000;aspect-ratio:9/16;max-height:260px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(249,115,22,.2)" id="avatarVideoDemo">
+                <div style="text-align:center;padding:20px">
+                  <div style="font-size:32px;margin-bottom:8px">▶️</div>
+                  <div style="font-size:12px;color:#f97316;font-weight:600">Vidéo démo AvatarAds</div>
+                  <div style="font-size:11px;color:#6b7280;margin-top:4px">Ajoute ton lien vidéo dans le code</div>
+                </div>
+              </div>
+              <div class="avatar-teaser-line" id="avatarTeaserHook">Hook : <em id="avatarTeaserHookText">"Personne ne t'en parle mais c'est le business le plus rentable en 2026…"</em></div>
+              <div class="avatar-teaser-line" id="avatarTeaserScript" style="font-size:12px;color:#d8b4fe;line-height:1.5" id="avatarTeaserScriptText">Script généré pour ton compte — avatar IA, ton chaleureux, 18 sec, CTA commentaire.</div>
+              <div style="text-align:center;margin-top:8px;font-size:11px;color:#f97316;font-weight:600">✓ Débloqué avec Élite — génère tes scripts en 5 min</div>
             </div>
           </div>
+
+          </div><!-- end pricingGrid -->
 
           <p style="font-size:11px;color:#3f3f5a;text-align:center;margin-top:10px;line-height:1.5">
             Annulation en 1 clic · TVA incluse · Remboursé 14 jours si non satisfait
@@ -795,18 +832,16 @@
         </div>
 
         <!-- Trust -->
-        <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px;flex-wrap:wrap">
-          <div class="trust-badge">🔒 Paiement sécurisé</div>
-          <div class="trust-badge" style="color:#f97316">🍋 Lemon Squeezy</div>
+        <div style="text-align:center;font-size:11px;font-weight:700;color:#4a4a70;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px">🔒 Paiement 100% sécurisé</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:20px;flex-wrap:wrap">
           <div class="trust-badge" style="color:#1a56db">VISA</div>
-          <div class="trust-badge" style="color:#003087">PayPal</div>
+          <div class="trust-badge" style="color:#eb001b">Mastercard</div>
+          <div class="trust-badge" style="color:#5a78f0">Carte Bleue</div>
+          <div class="trust-badge" style="color:#000">🍎 Apple Pay</div>
         </div>
 
-        <!-- Skip -->
-        <div class="pay-skip" onclick="closeFunnelAndShow()">Non merci, voir mon audit gratuit →</div>
-
-        <!-- Config -->
-        <details class="mt-6" style="border-top:1px solid #1e1e30;padding-top:14px">
+        <!-- Config (admin only) -->
+        <details class="mt-6" style="border-top:1px solid #1e1e30;padding-top:14px;display:none" id="adminConfigSection">
           <summary style="font-size:11px;color:#3f3f5a;cursor:pointer;user-select:none">⚙ Configuration Lemon Squeezy & Brevo</summary>
           <div class="mt-3">
             <!-- LS setup guide -->
@@ -839,7 +874,7 @@
               <div style="font-weight:800;color:#a855f7;margin-bottom:6px">📧 Setup Brevo (10 min)</div>
               1. Crée un compte gratuit sur <strong style="color:#a855f7">brevo.com</strong> (300 emails/jour offerts)<br/>
               2. <strong style="color:#e2e8f0">SMTP &amp; API → API Keys</strong> → génère une clé → colle-la ici<br/>
-              3. <strong style="color:#e2e8f0">Contacts → Lists</strong> → crée une liste "BLOX Prospects" → note l'ID (ex: 4)<br/>
+              3. <strong style="color:#e2e8f0">Contacts → Lists</strong> → crée une liste "BloxAI Prospects" → note l'ID (ex: 4)<br/>
               4. <strong style="color:#e2e8f0">Automations</strong> → nouveau workflow → trigger "Contact added to list [ID]"<br/>
               &nbsp;&nbsp;&nbsp;→ Ajoute les emails aux délais : J+1 / J+3 / J+5 / J+7 / J+10<br/>
               5. Chaque email de relance = angle différent (urgence / preuve / objection / deadline)
@@ -863,7 +898,7 @@
 <nav class="sticky top-0 z-40" style="background:rgba(6,6,12,.85);backdrop-filter:blur(12px)">
   <div class="max-w-5xl mx-auto px-5 h-16 flex items-center justify-between">
     <div class="flex items-center gap-2 cursor-pointer" onclick="showView('landing')">
-      <span class="font-black text-xl tracking-tight grad">⚡ BLOX</span>
+      <span class="font-black text-xl tracking-tight grad">⚡ BloxAI</span>
       <span style="font-size:11px;font-weight:400;color:#4a4a70;letter-spacing:.3px">by IA MANAGER</span>
     </div>
     <div id="navAdminBtn" style="display:none">
@@ -885,11 +920,11 @@
       </div>
 
       <h1 class="text-5xl font-black leading-tight mb-5" style="letter-spacing:-.02em">
-        Ton business audité<br/>
-        <span class="grad">par l'IA en 60 secondes</span>
+        Deviens viral.<br/>
+        <span class="grad">Monétise ce trafic.</span>
       </h1>
       <p class="text-gray-400 text-lg mb-10 max-w-xl mx-auto leading-relaxed">
-        Analyse ton profil Instagram / TikTok / site et génère <strong class="text-gray-200">ton plan de monétisation complet</strong> en quelques secondes.
+        BloxAI analyse ton compte TikTok et génère <strong class="text-gray-200">ton plan de croissance + monétisation personnalisé</strong> en 60 secondes.
       </p>
 
       <!-- Input Card -->
@@ -922,14 +957,14 @@
         <div class="step-num">01</div>
         <div>
           <div class="font-bold text-white mb-2">Décris ton business</div>
-          <div class="text-gray-500 text-sm leading-relaxed">Entre ton lien de profil et décris ta niche en 30 secondes. BLOX comprend exactement qui tu es et ce que tu vends.</div>
+          <div class="text-gray-500 text-sm leading-relaxed">Entre ton lien de profil et décris ta niche en 30 secondes. BloxAI comprend exactement qui tu es et ce que tu vends.</div>
         </div>
       </div>
       <div class="card p-6 flex gap-5 items-start fade-up" style="animation-delay:.1s">
         <div class="step-num">02</div>
         <div>
           <div class="font-bold text-white mb-2">L'IA analyse tout</div>
-          <div class="text-gray-500 text-sm leading-relaxed">BLOX scanne ton compte, identifie tes blocages, tes forces cachées et les opportunités que tu rates chaque semaine.</div>
+          <div class="text-gray-500 text-sm leading-relaxed">BloxAI scanne ton compte, identifie tes blocages, tes forces cachées et les opportunités que tu rates chaque semaine.</div>
         </div>
       </div>
       <div class="card p-6 flex gap-5 items-start fade-up" style="animation-delay:.15s">
@@ -943,7 +978,7 @@
         <div class="step-num">04</div>
         <div>
           <div class="font-bold text-white mb-2">Scale ton business</div>
-          <div class="text-gray-500 text-sm leading-relaxed">Publie, convertis, multiplie. BLOX continue de t'accompagner avec de nouveaux outils chaque semaine.</div>
+          <div class="text-gray-500 text-sm leading-relaxed">Publie, convertis, multiplie. BloxAI continue de t'accompagner avec de nouveaux outils chaque semaine.</div>
         </div>
       </div>
     </div>
@@ -1022,13 +1057,13 @@
 
   <!-- ── TÉMOIGNAGES ── -->
   <div class="max-w-5xl mx-auto px-5 py-24">
-    <h2 class="text-center text-3xl font-black mb-4">Ils ont <span class="grad">explosé</span> avec BLOX</h2>
-    <p class="text-center text-gray-500 text-sm mb-14 max-w-md mx-auto">Des créateurs comme toi qui ont appliqué le plan BLOX.</p>
+    <h2 class="text-center text-3xl font-black mb-4">Ils ont <span class="grad">explosé</span> avec BloxAI</h2>
+    <p class="text-center text-gray-500 text-sm mb-14 max-w-md mx-auto">Des créateurs comme toi qui ont appliqué le plan BloxAI.</p>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div class="review-card">
         <div class="flex gap-1 mb-4">★★★★★</div>
-        <p class="text-gray-300 text-sm leading-relaxed mb-5">"En 3 jours j'avais mon offre, mes scripts et mon calendrier. J'ai posté 2 vidéos avec les hooks BLOX — l'une à déjà 180k vues. Je comprends enfin ce qui fait cartonner."</p>
+        <p class="text-gray-300 text-sm leading-relaxed mb-5">"En 3 jours j'avais mon offre, mes scripts et mon calendrier. J'ai posté 2 vidéos avec les hooks BloxAI — l'une à déjà 180k vues. Je comprends enfin ce qui fait cartonner."</p>
         <div class="flex items-center gap-3">
           <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#db2777);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">👩</div>
           <div>
@@ -1039,7 +1074,7 @@
       </div>
       <div class="review-card" style="border-color:rgba(168,85,247,.25)">
         <div class="flex gap-1 mb-4" style="color:#a855f7">★★★★★</div>
-        <p class="text-gray-300 text-sm leading-relaxed mb-5">"J'avais 4k abonnés et zéro vente. BLOX a détecté que mon offre était mal positionnée. J'ai tout refait en suivant le plan. 3 semaines après : premiers clients, 1 400€ générés."</p>
+        <p class="text-gray-300 text-sm leading-relaxed mb-5">"J'avais 4k abonnés et zéro vente. BloxAI a détecté que mon offre était mal positionnée. J'ai tout refait en suivant le plan. 3 semaines après : premiers clients, 1 400€ générés."</p>
         <div class="flex items-center gap-3">
           <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#6366f1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">👨</div>
           <div>
@@ -1079,12 +1114,12 @@
       <p class="text-center text-gray-500 text-sm mb-14">Tout ce que tu veux savoir avant de commencer.</p>
 
       <details class="faq-det">
-        <summary>C'est quoi BLOX exactement ? <span class="faq-ico">▾</span></summary>
-        <div class="faq-body">BLOX est un outil IA SaaS qui analyse ton compte TikTok, Instagram, YouTube ou ton site web et génère en 60 secondes un plan d'action complet : audit, offre, scripts viraux, funnel, calendrier éditorial 30 jours, hashtags, analyse de concurrents et plus. Tout tourne dans ton navigateur, sans inscription complexe.</div>
+        <summary>C'est quoi BloxAI exactement ? <span class="faq-ico">▾</span></summary>
+        <div class="faq-body">BloxAI est un outil IA SaaS qui analyse ton compte TikTok, Instagram, YouTube ou ton site web et génère en 60 secondes un plan d'action complet : audit, offre, scripts viraux, funnel, calendrier éditorial 30 jours, hashtags, analyse de concurrents et plus. Tout tourne dans ton navigateur, sans inscription complexe.</div>
       </details>
       <details class="faq-det">
-        <summary>Est-ce que BLOX accède vraiment à mon compte ? <span class="faq-ico">▾</span></summary>
-        <div class="faq-body">Non. BLOX n'a besoin d'aucune connexion à tes réseaux sociaux. Tu entres simplement ton lien de profil. L'IA fait le reste — sans accès à tes données privées.</div>
+        <summary>Est-ce que BloxAI accède vraiment à mon compte ? <span class="faq-ico">▾</span></summary>
+        <div class="faq-body">Non. BloxAI n'a besoin d'aucune connexion à tes réseaux sociaux. Tu entres simplement ton lien de profil. L'IA fait le reste — sans accès à tes données privées.</div>
       </details>
       <details class="faq-det">
         <summary>Je peux annuler quand je veux ? <span class="faq-ico">▾</span></summary>
@@ -1095,8 +1130,8 @@
         <div class="faq-body">AvatarAds (Élite) est le module qui génère des scripts de publicité vidéo sans que tu aies besoin de te filmer. L'IA crée le script complet, le brief créatif pour un avatar IA, et des variantes A/B prêtes pour TikTok Ads et Meta Ads. Tu produis des pubs pro sans studio, sans te montrer.</div>
       </details>
       <details class="faq-det">
-        <summary>BLOX fonctionne pour quelle niche ? <span class="faq-ico">▾</span></summary>
-        <div class="faq-body">BLOX fonctionne pour tous les créateurs : coaching, fitness, business, lifestyle, finance, immobilier, formation, e-commerce… L'IA adapte chaque module à ton profil et ton audience.</div>
+        <summary>BloxAI fonctionne pour quelle niche ? <span class="faq-ico">▾</span></summary>
+        <div class="faq-body">BloxAI fonctionne pour tous les créateurs : coaching, fitness, business, lifestyle, finance, immobilier, formation, e-commerce… L'IA adapte chaque module à ton profil et ton audience.</div>
       </details>
     </div>
   </div>
@@ -1107,7 +1142,7 @@
       <!-- CTA final -->
       <div class="text-center mb-12">
         <h3 class="text-2xl font-black mb-3">Prêt à passer au niveau supérieur ?</h3>
-        <p class="text-gray-500 text-sm mb-6">Rejoins +1 200 créateurs qui utilisent BLOX pour scaler.</p>
+        <p class="text-gray-500 text-sm mb-6">Rejoins +1 200 créateurs qui utilisent BloxAI pour scaler.</p>
         <button onclick="document.getElementById('view-landing').scrollIntoView({behavior:'smooth'})" class="btn glow-btn">
           Analyser mon TikTok gratuitement →
         </button>
@@ -1130,7 +1165,7 @@
 
       <!-- Legal links -->
       <div class="flex items-center justify-center gap-6 flex-wrap text-xs text-gray-700">
-        <span>© 2025 BLOX by IA MANAGER</span>
+        <span>© 2025 BloxAI by IA MANAGER</span>
         <button onclick="openModal('cguModal')" class="hover:text-gray-500 transition-colors">Conditions Générales de Vente</button>
         <button onclick="openModal('privacyModal')" class="hover:text-gray-500 transition-colors">Politique de Confidentialité</button>
         <a href="mailto:axel@iamanager.fr" class="hover:text-gray-500 transition-colors">Contact</a>
@@ -1307,6 +1342,9 @@ window.onload = () => {
     if (_logoClicks >= 5) {
       const adminBtn = document.getElementById('navAdminBtn');
       if (adminBtn) adminBtn.style.display = 'block';
+      // Also show config section in paywall
+      const cfg = document.getElementById('adminConfigSection');
+      if (cfg) cfg.style.display = 'block';
       _logoClicks = 0;
     }
   });
@@ -1456,7 +1494,7 @@ function stopLoading() {
 }
 
 /* ── AI call ── */
-async function callClaude(system, user) {
+async function callClaude(system, user, opts = {}) {
   if (!S.apiKey) { openApiModal(); throw new Error('no_key'); }
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -1467,8 +1505,8 @@ async function callClaude(system, user) {
       'anthropic-dangerous-direct-browser-access': 'true',
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 3000,
+      model: opts.model || 'claude-sonnet-4-5',
+      max_tokens: opts.max_tokens || 3000,
       system: [{ type: 'text', text: system, cache_control: { type: 'ephemeral' } }],
       messages: [{ role: 'user', content: user }],
     }),
@@ -1762,7 +1800,7 @@ async function runAnalysis() {
   animateLoading();
 
   try {
-    const result = await callClaude(PROMPTS[1].system, PROMPTS[1].user(S.profile));
+    const result = await callClaude(PROMPTS[1].system, PROMPTS[1].user(S.profile), { model: 'claude-haiku-4-5', max_tokens: 900 });
     S.modules[1] = result;
     stopLoading();
     // Continue funnel from step 2 (questions)
@@ -3147,7 +3185,7 @@ function openFunnelStep(id) {
 }
 
 function showFunnelStep(id) {
-  ['0a','0b','1','2','3','4','5'].forEach(s => {
+  ['0a','0b','0c','1','2','3','4','5'].forEach(s => {
     const el = document.getElementById('fStep'+s);
     if (el) el.classList.remove('active');
   });
@@ -3189,7 +3227,7 @@ function selectFunnelBlocker(v) {
     const b = document.getElementById('fblk-'+k);
     if (b) b.classList.toggle('selected', k === v);
   });
-  setTimeout(() => launchFunnelAnalysis(), 250);
+  setTimeout(() => showFunnelStep('0c'), 250);
 }
 
 function selectFunnelContentType(v) {
@@ -3203,6 +3241,11 @@ function selectFunnelContentType(v) {
 
 function selectFunnelStyle(style) {
   S.contentStyle = style;
+  ['faceless','camera','both'].forEach(s => {
+    const b = document.getElementById('fcs-'+s);
+    if (b) b.classList.toggle('selected', s === style);
+  });
+  setTimeout(() => launchFunnelAnalysis(), 280);
 }
 
 /* ── Helper: extract handle + profile photo URL ── */
@@ -3432,7 +3475,7 @@ let _payPlan    = 'pro';
 let _payBilling = 'yearly'; // 'monthly' | 'yearly'
 
 const PRICES = {
-  starter: { monthly: '14,99€', yearly: '10,99€', billedM: 'Sans engagement', billedY: 'Facturé 131,88€/an' },
+  starter: { monthly: '12,99€', yearly: '9,99€', billedM: 'Sans engagement', billedY: 'Facturé 119,88€/an' },
   pro:     { monthly: '24,99€', yearly: '17,99€', billedM: 'Sans engagement', billedY: 'Facturé 215,88€/an' },
   elite:   { monthly: '54,99€', yearly: '39,99€', billedM: 'Sans engagement', billedY: 'Facturé 479,88€/an' },
 };
@@ -3609,7 +3652,7 @@ async function sendRecapEmail(email, auditData, profile) {
           updateEnabled: true,
           listIds: [listId],
           attributes: {
-            SOURCE: 'BLOX',
+            SOURCE: 'BloxAI',
             PLATFORM: profile?.platform || '',
             AUDIT_DATE: new Date().toISOString().split('T')[0],
             PROFILE_URL: profile?.url || '',
@@ -3625,9 +3668,9 @@ async function sendRecapEmail(email, auditData, profile) {
     method: 'POST',
     headers: { 'accept':'application/json','api-key':apiKey,'content-type':'application/json' },
     body: JSON.stringify({
-      sender:      { name: '⚡ BLOX', email: sender },
+      sender:      { name: '⚡ BloxAI', email: sender },
       to:          [{ email }],
-      subject:     '🔍 Ton audit BLOX est prêt — voici ton plan',
+      subject:     '🔍 Ton audit BloxAI est prêt — voici ton plan',
       htmlContent: html,
     }),
   });
@@ -3656,7 +3699,7 @@ function buildRecapEmailHTML(email, d, profile) {
 
   return `<!DOCTYPE html>
 <html lang="fr"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Ton audit BLOX</title></head>
+<title>Ton audit BloxAI</title></head>
 <body style="margin:0;padding:0;background:#06060c;font-family:'Helvetica Neue',Arial,sans-serif">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#06060c;padding:40px 0">
 <tr><td align="center">
@@ -3664,7 +3707,7 @@ function buildRecapEmailHTML(email, d, profile) {
 
   <!-- Header -->
   <tr><td style="background:linear-gradient(135deg,#0c0c16,#111120);border:1px solid #1e1e30;border-radius:16px 16px 0 0;padding:32px 36px;text-align:center">
-    <div style="font-size:28px;font-weight:900;background:linear-gradient(135deg,#a855f7,#ec4899);-webkit-background-clip:text;color:#a855f7">⚡ BLOX</div>
+    <div style="font-size:28px;font-weight:900;background:linear-gradient(135deg,#a855f7,#ec4899);-webkit-background-clip:text;color:#a855f7">⚡ BloxAI</div>
     <div style="color:#6b7280;font-size:13px;margin-top:4px">Ton audit IA est prêt</div>
   </td></tr>
 
@@ -3725,7 +3768,7 @@ function buildRecapEmailHTML(email, d, profile) {
   <!-- Footer -->
   <tr><td style="background:#06060c;border:1px solid #0f0f1e;border-radius:0 0 16px 16px;padding:20px 36px;text-align:center">
     <div style="font-size:11px;color:#3f3f5a;line-height:1.8">
-      ⚡ BLOX · Audit IA Business by IA MANAGER<br/>
+      ⚡ BloxAI · Audit IA Business by IA MANAGER<br/>
       Tu reçois cet email parce que tu as utilisé le générateur de plan.<br/>
       <a href="#" style="color:#4a4a70;text-decoration:underline">Se désabonner</a>
     </div>
@@ -3834,10 +3877,10 @@ function closeModal(id) {
     <div style="font-size:13px;color:#9ca3af;line-height:1.8">
 
       <h3 style="color:#e2e8f0;font-weight:700;margin:20px 0 8px">1. Éditeur</h3>
-      <p>BLOX est édité par <strong style="color:#e2e8f0">IA MANAGER</strong>, SIRET <strong style="color:#e2e8f0">97829670500038</strong>, domiciliée à <strong style="color:#e2e8f0">Dijon, 21000, France</strong>. Contact : <a href="mailto:axel@iamanager.fr" style="color:#a855f7">axel@iamanager.fr</a></p>
+      <p>BloxAI est édité par <strong style="color:#e2e8f0">IA MANAGER</strong>, SIRET <strong style="color:#e2e8f0">97829670500038</strong>, domiciliée à <strong style="color:#e2e8f0">Dijon, 21000, France</strong>. Contact : <a href="mailto:axel@iamanager.fr" style="color:#a855f7">axel@iamanager.fr</a></p>
 
       <h3 style="color:#e2e8f0;font-weight:700;margin:20px 0 8px">2. Description du service</h3>
-      <p>BLOX est un outil SaaS d'audit et d'accompagnement pour créateurs de contenu, accessible sur abonnement. Il génère des recommandations personnalisées basées sur les informations fournies par l'utilisateur via une intelligence artificielle (Anthropic Claude). Les résultats sont indicatifs et ne constituent pas un conseil professionnel garanti.</p>
+      <p>BloxAI est un outil SaaS d'audit et d'accompagnement pour créateurs de contenu, accessible sur abonnement. Il génère des recommandations personnalisées basées sur les informations fournies par l'utilisateur via une intelligence artificielle (Anthropic Claude). Les résultats sont indicatifs et ne constituent pas un conseil professionnel garanti.</p>
 
       <h3 style="color:#e2e8f0;font-weight:700;margin:20px 0 8px">3. Prix et facturation</h3>
       <p>Les tarifs sont affichés TTC sur la page de vente. Les abonnements sont facturés via Lemon Squeezy (marchand de référence), qui gère la TVA applicable selon la réglementation européenne. Les formules annuelles sont facturées en une fois pour 12 mois.</p>
@@ -3849,10 +3892,10 @@ function closeModal(id) {
       <p>Les abonnements mensuels peuvent être résiliés à tout moment depuis l'espace Lemon Squeezy, sans frais. La résiliation prend effet à la fin de la période en cours. Les abonnements annuels sont remboursables dans les 14 jours suivant la souscription.</p>
 
       <h3 style="color:#e2e8f0;font-weight:700;margin:20px 0 8px">6. Responsabilité</h3>
-      <p>BLOX met à disposition des recommandations générées par IA à titre informatif. L'éditeur ne peut être tenu responsable des décisions prises par l'utilisateur sur la base de ces recommandations. Les résultats varient selon les profils et l'application des conseils.</p>
+      <p>BloxAI met à disposition des recommandations générées par IA à titre informatif. L'éditeur ne peut être tenu responsable des décisions prises par l'utilisateur sur la base de ces recommandations. Les résultats varient selon les profils et l'application des conseils.</p>
 
       <h3 style="color:#e2e8f0;font-weight:700;margin:20px 0 8px">7. Propriété intellectuelle</h3>
-      <p>Les contenus générés par BLOX (scripts, recommandations, structures) sont mis à disposition de l'utilisateur pour son usage personnel et commercial. L'accès au service ne transfère pas de droits sur le logiciel ou les modèles IA sous-jacents.</p>
+      <p>Les contenus générés par BloxAI (scripts, recommandations, structures) sont mis à disposition de l'utilisateur pour son usage personnel et commercial. L'accès au service ne transfère pas de droits sur le logiciel ou les modèles IA sous-jacents.</p>
 
       <h3 style="color:#e2e8f0;font-weight:700;margin:20px 0 8px">8. Droit applicable</h3>
       <p>Les présentes CGV sont soumises au droit français. En cas de litige, les parties rechercheront une solution amiable avant tout recours judiciaire. Le tribunal compétent sera celui du ressort du siège social de l'éditeur.</p>
@@ -3873,7 +3916,7 @@ function closeModal(id) {
       <p><strong style="color:#e2e8f0">IA MANAGER</strong> — SIRET 97829670500038 — Dijon, 21000, France — <a href="mailto:axel@iamanager.fr" style="color:#a855f7">axel@iamanager.fr</a></p>
 
       <h3 style="color:#e2e8f0;font-weight:700;margin:20px 0 8px">2. Données collectées</h3>
-      <p>BLOX collecte les données suivantes :<br/>
+      <p>BloxAI collecte les données suivantes :<br/>
       • <strong style="color:#e2e8f0">Données saisies volontairement</strong> : lien de profil, description du business, adresse email (optionnel)<br/>
       • <strong style="color:#e2e8f0">Données de navigation</strong> : aucun cookie de tracking tiers par défaut<br/>
       • <strong style="color:#e2e8f0">Clé API</strong> : stockée uniquement dans le localStorage de votre navigateur, jamais transmise à nos serveurs</p>
@@ -3897,7 +3940,7 @@ function closeModal(id) {
       <p>Conformément au RGPD, vous disposez des droits d'accès, de rectification, d'effacement et de portabilité de vos données. Pour exercer ces droits : <a href="mailto:axel@iamanager.fr" style="color:#a855f7">axel@iamanager.fr</a><br/>Vous pouvez également introduire une réclamation auprès de la CNIL (<a href="https://cnil.fr" target="_blank" style="color:#a855f7">cnil.fr</a>).</p>
 
       <h3 style="color:#e2e8f0;font-weight:700;margin:20px 0 8px">7. Cookies</h3>
-      <p>BLOX n'utilise pas de cookies de tracking publicitaire. Seul le localStorage du navigateur est utilisé pour mémoriser tes préférences et ton niveau d'accès.</p>
+      <p>BloxAI n'utilise pas de cookies de tracking publicitaire. Seul le localStorage du navigateur est utilisé pour mémoriser tes préférences et ton niveau d'accès.</p>
     </div>
   </div>
 </div>
