@@ -444,6 +444,22 @@
       </div>
     </div>
 
+    <!-- ── STEP 0d : Niche / offre ── -->
+    <div class="funnel-step" id="fStep0d">
+      <div class="f-prog-bar"><div class="f-prog-fill" style="width:58%"></div></div>
+      <div class="text-center mb-8">
+        <div style="font-size:48px;margin-bottom:14px">💡</div>
+        <h2 class="text-white text-2xl font-black mb-3">Ta niche et ce que<br/>tu vends (ou veux vendre)</h2>
+        <p class="text-gray-500 text-sm">L'IA connaît ton contexte exact — l'audit sera 10× plus précis.</p>
+      </div>
+      <div style="margin-bottom:14px">
+        <textarea id="fNicheInput" class="inp" rows="3" placeholder="Ex: je vends une formation pour créer un business IA clé en main, ma cible c'est les 18-25 ans qui veulent de la liberté financière…" style="min-height:90px;font-size:14px"></textarea>
+        <div style="font-size:11px;color:#4a4a70;margin-top:6px">Si tu n'as pas encore d'offre, dis-le : l'IA t'en proposera une adaptée à ta niche.</div>
+      </div>
+      <button class="f-btn" onclick="submitNicheAndAnalyse()" id="fNicheBtn">Analyser mon compte →</button>
+      <button onclick="submitNicheAndAnalyse()" style="background:none;border:none;color:#4a4a70;font-size:13px;cursor:pointer;margin-top:12px;width:100%;text-align:center">Passer cette étape</button>
+    </div>
+
     <!-- ── STEP 1: Loading / generating plan ── -->
     <div class="funnel-step" id="fStep1">
       <!-- Top progress -->
@@ -525,18 +541,10 @@
         <div id="fAuditWins" style="display:flex;flex-direction:column;gap:8px"></div>
       </div>
 
-      <!-- Teaser bloqué -->
-      <div style="position:relative;border-radius:12px;overflow:hidden;margin-bottom:20px">
-        <div style="background:#0c0c16;border:1px solid #1e1e30;border-radius:12px;padding:16px 18px;filter:blur(4px);pointer-events:none;user-select:none">
-          <div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#a855f7;margin-bottom:10px">🔮 Opportunité cachée</div>
-          <p style="font-size:14px;color:#c4b5fd;line-height:1.6">Ton compte cache une opportunité de monétisation directe que 90% des créateurs dans ta niche n'exploitent pas encore. L'IA a identifié le bon angle pour toi.</p>
-        </div>
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(6,6,12,0.6);border-radius:12px">
-          <div style="text-align:center">
-            <div style="font-size:20px;margin-bottom:6px">🔒</div>
-            <div style="font-size:12px;font-weight:700;color:#a855f7">Disponible dans ton plan complet</div>
-          </div>
-        </div>
+      <!-- Opportunité cachée — affichée sans flou -->
+      <div id="fAuditOpportunity" style="background:rgba(168,85,247,0.07);border:1px solid rgba(168,85,247,0.2);border-radius:12px;padding:16px 18px;margin-bottom:20px">
+        <div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#a855f7;margin-bottom:8px">🔮 Opportunité à exploiter maintenant</div>
+        <p id="fAuditOpportunityText" style="font-size:14px;color:#c4b5fd;line-height:1.6;font-weight:500"></p>
       </div>
 
       <button class="f-btn" onclick="funnelStep(3)">Construire mon plan complet →</button>
@@ -1266,6 +1274,7 @@ const S = {
   blocker: null,          // 'start' | 'peur' | 'temps' | 'idees'
   contentType: null,      // 'edu' | 'divert' | 'story' | 'faceless' | 'life'
   contentStyle: 'both',   // 'faceless' | 'camera' | 'both'
+  niche: '',              // niche / ce que l'user vend (texte libre)
   selectedPlan: 'yearly',
   apiKey: OWNER_API_KEY || localStorage.getItem('blowup_api_key') || '',
   profile: { url: '', desc: '', platform: '', contentStyle: 'both' },
@@ -1525,37 +1534,43 @@ async function callClaude(system, user, opts = {}) {
 /* ── System prompts ── */
 const PROMPTS = {
   1: {
-    system: `Tu es un consultant business et growth hacker extrêmement direct, orienté revenus.
-Tu analyses des créateurs ou business en ligne et identifies POURQUOI ils ne génèrent pas d'argent.
-RULES:
-- Sois brutalement honnête et sans filtre
-- Priorise l'argent, pas les likes ou followers
-- Donne des conclusions actionnables
-- Réponds en JSON uniquement (pas de texte avant ou après le JSON)
-- Sois précis et spécifique, pas générique`,
+    system: `Tu es un consultant growth hacker TikTok ultra direct, spécialisé dans la monétisation de comptes creators.
+Tu analyses des profils avec leur contexte déclaré et tu donnes un diagnostic PERSONNALISÉ et ACTIONNABLE.
+RÈGLES ABSOLUES :
+- Utilise TOUJOURS les infos déclarées par l'utilisateur (niche, offre, niveau, frein) — ne les invente pas
+- Si l'utilisateur dit qu'il a une offre → dis-le dans le diagnostic, ne prétends pas qu'il n'en a pas
+- Sois court, percutant, bullshit-free — style "coach qui te dit la vérité en face"
+- Pas de généralités creuses : chaque point doit être spécifique à leur situation déclarée
+- Réponds en JSON UNIQUEMENT, zéro texte avant/après`,
 
-    user: (p) => `Analyse ce créateur TikTok en profondeur.
-Handle TikTok : ${p.url || 'non fourni'}
-Niveau actuel : ${{'zero':'Débutant — aucune publication','start':'Quelques vidéos — pas de stratégie','grind':'Poste régulièrement — stagne','pro':'Déjà +10k vues régulières'}[p.level] || 'non précisé'}
-Frein principal : ${{'start':'Ne sait pas par où commencer','peur':'Peur du regard des autres','temps':'Manque de temps','idees':'Manque d\'idées/inspiration'}[p.blocker] || 'non précisé'}
-Type de contenu préféré : ${{'edu':'Éducation/Tutoriel','divert':'Divertissement/Humour','story':'Storytelling/Vlog','faceless':'Faceless/Voix off','life':'Lifestyle/Inspiration'}[p.contentType] || 'non précisé'}
+    user: (p) => `Audite ce créateur TikTok avec ces informations déclarées :
 
-Analyse le compte TikTok @${(p.url||'').replace(/^@/,'').split('/').pop().split('?')[0]} selon les informations disponibles sur ce handle et les patterns typiques de créateurs dans cette niche. Donne une analyse honnête et spécifique basée sur ce que ce type de profil affiche généralement sur TikTok.
+HANDLE : @${(p.url||'').replace(/^@/,'').replace(/.*tiktok\.com\/@?/,'').split('/')[0].split('?')[0] || 'non fourni'}
+NIVEAU : ${{'zero':'Débutant — aucune publication encore','start':'A posté quelques vidéos — pas de stratégie claire','grind':'Poste régulièrement — stagne en vues ou ventes','pro':'Fait déjà +10k vues régulières — veut monétiser plus'}[p.level] || 'non précisé'}
+FREIN PRINCIPAL : ${{'start':'Ne sait pas par où commencer — trop d\'infos, pas assez d\'actions','peur':'Peur du regard des autres — se sent illégitime','temps':'Manque de temps — veut aller vite et efficace','idees':'Manque d\'idées et d\'inspiration — ne sait pas quoi poster'}[p.blocker] || 'non précisé'}
+STYLE DE CONTENU : ${{'faceless':'Faceless / voix off — ne veut pas apparaître à l\'écran','camera':'Face caméra — se montre dans ses vidéos','both':'Mix faceless + face caméra'}[p.contentStyle] || 'non précisé'}
+NICHE / CE QU\'IL VEND : ${p.niche || 'non précisé — base ton analyse sur le handle et les patterns TikTok classiques de cette niche'}
 
-Réponds UNIQUEMENT avec ce JSON (sans markdown, sans texte autour) :
+IMPORTANT : Si une niche ou offre est déclarée ci-dessus, base ton diagnostic dessus. Ne dis jamais "pas d'offre" si l'utilisateur en a mentionné une.
+
+Réponds UNIQUEMENT avec ce JSON (sans markdown) :
 {
   "diagnostic": {
-    "probleme_principal": "string — le vrai problème #1 en 1 phrase directe",
-    "problemes_secondaires": ["string","string","string"],
-    "raison_perte_argent": "string — pourquoi il/elle perd de l'argent en ce moment"
+    "probleme_principal": "string — le vrai blocage #1 en 1 phrase directe et percutante, spécifique à leur situation",
+    "problemes_secondaires": ["string — blocage #2","string — blocage #3"],
+    "raison_perte_argent": "string — pourquoi il/elle laisse de l'argent sur la table EN CE MOMENT"
   },
   "analyse": {
-    "contenu": "string — diagnostic du contenu actuel",
-    "offre": "string — diagnostic de l'offre ou absence d'offre",
-    "positionnement": "string — diagnostic du positionnement"
+    "contenu": "string — ce qui ne va pas (ou va bien) dans leur stratégie de contenu selon leur niveau/style",
+    "offre": "string — état réel de leur monétisation selon ce qu'ils ont déclaré",
+    "positionnement": "string — comment ils se positionnent vs la concurrence TikTok dans leur niche"
   },
-  "quick_wins": ["string — action #1 à faire cette semaine","string","string","string"],
-  "opportunite_cachee": "string — l'opportunité que personne n'a vue"
+  "quick_wins": [
+    "string — action #1 concrète à faire CETTE SEMAINE (max 15 mots, ultra actionnable)",
+    "string — action #2",
+    "string — action #3"
+  ],
+  "opportunite_cachee": "string — l'angle ou la tactique précise que 90% des créateurs dans cette niche n'exploitent pas — sois SPÉCIFIQUE"
 }`
   },
 
@@ -1570,8 +1585,10 @@ RULES:
 
     user: (p, prev) => `Crée une offre monétisable pour ce profil.
 
-PROFIL : ${p.desc || p.url}
+HANDLE : ${p.url}
+NICHE / CE QU'IL VEND DÉJÀ : ${p.niche || p.desc || 'voir diagnostic'}
 PLATEFORME : ${p.platform}
+STYLE : ${{'faceless':'Faceless','camera':'Face caméra','both':'Mix'}[p.contentStyle] || 'mixte'}
 DIAGNOSTIC PRÉCÉDENT : ${JSON.stringify(prev)}
 
 Réponds UNIQUEMENT avec ce JSON :
@@ -1597,36 +1614,45 @@ Réponds UNIQUEMENT avec ce JSON :
   },
 
   3: {
-    system: `Tu es un expert TikTok/Instagram growth et copywriting viral orienté conversion.
-OBJECTIF : Créer du contenu qui génère des ventes, pas seulement des vues.
-RULES:
-- Chaque script doit vendre indirectement une offre
-- Hook très fort et accrocheur obligatoire (les 3 premières secondes)
-- Structure simple et utilisable directement
-- Adapte pour TikTok, Reels, YouTube Shorts
+    system: `Tu es un expert en scripts TikTok viraux orientés conversion — style "faceless voix off" et "face cam éducatif".
+OBJECTIF : Générer des scripts courts, percutants, qui vendent sans avoir l'air de vendre.
+STYLE OBLIGATOIRE :
+- Hook choc en 1 phrase (crée la curiosité ou le FOMO dès la 1ère seconde)
+- Corps : 3-5 bullet points bénéfices/faits (pas de blabla)
+- Langage simple, direct, familier — "tu" pas "vous"
+- CTA en commentaire : "Commente [MOT CLÉ]" ou "Écris [MOT] en commentaire"
+- Scripts faceless-friendly par défaut (voix off + B-roll ou texte à l'écran)
+- Durée cible : 15-25 secondes (TikTok court format)
 - Réponds en JSON uniquement`,
 
-    user: (p, prev) => `Crée des scripts de contenu viral pour ce profil.
+    user: (p, prev) => `Crée des scripts TikTok viraux pour ce créateur.
 
-PROFIL : ${p.desc || p.url}
-OFFRE : ${JSON.stringify(prev)}
+HANDLE : ${p.url}
+NICHE / OFFRE : ${p.niche || p.desc || 'voir diagnostic ci-dessous'}
+STYLE : ${{'faceless':'Faceless / voix off','camera':'Face caméra','both':'Mix faceless + face cam'}[p.contentStyle] || 'mixte'}
+DIAGNOSTIC : ${JSON.stringify(prev?.diagnostic || prev || {})}
+
+Génère des scripts dans le style : hook accrocheur → bullet points bénéfices → CTA commentaire.
+Exemple de structure attendue : "Le business le plus rentable en 2026 que personne ne te montre / ✓ 0 stock / ✓ 0 expérience / ✓ 100% en ligne / Commente PLAN je t'envoie les détails"
 
 Réponds UNIQUEMENT avec ce JSON :
 {
   "video_scripts": [
     {
-      "titre": "string",
-      "hook": "string — les 3 premières secondes exactes",
-      "script": "string — le corps du script (150-200 mots max)",
-      "cta": "string — l'appel à l'action final",
-      "objectif": "string — vente / lead / awareness / viralité",
-      "plateforme": "string — TikTok / Reels / YouTube Shorts"
+      "titre": "string — nom du script",
+      "format": "string — Faceless voix off / Face cam / B-roll texte",
+      "duree_cible": "string — ex: 18 sec",
+      "hook": "string — LA phrase d'accroche exacte (les 2-3 premières secondes)",
+      "corps": ["string — point 1 (bénéfice ou fait choc)", "string — point 2", "string — point 3", "string — point 4"],
+      "cta": "string — CTA exact à dire/écrire (ex: Commente PLAN en commentaire)",
+      "objectif": "string — lead / vente / viralité / notoriété"
     },
-    { "titre":"","hook":"","script":"","cta":"","objectif":"","plateforme":"" },
-    { "titre":"","hook":"","script":"","cta":"","objectif":"","plateforme":"" }
+    { "titre":"","format":"","duree_cible":"","hook":"","corps":["","","",""],"cta":"","objectif":"" },
+    { "titre":"","format":"","duree_cible":"","hook":"","corps":["","","",""],"cta":"","objectif":"" },
+    { "titre":"","format":"","duree_cible":"","hook":"","corps":["","","",""],"cta":"","objectif":"" }
   ],
   "content_angles": [
-    "string — angle 1",
+    "string — angle de contenu 1 (ex: POV tu découvres X)",
     "string — angle 2",
     "string — angle 3",
     "string — angle 4",
@@ -1643,7 +1669,8 @@ Réponds UNIQUEMENT avec ce JSON :
     "string — hook choc 8",
     "string — hook choc 9",
     "string — hook choc 10"
-  ]
+  ],
+  "mots_cles_cta": ["string — mot clé CTA 1 (ex: PLAN)","string — GUIDE","string — INFO","string — GO","string — LINK"]
 }`
   },
 
@@ -1791,7 +1818,7 @@ async function runAnalysis() {
   }
   const url  = S._pendingUrl || '';
   const desc = '';
-  S.profile = { url, desc, platform: S.platform, contentStyle: S.contentStyle, level: S.level, blocker: S.blocker, contentType: S.contentType };
+  S.profile = { url, desc, platform: S.platform, contentStyle: S.contentStyle, level: S.level, blocker: S.blocker, contentType: S.contentType, niche: S.niche };
   S.modules = { 1:null,2:null,3:null,4:null,5:null,6:null,7:null,8:null,9:null,10:null,11:null,12:null };
   S.videoUrl = ''; S.videoTranscript = ''; S.mcTranscript = '';
   _mcFile = null; _mcClips = []; _mcBlobs = {};
@@ -2395,6 +2422,7 @@ function renderModule3(d) {
   const angles  = d.content_angles || [];
   const hooks   = d.hooks_viraux || [];
 
+  const ctaWords = d.mots_cles_cta || [];
   return `<div class="fade-up space-y-5">
     <!-- Scripts vidéo -->
     <div>
@@ -2403,16 +2431,26 @@ function renderModule3(d) {
         <div class="script-card fade-up" style="animation-delay:${i*.08}s">
           <div class="flex items-center justify-between mb-3">
             <span class="font-bold text-sm">${esc(s.titre||'Script #'+(i+1))}</span>
-            <span class="badge-pro">${esc(s.plateforme||'Reels')}</span>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+              ${s.format ? `<span style="font-size:10px;color:#6b7280;background:#141422;border-radius:6px;padding:2px 8px">${esc(s.format)}</span>` : ''}
+              ${s.duree_cible ? `<span style="font-size:10px;color:#a855f7;background:rgba(168,85,247,.1);border-radius:6px;padding:2px 8px">⏱ ${esc(s.duree_cible)}</span>` : ''}
+            </div>
           </div>
           <div class="mb-3">
             <span class="hook-tag">HOOK</span>
             <p class="text-purple-200 font-semibold text-sm leading-relaxed">"${esc(s.hook||'—')}"</p>
           </div>
+          ${Array.isArray(s.corps) && s.corps.filter(Boolean).length ? `
+          <div class="mb-3">
+            <div class="section-lbl">Corps</div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              ${s.corps.filter(Boolean).map(pt=>`<div style="font-size:13px;color:#c4b5fd;display:flex;gap:8px"><span style="color:#a855f7;flex-shrink:0">✓</span>${esc(pt)}</div>`).join('')}
+            </div>
+          </div>` : s.script ? `
           <div class="mb-3">
             <div class="section-lbl">Script</div>
-            <p class="text-gray-400 text-sm leading-relaxed whitespace-pre-line">${esc(s.script||'—')}</p>
-          </div>
+            <p class="text-gray-400 text-sm leading-relaxed whitespace-pre-line">${esc(s.script)}</p>
+          </div>` : ''}
           <div>
             <span class="cta-tag">CTA</span>
             <p class="text-green-300 text-sm font-medium">${esc(s.cta||'—')}</p>
@@ -2420,6 +2458,15 @@ function renderModule3(d) {
         </div>
       `).join('') || '<p class="text-gray-500 text-sm">—</p>'}
     </div>
+
+    ${ctaWords.length ? `
+    <!-- Mots-clés CTA -->
+    <div class="card p-6">
+      <div class="section-lbl">💬 Mots-clés pour tes CTA commentaires</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px">
+        ${ctaWords.map(w=>`<span style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#86efac;border-radius:8px;padding:4px 14px;font-size:13px;font-weight:700">Commente ${esc(w)}</span>`).join('')}
+      </div>
+    </div>` : ''}
 
     <!-- 10 hooks viraux -->
     <div class="card p-6">
@@ -2634,46 +2681,56 @@ Réponds UNIQUEMENT avec ce JSON :
   },
 
   8: {
-    system: `Tu es un expert en publicité vidéo IA (TikTok Ads, Meta Ads) spécialisé dans la création de contenu avec des avatars numériques.
-OBJECTIF : Créer des pubs vidéo complètes sans que le créateur ait besoin d'apparaître à l'écran.
-RULES :
-- Scripts ultra-courts et percutants (15-30 sec pour TikTok/Reels)
-- Brief créatif très précis (l'IA avatar doit savoir exactement comment se comporter)
-- Variantes A/B obligatoires pour tester
+    system: `Tu es un expert en AvatarAds — publicités vidéo IA avec avatars numériques pour TikTok et Meta Reels.
+OBJECTIF : Scripts faceless ultra-percutants lus par un avatar IA, qui convertissent sans que le créateur apparaisse.
+STYLE OBLIGATOIRE (inspiré des top creators TikTok monétisation) :
+- Hook visuel fort dès la 1ère seconde (chiffre choc, promesse, question qui intrigue)
+- Corps : 3-4 bullet points bénéfices concrets (pas de blabla)
+- Ton : direct, accessible, chaleureux — parle à des 18-30 ans qui veulent de la liberté financière
+- CTA : "Commente [MOT CLÉ]" ou "Clique sur le lien en bio"
+- Durée : 15-20 secondes max (format TikTok court)
+- Brief avatar précis pour l'outil IA (Heygen, Synthesia, D-ID…)
 - Réponds en JSON uniquement`,
 
     user: (p, prev) => `Crée des AvatarAds pour ce profil.
 
-PROFIL : ${p.desc || p.url}
+HANDLE : ${p.url}
+NICHE / OFFRE : ${p.niche || p.desc || 'voir offre ci-dessous'}
 PLATEFORME : ${p.platform}
 OFFRE : ${JSON.stringify(prev)}
+
+Style de script attendu :
+"Personne ne t'en parle mais c'est le business le plus rentable en 2026 / ✓ 0 stock / ✓ 0 expérience / ✓ 100% en ligne / Commente PLAN je t'envoie tout"
+
+Génère 3 AvatarAds prêts à tourner avec un avatar IA.
 
 Réponds UNIQUEMENT avec ce JSON :
 {
   "concept_avatar": {
-    "type": "string — type d'avatar recommandé (ex: femme 25-35 ans, coach fitness, ton chaleureux)",
-    "style_visuel": "string — background, tenue, ambiance",
-    "ton": "string — débit, émotion, posture"
+    "type": "string — profil avatar recommandé (ex: homme/femme 22-30 ans, ton coach accessible, souriant)",
+    "style_visuel": "string — background épuré, tenue décontractée, lumière naturelle",
+    "ton": "string — débit rapide mais clair, enthousiaste, direct, chaleureux"
   },
   "ads": [
     {
-      "nom": "string",
-      "plateforme": "TikTok Ads / Meta Reels",
-      "duree": "string — ex: 15 sec",
-      "hook_visuel": "string — les 2 premières secondes exactes (ce que l'avatar fait/dit)",
-      "script_complet": "string — script mot pour mot, max 80 mots",
-      "cta_final": "string — l'appel à l'action exact",
-      "brief_avatar": "string — instructions précises pour l'outil IA (ton, rythme, gestes)"
+      "nom": "string — nom de la pub",
+      "plateforme": "TikTok Ads",
+      "duree": "string — ex: 17 sec",
+      "hook_visuel": "string — ce que l'avatar dit/fait dans la 1ère seconde (accroche visuelle + orale)",
+      "script_complet": "string — script mot pour mot, max 60 mots, inclut les bullet points bénéfices",
+      "cta_final": "string — CTA exact (ex: Commente PLAN en dessous, je t'envoie tout)",
+      "brief_avatar": "string — instructions précises pour Heygen/Synthesia (ton, rythme, regard caméra, gestes)"
     },
-    { "nom":"","plateforme":"","duree":"","hook_visuel":"","script_complet":"","cta_final":"","brief_avatar":"" },
-    { "nom":"","plateforme":"","duree":"","hook_visuel":"","script_complet":"","cta_final":"","brief_avatar":"" }
+    { "nom":"","plateforme":"Meta Reels","duree":"","hook_visuel":"","script_complet":"","cta_final":"","brief_avatar":"" },
+    { "nom":"","plateforme":"TikTok Ads","duree":"","hook_visuel":"","script_complet":"","cta_final":"","brief_avatar":"" }
   ],
   "variantes_ab": [
-    { "element": "string — ce qu'on teste (ex: hook)", "version_a": "string", "version_b": "string" },
+    { "element": "string — élément testé (hook / CTA / bénéfice mis en avant)", "version_a": "string", "version_b": "string" },
     { "element": "", "version_a": "", "version_b": "" }
   ],
-  "outils_recommandes": ["string — outil 1 avec lien", "string — outil 2", "string — outil 3"],
-  "budget_test_recommande": "string — ex: 5€/jour pendant 3 jours par variante"
+  "mots_cles_cta": ["string — ex: PLAN","string — GUIDE","string — INFO"],
+  "outils_recommandes": ["Heygen — heygen.com", "Synthesia — synthesia.io", "D-ID — d-id.com"],
+  "budget_test_recommande": "string — ex: 5€/jour × 3 jours par variante avant de scaler"
 }`
   },
 
@@ -3185,7 +3242,7 @@ function openFunnelStep(id) {
 }
 
 function showFunnelStep(id) {
-  ['0a','0b','0c','1','2','3','4','5'].forEach(s => {
+  ['0a','0b','0c','0d','1','2','3','4','5'].forEach(s => {
     const el = document.getElementById('fStep'+s);
     if (el) el.classList.remove('active');
   });
@@ -3245,7 +3302,13 @@ function selectFunnelStyle(style) {
     const b = document.getElementById('fcs-'+s);
     if (b) b.classList.toggle('selected', s === style);
   });
-  setTimeout(() => launchFunnelAnalysis(), 280);
+  setTimeout(() => showFunnelStep('0d'), 280);
+}
+
+function submitNicheAndAnalyse() {
+  const inp = document.getElementById('fNicheInput');
+  S.niche = inp ? inp.value.trim() : '';
+  launchFunnelAnalysis();
 }
 
 /* ── Helper: extract handle + profile photo URL ── */
@@ -3278,14 +3341,19 @@ function populateFreeAudit() {
   if (!d) return;
   const prob = d.diagnostic?.probleme_principal || '';
   const wins = (d.quick_wins || []).slice(0, 3);
+  const opportunity = d.opportunite_cachee || '';
   const probEl = document.getElementById('fAuditProblemText');
   const winsEl = document.getElementById('fAuditWins');
+  const oppEl  = document.getElementById('fAuditOpportunityText');
   if (probEl) probEl.textContent = prob;
   if (winsEl) winsEl.innerHTML = wins.map(w =>
     `<div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#c4b5fd">
       <span style="color:#a855f7;font-weight:700;flex-shrink:0;margin-top:1px">→</span>${w}
     </div>`
   ).join('');
+  if (oppEl) oppEl.textContent = opportunity;
+  const oppWrap = document.getElementById('fAuditOpportunity');
+  if (oppWrap) oppWrap.style.display = opportunity ? 'block' : 'none';
 }
 
 async function launchFunnelAnalysis() {
