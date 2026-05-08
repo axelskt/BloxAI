@@ -544,10 +544,17 @@
             <div id="fAuditNicheBadge" style="display:none;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.25);color:#c4b5fd;font-size:10px;font-weight:700;padding:1px 8px;border-radius:999px"></div>
           </div>
         </div>
-        <!-- Note /10 -->
-        <div id="fAuditScore" style="display:none;flex-shrink:0;text-align:center;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:8px 12px;min-width:52px">
-          <div id="fAuditScoreVal" style="font-size:22px;font-weight:900;color:#a855f7;line-height:1"></div>
-          <div style="font-size:9px;color:#6b7280;margin-top:2px;font-weight:600">/10</div>
+        <!-- Note /10 + potentiel -->
+        <div id="fAuditScore" style="display:none;flex-shrink:0;text-align:center">
+          <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:6px 10px;margin-bottom:4px">
+            <div id="fAuditScoreVal" style="font-size:20px;font-weight:900;color:#f87171;line-height:1"></div>
+            <div style="font-size:8px;color:#9ca3af;margin-top:1px;font-weight:600">/10 actuel</div>
+          </div>
+          <div style="font-size:9px;color:#4a4a70;margin-bottom:2px">→ avec Pro</div>
+          <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:4px 10px">
+            <div id="fAuditScorePotential" style="font-size:16px;font-weight:900;color:#4ade80;line-height:1"></div>
+            <div style="font-size:8px;color:#9ca3af;margin-top:1px;font-weight:600">/10</div>
+          </div>
         </div>
       </div>
 
@@ -1650,7 +1657,7 @@ IMPORTANT : Si une niche ou offre est déclarée ci-dessus, base ton diagnostic 
 Réponds UNIQUEMENT avec ce JSON (sans markdown) :
 {
   "niche_detectee": "string — la niche en 3-5 mots simples (ex: Business IA, Fitness, Développement perso…)",
-  "note_compte": number entre 1 et 10,
+  "note_compte": number entre 4 et 7 (jamais plus — le potentiel d'amélioration avec BloxAI est montré séparément),
   "resume_compte": "string — résumé en 1-2 phrases simples, compréhensibles par un débutant de 14 ans",
   "points_forts": ["string — force #1 courte (max 10 mots)", "string — force #2"],
   "points_faibles": ["string — faiblesse #1 courte (max 10 mots)", "string — faiblesse #2"],
@@ -3438,16 +3445,19 @@ function populateFreeAudit() {
   const nicheBadge = document.getElementById('fAuditNicheBadge');
   if (nicheBadge && niche) { nicheBadge.textContent = '# ' + niche; nicheBadge.style.display = 'inline-block'; }
 
-  // Score /10
+  // Score /10 + potentiel
   const score = d.note_compte;
-  const scoreWrap = document.getElementById('fAuditScore');
-  const scoreVal  = document.getElementById('fAuditScoreVal');
+  const scoreWrap      = document.getElementById('fAuditScore');
+  const scoreVal       = document.getElementById('fAuditScoreVal');
+  const scorePotential = document.getElementById('fAuditScorePotential');
   if (scoreWrap && scoreVal && score != null) {
     scoreVal.textContent = score;
-    scoreWrap.style.display = 'block';
-    const col = score >= 7 ? '#4ade80' : score >= 5 ? '#facc15' : '#f87171';
-    scoreVal.style.color = col;
-    scoreWrap.style.borderColor = col.replace(')',',0.3)').replace('rgb','rgba');
+    // Potentiel = score + 2 ou 3 (plafonné à 9)
+    const potential = Math.min(9, score + (score <= 5 ? 3 : 2));
+    if (scorePotential) scorePotential.textContent = potential;
+    scoreWrap.style.display = 'flex';
+    scoreWrap.style.flexDirection = 'column';
+    scoreWrap.style.gap = '2px';
   }
 
   // Résumé
@@ -3940,10 +3950,15 @@ function buildRecapEmailHTML(email, d, profile) {
           ${niche ? `<div style="display:inline-block;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3);color:#c4b5fd;font-size:11px;font-weight:700;padding:2px 10px;border-radius:999px"># ${esc(niche)}</div>` : ''}
           ${resume ? `<div style="font-size:13px;color:#9ca3af;margin-top:8px;line-height:1.5">${esc(resume)}</div>` : ''}
         </td>
-        ${score != null ? `<td style="vertical-align:middle;text-align:center;width:80px">
-          <div style="background:rgba(168,85,247,.08);border:2px solid ${scoreColor};border-radius:14px;padding:10px 16px">
-            <div style="font-size:30px;font-weight:900;color:${scoreColor};line-height:1">${score}</div>
-            <div style="font-size:10px;color:#6b7280;font-weight:600">/10</div>
+        ${score != null ? `<td style="vertical-align:middle;text-align:center;width:90px">
+          <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:8px 12px;margin-bottom:4px">
+            <div style="font-size:26px;font-weight:900;color:#f87171;line-height:1">${score}</div>
+            <div style="font-size:9px;color:#6b7280;font-weight:600">/10 actuel</div>
+          </div>
+          <div style="font-size:10px;color:#4a4a70;margin-bottom:3px">→ avec Pro</div>
+          <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:6px 12px">
+            <div style="font-size:20px;font-weight:900;color:#4ade80;line-height:1">${Math.min(9, score + (score <= 5 ? 3 : 2))}</div>
+            <div style="font-size:9px;color:#6b7280;font-weight:600">/10</div>
           </div>
         </td>` : ''}
       </tr>
