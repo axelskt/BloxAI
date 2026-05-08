@@ -3,7 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BloxAI — Viral en un clic</title>
+  <title>BloxAI — Deviens viral sur TikTok avec l'IA | Audit gratuit</title>
+  <meta name="description" content="BloxAI analyse ton compte TikTok en 60 secondes et te génère un plan complet : audit IA, scripts viraux, offre sur mesure, calendrier 30 jours. Gratuit pour commencer." />
+  <meta name="keywords" content="TikTok viral, croissance TikTok, scripts TikTok, audit TikTok IA, créer du contenu viral, monetiser TikTok, BloxAI" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://bloxai.fr/" />
+  <!-- Open Graph -->
+  <meta property="og:title" content="BloxAI — Deviens viral sur TikTok avec l'IA" />
+  <meta property="og:description" content="Audit IA gratuit de ton compte TikTok. Scripts viraux, offre sur mesure et calendrier 30 jours générés en 60 secondes." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://bloxai.fr/" />
+  <meta property="og:image" content="https://bloxai.fr/og-image.png" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="BloxAI — Deviens viral sur TikTok avec l'IA" />
+  <meta name="twitter:description" content="Audit IA gratuit de ton compte TikTok en 60 secondes." />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.10.1/dist/ffmpeg.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -517,33 +531,59 @@
     <div class="funnel-step" id="fStep2">
       <div class="f-prog-bar"><div class="f-prog-fill" style="width:55%"></div></div>
 
-      <!-- Profile card -->
-      <div style="display:flex;align-items:center;gap:16px;background:#0c0c16;border:1px solid #1e1e30;border-radius:16px;padding:18px 20px;margin-bottom:20px">
+      <!-- Profile card + note /10 -->
+      <div style="display:flex;align-items:center;gap:14px;background:#0c0c16;border:1px solid #1e1e30;border-radius:16px;padding:16px 18px;margin-bottom:16px">
         <div style="position:relative;flex-shrink:0">
-          <img id="fAuditAvatar" src="" alt="" style="width:64px;height:64px;border-radius:50%;object-fit:cover;background:#1a1a2e;border:2px solid #a855f7"/>
-          <div style="position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;background:linear-gradient(135deg,#a855f7,#ec4899);border-radius:50%;border:2px solid #06060c;display:flex;align-items:center;justify-content:center;font-size:9px">✓</div>
+          <img id="fAuditAvatar" src="" alt="" style="width:58px;height:58px;border-radius:50%;object-fit:cover;background:#1a1a2e;border:2px solid #a855f7"/>
+          <div style="position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;background:linear-gradient(135deg,#a855f7,#ec4899);border-radius:50%;border:2px solid #06060c;display:flex;align-items:center;justify-content:center;font-size:8px">✓</div>
         </div>
-        <div>
-          <div id="fAuditHandle" style="font-weight:800;font-size:16px;color:#fff"></div>
-          <div style="font-size:12px;color:#6b7280;margin-top:2px">🎵 TikTok · Analysé par BloxAI</div>
+        <div style="flex:1;min-width:0">
+          <div id="fAuditHandle" style="font-weight:800;font-size:15px;color:#fff"></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap">
+            <div style="font-size:11px;color:#6b7280">🎵 TikTok · Analysé par BloxAI</div>
+            <div id="fAuditNicheBadge" style="display:none;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.25);color:#c4b5fd;font-size:10px;font-weight:700;padding:1px 8px;border-radius:999px"></div>
+          </div>
+        </div>
+        <!-- Note /10 -->
+        <div id="fAuditScore" style="display:none;flex-shrink:0;text-align:center;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:8px 12px;min-width:52px">
+          <div id="fAuditScoreVal" style="font-size:22px;font-weight:900;color:#a855f7;line-height:1"></div>
+          <div style="font-size:9px;color:#6b7280;margin-top:2px;font-weight:600">/10</div>
+        </div>
+      </div>
+
+      <!-- Résumé du compte -->
+      <div id="fAuditResume" style="display:none;background:#111120;border:1px solid #1e1e30;border-radius:12px;padding:14px 16px;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#6b7280;margin-bottom:7px">📊 Résumé de ton compte</div>
+        <p id="fAuditResumeText" style="font-size:14px;color:#d1d5db;line-height:1.6"></p>
+      </div>
+
+      <!-- Points forts / Points faibles -->
+      <div id="fAuditPF" style="display:none;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.18);border-radius:12px;padding:12px 14px">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#4ade80;margin-bottom:8px">💪 Points forts</div>
+          <div id="fAuditForts" style="display:flex;flex-direction:column;gap:6px"></div>
+        </div>
+        <div style="background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15);border-radius:12px;padding:12px 14px">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#f87171;margin-bottom:8px">⚠ Points faibles</div>
+          <div id="fAuditFaibles" style="display:flex;flex-direction:column;gap:6px"></div>
         </div>
       </div>
 
       <!-- Problème principal -->
-      <div id="fAuditProblem" style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:16px 18px;margin-bottom:14px">
+      <div id="fAuditProblem" style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:14px 16px;margin-bottom:12px">
         <div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#f87171;margin-bottom:8px">⚠ Problème principal identifié</div>
         <p id="fAuditProblemText" style="font-size:14px;color:#fca5a5;line-height:1.6;font-weight:500"></p>
       </div>
 
       <!-- Quick wins -->
-      <div style="background:#0c0c16;border:1px solid #1e1e30;border-radius:12px;padding:16px 18px;margin-bottom:14px">
-        <div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#a855f7;margin-bottom:12px">⚡ Actions prioritaires cette semaine</div>
+      <div style="background:#0c0c16;border:1px solid #1e1e30;border-radius:12px;padding:14px 16px;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#a855f7;margin-bottom:10px">⚡ Actions prioritaires cette semaine</div>
         <div id="fAuditWins" style="display:flex;flex-direction:column;gap:8px"></div>
       </div>
 
-      <!-- Opportunité cachée — affichée sans flou -->
-      <div id="fAuditOpportunity" style="background:rgba(168,85,247,0.07);border:1px solid rgba(168,85,247,0.2);border-radius:12px;padding:16px 18px;margin-bottom:20px">
-        <div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#a855f7;margin-bottom:8px">🔮 Opportunité à exploiter maintenant</div>
+      <!-- Potentiel — Opportunité à exploiter -->
+      <div id="fAuditOpportunity" style="background:rgba(168,85,247,0.07);border:1px solid rgba(168,85,247,0.2);border-radius:12px;padding:14px 16px;margin-bottom:20px">
+        <div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#a855f7;margin-bottom:8px">🔮 Potentiel — Opportunité à exploiter</div>
         <p id="fAuditOpportunityText" style="font-size:14px;color:#c4b5fd;line-height:1.6;font-weight:500"></p>
       </div>
 
@@ -595,20 +635,25 @@
         </div>
       </div>
 
-      <!-- Checklist visuelle -->
-      <div style="background:#111120;border:1px solid #1e1e30;border-radius:12px;padding:14px 18px;margin-bottom:22px">
-        <div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#6b7280;margin-bottom:10px">Ce que tu vas recevoir</div>
-        <div style="display:flex;flex-direction:column;gap:7px">
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#d8b4fe"><span style="color:#a855f7;font-weight:700;flex-shrink:0">✓</span>Analyse complète de ton compte</div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#d8b4fe"><span style="color:#a855f7;font-weight:700;flex-shrink:0">✓</span>Calendrier éditorial 30 jours</div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#d8b4fe"><span style="color:#a855f7;font-weight:700;flex-shrink:0">✓</span>Scripts viraux adaptés à ton style</div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#d8b4fe"><span style="color:#a855f7;font-weight:700;flex-shrink:0">✓</span>Offre + funnel de vente générés</div>
+      <!-- Email preview card -->
+      <div style="background:linear-gradient(135deg,rgba(168,85,247,.08),rgba(236,72,153,.06));border:1px solid rgba(168,85,247,.2);border-radius:14px;padding:18px 20px;margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <div style="width:36px;height:36px;background:linear-gradient(135deg,#7c3aed,#db2777);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📊</div>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:#fff">Ton rapport d'audit personnalisé</div>
+            <div style="font-size:11px;color:#6b7280;margin-top:2px">Reçois-le maintenant par email</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#c4b5fd"><span style="font-size:14px">📋</span>Ton diagnostic complet + note /10</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#c4b5fd"><span style="font-size:14px">⚡</span>Tes 3 actions prioritaires à faire cette semaine</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#c4b5fd"><span style="font-size:14px">🔮</span>L'opportunité précise à exploiter dans ta niche</div>
         </div>
       </div>
 
-      <div class="text-center mb-6">
-        <h2 class="text-white text-xl font-black mb-2">Où envoyer ton plan ?</h2>
-        <p class="text-gray-500 text-sm">Tu le reçois aussi par email pour l'avoir toujours sous la main.</p>
+      <div class="text-center mb-5">
+        <h2 class="text-white text-xl font-black mb-2">Où envoyer ton rapport ?</h2>
+        <p class="text-gray-500 text-sm">Reçois ton audit par email — pour l'avoir toujours sous la main.</p>
         <p class="text-gray-700 text-xs mt-2">🔒 Données protégées · Aucun spam · Désabonnement en 1 clic</p>
       </div>
 
@@ -815,20 +860,17 @@
               <li class="fi-elite"><span class="fi">⚡</span>Support prioritaire + accès bêta</li>
             </ul>
 
-            <!-- AvatarAds live preview -->
-            <div class="avatar-teaser">
-              <div class="avatar-teaser-title">🤖 Exemple AvatarAds — Aperçu ce que ça génère</div>
-              <!-- Video demo placeholder -->
-              <div style="border-radius:10px;overflow:hidden;margin-bottom:10px;background:#000;aspect-ratio:9/16;max-height:260px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(249,115,22,.2)" id="avatarVideoDemo">
+            <!-- AvatarAds teaser -->
+            <div class="avatar-teaser" style="margin-top:16px">
+              <div class="avatar-teaser-title">🤖 AvatarAds — Exemple de pub générée</div>
+              <div style="border-radius:10px;overflow:hidden;margin-bottom:10px;background:#000;aspect-ratio:9/16;max-height:220px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(249,115,22,.2)">
                 <div style="text-align:center;padding:20px">
-                  <div style="font-size:32px;margin-bottom:8px">▶️</div>
-                  <div style="font-size:12px;color:#f97316;font-weight:600">Vidéo démo AvatarAds</div>
-                  <div style="font-size:11px;color:#6b7280;margin-top:4px">Ajoute ton lien vidéo dans le code</div>
+                  <div style="font-size:28px;margin-bottom:6px">▶️</div>
+                  <div style="font-size:11px;color:#f97316;font-weight:700">Vidéo démo AvatarAds</div>
+                  <div style="font-size:10px;color:#4a4a70;margin-top:3px">Pub vidéo générée par IA en 5 min</div>
                 </div>
               </div>
-              <div class="avatar-teaser-line" id="avatarTeaserHook">Hook : <em id="avatarTeaserHookText">"Personne ne t'en parle mais c'est le business le plus rentable en 2026…"</em></div>
-              <div class="avatar-teaser-line" id="avatarTeaserScript" style="font-size:12px;color:#d8b4fe;line-height:1.5" id="avatarTeaserScriptText">Script généré pour ton compte — avatar IA, ton chaleureux, 18 sec, CTA commentaire.</div>
-              <div style="text-align:center;margin-top:8px;font-size:11px;color:#f97316;font-weight:600">✓ Débloqué avec Élite — génère tes scripts en 5 min</div>
+              <div style="text-align:center;font-size:11px;color:#f97316;font-weight:700">✓ Débloqué avec Élite — génère tes scripts en 5 min</div>
             </div>
           </div>
 
@@ -841,11 +883,23 @@
 
         <!-- Trust -->
         <div style="text-align:center;font-size:11px;font-weight:700;color:#4a4a70;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px">🔒 Paiement 100% sécurisé</div>
-        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:20px;flex-wrap:wrap">
-          <div class="trust-badge" style="color:#1a56db">VISA</div>
-          <div class="trust-badge" style="color:#eb001b">Mastercard</div>
-          <div class="trust-badge" style="color:#5a78f0">Carte Bleue</div>
-          <div class="trust-badge" style="color:#000">🍎 Apple Pay</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+          <!-- Visa -->
+          <div class="trust-badge" style="padding:6px 10px">
+            <svg height="18" viewBox="0 0 750 471" xmlns="http://www.w3.org/2000/svg"><rect width="750" height="471" rx="40" fill="#1a1f71"/><path d="M278 334l45-278h72l-45 278h-72zm312-271c-14-5-37-11-65-11-72 0-122 36-122 87 0 38 36 59 64 71 28 13 38 21 38 33 0 18-23 26-44 26-29 0-44-4-68-14l-9-4-10 60c17 7 47 14 79 14 76 0 125-35 126-90 0-30-19-53-61-71-25-12-41-20-41-33 1-11 13-22 42-22 24 0 41 5 54 10l6 3 10-59zm188-7l-55 278h-68l-9-40h-88l-14 40h-73l103-255c8-18 21-23 38-23h86zm-117 176l25-80c0 0 18-55 22-73l10 66 12 87h-69zm-441-183l-72 190-8-38c-13-44-54-91-100-115l65 243h74l110-280h-69z" fill="white"/></svg>
+          </div>
+          <!-- Mastercard -->
+          <div class="trust-badge" style="padding:6px 10px">
+            <svg height="18" viewBox="0 0 152 95" xmlns="http://www.w3.org/2000/svg"><circle cx="55" cy="47.5" r="47.5" fill="#EB001B"/><circle cx="97" cy="47.5" r="47.5" fill="#F79E1B"/><path d="M76 16.5a47.4 47.4 0 0 1 0 62A47.4 47.4 0 0 1 76 16.5z" fill="#FF5F00"/></svg>
+          </div>
+          <!-- CB (Carte bancaire) -->
+          <div class="trust-badge" style="padding:6px 10px;display:flex;align-items:center;gap:4px">
+            <svg height="16" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="32" rx="4" fill="#1357BE"/><text x="24" y="22" font-family="Arial" font-weight="900" font-size="13" fill="white" text-anchor="middle">CB</text></svg>
+          </div>
+          <!-- Apple Pay -->
+          <div class="trust-badge" style="padding:6px 10px">
+            <svg height="18" viewBox="0 0 165 105" xmlns="http://www.w3.org/2000/svg"><rect width="165" height="105" rx="10" fill="#000"/><path d="M52 35c2-2 3-5 3-8-3 0-7 2-9 4s-3 5-3 8c3 0 7-2 9-4zm3 3c-5 0-9 3-11 3s-6-3-9-3c-5 0-9 3-12 8-7 12-2 30 5 40 3 5 7 10 12 10 5 0 6-3 12-3s8 3 12 3 8-5 12-10c2-3 3-5 4-8-11-4-13-18-2-24-3-4-7-6-11-6z" fill="white"/><path d="M98 34h4l-13 37h-5l-4-22-4 22h-5l-13-37h4l10 30 5-30h4l5 30 10-30z" fill="white"/><path d="M117 71l-2-7h-12l-2 7h-5l11-37h4l11 37h-5zm-13-11h9l-4-16-5 16z" fill="white"/><path d="M137 48h-1c-4 0-6 2-6 5v18h-4V44h4v3c1-2 3-3 6-3h1v4z" fill="white"/></svg>
+          </div>
         </div>
 
         <!-- Config (admin only) -->
@@ -891,6 +945,18 @@
               <input id="brevoKeyInput"    type="password" class="inp" placeholder="Clé API Brevo  (xkeysib-...)" style="font-size:11px;padding:10px 14px" />
               <input id="brevoSenderInput" type="text"     class="inp" placeholder="Email expéditeur  (ex: axel@tonsite.com)" style="font-size:11px;padding:10px 14px" />
               <input id="brevoListInput"   type="text"     class="inp" placeholder="ID liste Brevo  (ex: 4)" style="font-size:11px;padding:10px 14px" />
+            </div>
+            <!-- Supabase -->
+            <div class="section-lbl mt-4">Supabase — stockage des leads</div>
+            <div style="background:rgba(62,207,142,.05);border:1px solid rgba(62,207,142,.15);border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:11px;color:#6b7280;line-height:1.7">
+              <div style="font-weight:800;color:#3ecf8e;margin-bottom:4px">🗄 Setup Supabase (5 min)</div>
+              1. Crée un projet sur <strong style="color:#3ecf8e">supabase.com</strong> (gratuit)<br/>
+              2. SQL Editor → Exécute : <code style="background:#1a1a2e;padding:1px 5px;border-radius:4px;color:#a855f7">CREATE TABLE leads (id uuid default gen_random_uuid(), email text, tiktok_handle text, niche text, score int, level text, content_style text, created_at timestamptz default now());</code><br/>
+              3. Settings → API → copie <strong style="color:#e2e8f0">URL</strong> et <strong style="color:#e2e8f0">anon key</strong>
+            </div>
+            <div class="space-y-2">
+              <input id="supabaseUrlInput"  type="text"     class="inp" placeholder="Supabase URL  (https://xxxx.supabase.co)" style="font-size:11px;padding:10px 14px;border-color:rgba(62,207,142,.3)" />
+              <input id="supabaseAnonInput" type="password" class="inp" placeholder="Supabase Anon Key" style="font-size:11px;padding:10px 14px;border-color:rgba(62,207,142,.3)" />
             </div>
             <button onclick="savePayConfig()" class="btn-outline text-xs px-3 py-1.5 mt-3">Sauvegarder la configuration</button>
           </div>
@@ -1288,6 +1354,34 @@ const S = {
 };
 
 // Checkout links Formation — hardcodés, non affichés dans l'UI
+/* ── Supabase config — remplis avec tes clés du dashboard Supabase ── */
+const SUPABASE_URL    = localStorage.getItem('supabase_url')  || '';  // ex: https://xxxx.supabase.co
+const SUPABASE_ANON   = localStorage.getItem('supabase_anon') || '';  // clé anon public
+
+async function saveLeadToSupabase(email, profileData, auditData) {
+  if (!SUPABASE_URL || !SUPABASE_ANON) return; // silent skip if not configured
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/leads`, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'apikey':         SUPABASE_ANON,
+        'Authorization': 'Bearer ' + SUPABASE_ANON,
+        'Prefer':         'return=minimal',
+      },
+      body: JSON.stringify({
+        email:        email,
+        tiktok_handle: profileData?.url || '',
+        niche:         auditData?.niche_detectee || profileData?.niche || '',
+        score:         auditData?.note_compte || null,
+        level:         profileData?.level || '',
+        content_style: profileData?.contentStyle || '',
+        created_at:    new Date().toISOString(),
+      }),
+    });
+  } catch(e) { /* non-blocking */ }
+}
+
 const LS_FORMATION_PRO   = 'https://iamanager.lemonsqueezy.com/checkout/buy/fa14807f-888b-42e5-8f08-66cab4ab74eb';
 const LS_FORMATION_ELITE = 'https://app.lemonsqueezy.com/share/1024203';
 
@@ -1555,15 +1649,14 @@ IMPORTANT : Si une niche ou offre est déclarée ci-dessus, base ton diagnostic 
 
 Réponds UNIQUEMENT avec ce JSON (sans markdown) :
 {
+  "niche_detectee": "string — la niche en 3-5 mots simples (ex: Business IA, Fitness, Développement perso…)",
+  "note_compte": number entre 1 et 10,
+  "resume_compte": "string — résumé en 1-2 phrases simples, compréhensibles par un débutant de 14 ans",
+  "points_forts": ["string — force #1 courte (max 10 mots)", "string — force #2"],
+  "points_faibles": ["string — faiblesse #1 courte (max 10 mots)", "string — faiblesse #2"],
   "diagnostic": {
-    "probleme_principal": "string — le vrai blocage #1 en 1 phrase directe et percutante, spécifique à leur situation",
-    "problemes_secondaires": ["string — blocage #2","string — blocage #3"],
+    "probleme_principal": "string — le vrai blocage #1 en 1 phrase directe et percutante",
     "raison_perte_argent": "string — pourquoi il/elle laisse de l'argent sur la table EN CE MOMENT"
-  },
-  "analyse": {
-    "contenu": "string — ce qui ne va pas (ou va bien) dans leur stratégie de contenu selon leur niveau/style",
-    "offre": "string — état réel de leur monétisation selon ce qu'ils ont déclaré",
-    "positionnement": "string — comment ils se positionnent vs la concurrence TikTok dans leur niche"
   },
   "quick_wins": [
     "string — action #1 concrète à faire CETTE SEMAINE (max 15 mots, ultra actionnable)",
@@ -3339,18 +3432,62 @@ function populateFreeAudit() {
   if (emailHandle) emailHandle.textContent = handle ? '@' + handle : 'Ton compte';
 
   if (!d) return;
-  const prob = d.diagnostic?.probleme_principal || '';
-  const wins = (d.quick_wins || []).slice(0, 3);
-  const opportunity = d.opportunite_cachee || '';
+
+  // Niche badge
+  const niche = d.niche_detectee || '';
+  const nicheBadge = document.getElementById('fAuditNicheBadge');
+  if (nicheBadge && niche) { nicheBadge.textContent = '# ' + niche; nicheBadge.style.display = 'inline-block'; }
+
+  // Score /10
+  const score = d.note_compte;
+  const scoreWrap = document.getElementById('fAuditScore');
+  const scoreVal  = document.getElementById('fAuditScoreVal');
+  if (scoreWrap && scoreVal && score != null) {
+    scoreVal.textContent = score;
+    scoreWrap.style.display = 'block';
+    const col = score >= 7 ? '#4ade80' : score >= 5 ? '#facc15' : '#f87171';
+    scoreVal.style.color = col;
+    scoreWrap.style.borderColor = col.replace(')',',0.3)').replace('rgb','rgba');
+  }
+
+  // Résumé
+  const resume = d.resume_compte || '';
+  const resumeWrap = document.getElementById('fAuditResume');
+  const resumeText = document.getElementById('fAuditResumeText');
+  if (resumeWrap && resumeText && resume) {
+    resumeText.textContent = resume;
+    resumeWrap.style.display = 'block';
+  }
+
+  // Points forts / faibles
+  const forts   = (d.points_forts   || []).slice(0, 3);
+  const faibles = (d.points_faibles || []).slice(0, 3);
+  const pfWrap  = document.getElementById('fAuditPF');
+  const fortsEl  = document.getElementById('fAuditForts');
+  const faiblesEl = document.getElementById('fAuditFaibles');
+  if (pfWrap && (forts.length || faibles.length)) {
+    pfWrap.style.display = 'grid';
+    if (fortsEl)  fortsEl.innerHTML  = forts.map(f  => `<div style="font-size:12px;color:#86efac;display:flex;gap:6px"><span style="flex-shrink:0;color:#22c55e">✓</span>${f}</div>`).join('');
+    if (faiblesEl) faiblesEl.innerHTML = faibles.map(f => `<div style="font-size:12px;color:#fca5a5;display:flex;gap:6px"><span style="flex-shrink:0;color:#ef4444">✗</span>${f}</div>`).join('');
+  }
+
+  // Problème principal
+  const prob  = d.diagnostic?.probleme_principal || '';
   const probEl = document.getElementById('fAuditProblemText');
-  const winsEl = document.getElementById('fAuditWins');
-  const oppEl  = document.getElementById('fAuditOpportunityText');
   if (probEl) probEl.textContent = prob;
+
+  // Quick wins
+  const wins  = (d.quick_wins || []).slice(0, 3);
+  const winsEl = document.getElementById('fAuditWins');
   if (winsEl) winsEl.innerHTML = wins.map(w =>
     `<div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#c4b5fd">
       <span style="color:#a855f7;font-weight:700;flex-shrink:0;margin-top:1px">→</span>${w}
     </div>`
   ).join('');
+
+  // Opportunité
+  const opportunity = d.opportunite_cachee || '';
+  const oppEl  = document.getElementById('fAuditOpportunityText');
   if (oppEl) oppEl.textContent = opportunity;
   const oppWrap = document.getElementById('fAuditOpportunity');
   if (oppWrap) oppWrap.style.display = opportunity ? 'block' : 'none';
@@ -3505,6 +3642,9 @@ async function submitFunnelEmail() {
 
   const status = document.getElementById('fEmailStatus');
 
+  // Always save lead to Supabase (non-blocking)
+  saveLeadToSupabase(email, S.profile, S.modules[1]);
+
   try {
     await sendRecapEmail(email, S.modules[1], S.profile);
     if (status) {
@@ -3512,16 +3652,16 @@ async function submitFunnelEmail() {
       status.style.background = 'rgba(34,197,94,.1)';
       status.style.color = '#86efac';
       status.style.border = '1px solid rgba(34,197,94,.2)';
-      status.textContent = '✓ Ton audit a été envoyé à ' + email;
+      status.textContent = '✓ Ton rapport a été envoyé à ' + email;
     }
   } catch(e) {
-    // Silent fail — still proceed
+    // Silent fail — still proceed (lead already saved to Supabase)
     if (status) {
       status.style.display = 'block';
-      status.style.background = 'rgba(239,68,68,.08)';
-      status.style.color = '#fca5a5';
-      status.style.border = '1px solid rgba(239,68,68,.2)';
-      status.textContent = 'Email non envoyé — configure Brevo dans les paramètres.';
+      status.style.background = 'rgba(34,197,94,.08)';
+      status.style.color = '#86efac';
+      status.style.border = '1px solid rgba(34,197,94,.15)';
+      status.textContent = '✓ Ton rapport est sauvegardé. Configure Brevo pour l\'envoi email.';
     }
   }
 
@@ -3575,6 +3715,10 @@ function initPayStep() {
   if (brevoEl)     brevoEl.value     = localStorage.getItem('brevo_api_key') || '';
   if (brevoSender) brevoSender.value = localStorage.getItem('brevo_sender')  || '';
   if (brevoList)   brevoList.value   = localStorage.getItem('brevo_list_id') || '';
+  const sbUrlEl  = document.getElementById('supabaseUrlInput');
+  const sbAnonEl = document.getElementById('supabaseAnonInput');
+  if (sbUrlEl)  sbUrlEl.value  = localStorage.getItem('supabase_url')  || '';
+  if (sbAnonEl) sbAnonEl.value = localStorage.getItem('supabase_anon') || '';
 
   // Default billing = yearly, update prices
   setBilling('yearly');
@@ -3693,6 +3837,10 @@ function savePayConfig() {
   localStorage.setItem('brevo_api_key', document.getElementById('brevoKeyInput').value.trim());
   localStorage.setItem('brevo_sender',  document.getElementById('brevoSenderInput').value.trim());
   localStorage.setItem('brevo_list_id', document.getElementById('brevoListInput').value.trim());
+  const sbUrl  = document.getElementById('supabaseUrlInput');
+  const sbAnon = document.getElementById('supabaseAnonInput');
+  if (sbUrl)  localStorage.setItem('supabase_url',  sbUrl.value.trim());
+  if (sbAnon) localStorage.setItem('supabase_anon', sbAnon.value.trim());
   const btn = event.target;
   btn.textContent = '✓ Sauvegardé';
   btn.style.color = '#22c55e';
@@ -3750,94 +3898,125 @@ async function sendRecapEmail(email, auditData, profile) {
 
 function buildRecapEmailHTML(email, d, profile) {
   const diag    = d?.diagnostic || {};
-  const analyse = d?.analyse || {};
-  const wins    = (d?.quick_wins || []).slice(0, 4);
+  const wins    = (d?.quick_wins || []).slice(0, 3);
   const opp     = d?.opportunite_cachee || '';
-  const plat    = profile?.platform || 'ta plateforme';
+  const niche   = d?.niche_detectee || '';
+  const score   = d?.note_compte;
+  const resume  = d?.resume_compte || '';
+  const forts   = (d?.points_forts   || []).slice(0, 2);
+  const faibles = (d?.points_faibles || []).slice(0, 2);
   const url     = profile?.url || '';
   const emailParam = email ? ('?checkout[email]=' + encodeURIComponent(email)) : '';
-  const payURL  = (localStorage.getItem('ls_yearly')  || '#') + emailParam;
-  const weekURL = (localStorage.getItem('ls_weekly')  || '#') + emailParam;
+  const starterURL = (localStorage.getItem('ls_starter_y') || localStorage.getItem('ls_starter_m') || 'https://bloxai.fr') + emailParam;
+  const proURL     = (localStorage.getItem('ls_pro_y')     || localStorage.getItem('ls_pro_m')     || 'https://bloxai.fr') + emailParam;
 
+  const scoreColor = score >= 7 ? '#4ade80' : score >= 5 ? '#facc15' : '#f87171';
   const winItems = wins.map(w =>
-    `<tr><td style="padding:8px 0;border-bottom:1px solid #1e1e30;font-size:13px;color:#d8b4fe">
-      <span style="color:#a855f7;font-weight:700;margin-right:8px">✓</span>${esc(w)}
+    `<tr><td style="padding:7px 0;border-bottom:1px solid #1e1e30;font-size:13px;color:#d8b4fe">
+      <span style="color:#a855f7;font-weight:700;margin-right:8px">→</span>${esc(w)}
     </td></tr>`
   ).join('');
 
   return `<!DOCTYPE html>
 <html lang="fr"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Ton audit BloxAI</title></head>
+<title>Ton rapport BloxAI — ${esc(url)}</title></head>
 <body style="margin:0;padding:0;background:#06060c;font-family:'Helvetica Neue',Arial,sans-serif">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#06060c;padding:40px 0">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#06060c;padding:32px 0">
 <tr><td align="center">
-<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%">
+<table width="580" cellpadding="0" cellspacing="0" style="max-width:580px;width:100%">
 
   <!-- Header -->
-  <tr><td style="background:linear-gradient(135deg,#0c0c16,#111120);border:1px solid #1e1e30;border-radius:16px 16px 0 0;padding:32px 36px;text-align:center">
-    <div style="font-size:28px;font-weight:900;background:linear-gradient(135deg,#a855f7,#ec4899);-webkit-background-clip:text;color:#a855f7">⚡ BloxAI</div>
-    <div style="color:#6b7280;font-size:13px;margin-top:4px">Ton audit IA est prêt</div>
+  <tr><td style="background:linear-gradient(135deg,#0c0c16,#111120);border:1px solid #1e1e30;border-radius:16px 16px 0 0;padding:28px 32px;text-align:center">
+    <div style="font-size:26px;font-weight:900;color:#a855f7">⚡ BloxAI</div>
+    <div style="color:#6b7280;font-size:12px;margin-top:4px">Ton rapport d'audit personnalisé</div>
   </td></tr>
 
-  <!-- Hero -->
-  <tr><td style="background:#0c0c16;border-left:1px solid #1e1e30;border-right:1px solid #1e1e30;padding:32px 36px;text-align:center">
-    <div style="font-size:22px;font-weight:900;color:#fff;line-height:1.3;margin-bottom:12px">
-      On a analysé ton compte ${esc(url || plat)}.<br/>
-      <span style="background:linear-gradient(135deg,#a855f7,#ec4899);-webkit-background-clip:text;color:#a855f7">Voici ce qu'on a trouvé.</span>
-    </div>
-    <div style="color:#6b7280;font-size:13px;line-height:1.6">Diagnostic complet ci-dessous — lis ça attentivement,<br/>c'est la clé pour débloquer ta croissance.</div>
+  <!-- Score card -->
+  <tr><td style="background:#0c0c16;border-left:1px solid #1e1e30;border-right:1px solid #1e1e30;padding:24px 32px">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="vertical-align:middle">
+          <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:4px">@${esc(url.replace(/^@/,'').replace(/.*tiktok\.com\/@?/,'').split('/')[0].split('?')[0] || url)}</div>
+          ${niche ? `<div style="display:inline-block;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3);color:#c4b5fd;font-size:11px;font-weight:700;padding:2px 10px;border-radius:999px"># ${esc(niche)}</div>` : ''}
+          ${resume ? `<div style="font-size:13px;color:#9ca3af;margin-top:8px;line-height:1.5">${esc(resume)}</div>` : ''}
+        </td>
+        ${score != null ? `<td style="vertical-align:middle;text-align:center;width:80px">
+          <div style="background:rgba(168,85,247,.08);border:2px solid ${scoreColor};border-radius:14px;padding:10px 16px">
+            <div style="font-size:30px;font-weight:900;color:${scoreColor};line-height:1">${score}</div>
+            <div style="font-size:10px;color:#6b7280;font-weight:600">/10</div>
+          </div>
+        </td>` : ''}
+      </tr>
+    </table>
   </td></tr>
+
+  <!-- Points forts / faibles -->
+  ${(forts.length || faibles.length) ? `<tr><td style="background:#0c0c16;border-left:1px solid #1e1e30;border-right:1px solid #1e1e30;padding:0 32px 20px">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td width="48%" style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:12px 14px;vertical-align:top">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#4ade80;margin-bottom:8px">💪 Points forts</div>
+          ${forts.map(f=>`<div style="font-size:12px;color:#86efac;margin-bottom:4px">✓ ${esc(f)}</div>`).join('')}
+        </td>
+        <td width="4%"></td>
+        <td width="48%" style="background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:12px 14px;vertical-align:top">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#f87171;margin-bottom:8px">⚠ Points faibles</div>
+          ${faibles.map(f=>`<div style="font-size:12px;color:#fca5a5;margin-bottom:4px">✗ ${esc(f)}</div>`).join('')}
+        </td>
+      </tr>
+    </table>
+  </td></tr>` : ''}
 
   <!-- Problème principal -->
-  <tr><td style="background:#0c0c16;border-left:1px solid #1e1e30;border-right:1px solid #1e1e30;padding:0 36px 24px">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:20px">
+  <tr><td style="background:#0c0c16;border-left:1px solid #1e1e30;border-right:1px solid #1e1e30;padding:0 32px 20px">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:16px">
     <tr><td>
-      <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:#f87171;margin-bottom:8px">🔴 Problème principal identifié</div>
-      <div style="font-size:15px;font-weight:700;color:#fca5a5;line-height:1.5">${esc(diag.probleme_principal || '—')}</div>
+      <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:#f87171;margin-bottom:7px">⚠ Problème principal identifié</div>
+      <div style="font-size:14px;font-weight:700;color:#fca5a5;line-height:1.5">${esc(diag.probleme_principal || '—')}</div>
     </td></tr></table>
   </td></tr>
 
-  <!-- Analyse -->
-  <tr><td style="background:#0c0c16;border-left:1px solid #1e1e30;border-right:1px solid #1e1e30;padding:0 36px 24px">
-    <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:#4a4a70;margin-bottom:12px">Diagnostic détaillé</div>
-    ${analyse.contenu ? `<div style="background:#111120;border:1px solid #1e1e30;border-radius:10px;padding:14px 16px;margin-bottom:8px"><div style="font-size:11px;color:#6b7280;margin-bottom:4px">CONTENU</div><div style="font-size:13px;color:#e2e8f0">${esc(analyse.contenu)}</div></div>` : ''}
-    ${analyse.offre ? `<div style="background:#111120;border:1px solid #1e1e30;border-radius:10px;padding:14px 16px;margin-bottom:8px"><div style="font-size:11px;color:#6b7280;margin-bottom:4px">OFFRE</div><div style="font-size:13px;color:#e2e8f0">${esc(analyse.offre)}</div></div>` : ''}
-    ${analyse.positionnement ? `<div style="background:#111120;border:1px solid #1e1e30;border-radius:10px;padding:14px 16px"><div style="font-size:11px;color:#6b7280;margin-bottom:4px">POSITIONNEMENT</div><div style="font-size:13px;color:#e2e8f0">${esc(analyse.positionnement)}</div></div>` : ''}
-  </td></tr>
-
   <!-- Quick wins -->
-  <tr><td style="background:#0c0c16;border-left:1px solid #1e1e30;border-right:1px solid #1e1e30;padding:0 36px 24px">
-    <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:#4a4a70;margin-bottom:12px">⚡ Tes 4 actions prioritaires cette semaine</div>
-    <table width="100%" cellpadding="0" cellspacing="0" style="background:#111120;border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:4px 16px">
+  <tr><td style="background:#0c0c16;border-left:1px solid #1e1e30;border-right:1px solid #1e1e30;padding:0 32px 20px">
+    <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:#4a4a70;margin-bottom:10px">⚡ Tes actions prioritaires cette semaine</div>
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#111120;border:1px solid rgba(168,85,247,.2);border-radius:10px;padding:4px 14px">
       ${winItems}
     </table>
   </td></tr>
 
-  ${opp ? `<!-- Hidden opportunity -->
-  <tr><td style="background:#0c0c16;border-left:1px solid #1e1e30;border-right:1px solid #1e1e30;padding:0 36px 24px">
-    <div style="background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:20px">
-      <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:#a855f7;margin-bottom:8px">💡 L'opportunité cachée que personne ne voit</div>
+  ${opp ? `<tr><td style="background:#0c0c16;border-left:1px solid #1e1e30;border-right:1px solid #1e1e30;padding:0 32px 20px">
+    <div style="background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:16px">
+      <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:#a855f7;margin-bottom:7px">🔮 Potentiel — Opportunité à exploiter</div>
       <div style="font-size:13px;color:#d8b4fe;line-height:1.6">${esc(opp)}</div>
     </div>
   </td></tr>` : ''}
 
-  <!-- CTA unlock -->
-  <tr><td style="background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(219,39,119,.1));border-left:1px solid #1e1e30;border-right:1px solid #1e1e30;border-top:1px solid rgba(124,58,237,.2);padding:32px 36px;text-align:center">
-    <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:8px">Il te manque l'offre, les scripts<br/>le funnel et le site web.</div>
-    <div style="font-size:13px;color:#6b7280;margin-bottom:24px;line-height:1.6">L'audit n'est que la partie gratuite.<br/>Le système complet est dans la version Pro.</div>
-    <a href="${payURL}" style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font-weight:900;font-size:15px;padding:16px 36px;border-radius:12px;text-decoration:none">
-      Débloquer le plan complet — 48,99€/an →
-    </a>
-    <div style="margin-top:12px">
-      <a href="${weekURL}" style="color:#6b7280;font-size:12px;text-decoration:underline">Ou essayer 7 jours pour 4,99€</a>
-    </div>
+  <!-- CTA — Push Starter -->
+  <tr><td style="background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(219,39,119,.08));border-left:1px solid #1e1e30;border-right:1px solid #1e1e30;border-top:1px solid rgba(124,58,237,.2);padding:28px 32px;text-align:center">
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#a855f7;margin-bottom:8px">Passe à l'étape suivante</div>
+    <div style="font-size:17px;font-weight:900;color:#fff;margin-bottom:6px;line-height:1.3">Ton audit est prêt.<br/>Maintenant, construis ton système.</div>
+    <div style="font-size:13px;color:#6b7280;margin-bottom:20px">Scripts viraux, offre sur mesure, funnel de vente —<br/>tout est généré par l'IA en moins de 5 minutes.</div>
+    <table cellpadding="0" cellspacing="0" style="margin:0 auto">
+      <tr>
+        <td style="padding:0 6px">
+          <a href="${starterURL}" style="display:inline-block;background:#111120;border:1px solid #a855f7;color:#a855f7;font-weight:700;font-size:13px;padding:12px 22px;border-radius:10px;text-decoration:none">
+            Starter — 9,99€/mois →
+          </a>
+        </td>
+        <td style="padding:0 6px">
+          <a href="${proURL}" style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font-weight:900;font-size:13px;padding:12px 22px;border-radius:10px;text-decoration:none">
+            ✦ Pro — 17,99€/mois →
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div style="font-size:11px;color:#4a4a70;margin-top:14px">Annulation en 1 clic · Remboursé 14 jours si non satisfait</div>
   </td></tr>
 
   <!-- Footer -->
-  <tr><td style="background:#06060c;border:1px solid #0f0f1e;border-radius:0 0 16px 16px;padding:20px 36px;text-align:center">
+  <tr><td style="background:#06060c;border:1px solid #0f0f1e;border-radius:0 0 16px 16px;padding:18px 32px;text-align:center">
     <div style="font-size:11px;color:#3f3f5a;line-height:1.8">
-      ⚡ BloxAI · Audit IA Business by IA MANAGER<br/>
-      Tu reçois cet email parce que tu as utilisé le générateur de plan.<br/>
+      ⚡ BloxAI by IA MANAGER · <a href="https://bloxai.fr" style="color:#4a4a70;text-decoration:none">bloxai.fr</a><br/>
       <a href="#" style="color:#4a4a70;text-decoration:underline">Se désabonner</a>
     </div>
   </td></tr>
