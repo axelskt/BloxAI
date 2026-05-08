@@ -432,6 +432,10 @@
           <span style="font-size:18px">💡</span>
           <span class="f-ans-texts"><strong>Je n'arrive pas à trouver des idées</strong><em>Je manque d'inspiration et de constance</em></span>
         </button>
+        <button class="f-ans f-ans-2line" id="fblk-growth" onclick="selectFunnelBlocker('growth')">
+          <span style="font-size:18px">🌱</span>
+          <span class="f-ans-texts"><strong>Je veux juste progresser et me développer</strong><em>Pas de blocage précis — je veux m'améliorer</em></span>
+        </button>
       </div>
     </div>
 
@@ -481,14 +485,31 @@
       <div class="text-center mb-8">
         <div style="font-size:48px;margin-bottom:14px">💸</div>
         <h2 class="text-white text-2xl font-black mb-3">Tu as déjà gagné de l'argent<br/>avec ton contenu ?</h2>
-        <p class="text-gray-500 text-sm">L'IA calibre mieux ton plan si elle connaît ton niveau de revenus.</p>
+        <p class="text-gray-500 text-sm">L'IA calibre mieux ton plan selon ton niveau de revenus.</p>
       </div>
-      <div style="margin-bottom:14px">
-        <textarea id="fRevenueInput" class="inp" rows="2" placeholder="Ex: non pas encore / oui environ 200€/mois avec des placements / oui 2 000€ avec ma formation…" style="min-height:80px;font-size:14px"></textarea>
-        <div style="font-size:11px;color:#4a4a70;margin-top:6px">Si tu ne gagnes encore rien, c'est normal — l'IA te dira comment débloquer ça.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px">
+        <button class="f-ans f-ans-2line" id="frev-zero" onclick="selectFunnelRevenue('zero','0€ — je n\'ai encore rien gagné')">
+          <span style="font-size:18px">🌱</span>
+          <span class="f-ans-texts"><strong>0€ — Je n'ai encore rien gagné</strong><em>Je pars de zéro côté monétisation</em></span>
+        </button>
+        <button class="f-ans f-ans-2line" id="frev-low" onclick="selectFunnelRevenue('low','Entre 1€ et 100€')">
+          <span style="font-size:18px">🪙</span>
+          <span class="f-ans-texts"><strong>Entre 1€ et 100€</strong><em>Quelques premiers euros — placements, dons...</em></span>
+        </button>
+        <button class="f-ans f-ans-2line" id="frev-mid" onclick="selectFunnelRevenue('mid','Entre 100€ et 2 000€')">
+          <span style="font-size:18px">📈</span>
+          <span class="f-ans-texts"><strong>Entre 100€ et 2 000€</strong><em>Des revenus réguliers mais pas encore constants</em></span>
+        </button>
+        <button class="f-ans f-ans-2line" id="frev-high" onclick="selectFunnelRevenue('high','Entre 2 000€ et 10 000€')">
+          <span style="font-size:18px">🚀</span>
+          <span class="f-ans-texts"><strong>Entre 2 000€ et 10 000€</strong><em>Mon contenu génère un vrai revenu</em></span>
+        </button>
+        <button class="f-ans f-ans-2line" id="frev-top" onclick="selectFunnelRevenue('top','Plus de 10 000€')">
+          <span style="font-size:18px">🔥</span>
+          <span class="f-ans-texts"><strong>Plus de 10 000€</strong><em>Je scale — je veux aller encore plus loin</em></span>
+        </button>
       </div>
-      <button class="f-btn" onclick="submitRevenueAndAnalyse()">Analyser mon compte →</button>
-      <button onclick="submitRevenueAndAnalyse()" style="background:none;border:none;color:#4a4a70;font-size:13px;cursor:pointer;margin-top:12px;width:100%;text-align:center">Passer cette étape</button>
+      <button onclick="submitRevenueAndAnalyse()" style="background:none;border:none;color:#4a4a70;font-size:13px;cursor:pointer;margin-top:4px;width:100%;text-align:center">Passer cette étape →</button>
     </div>
 
     <!-- ── STEP 1: Loading / generating plan ── -->
@@ -1754,7 +1775,7 @@ SIGNAUX NÉGATIFS : discordance entre hook et contenu réel, clickbait excessif 
 
 HANDLE : @${(p.url||'').replace(/^@/,'').replace(/.*tiktok\.com\/@?/,'').split('/')[0].split('?')[0] || 'non fourni'}
 NIVEAU : ${{'zero':'Débutant — aucune publication encore','start':'A posté quelques vidéos — pas de stratégie claire','grind':'Poste régulièrement — stagne en vues ou ventes','pro':'Fait déjà +10k vues régulières — veut monétiser plus'}[p.level] || 'non précisé'}
-FREIN PRINCIPAL : ${{'start':'Ne sait pas par où commencer — trop d\'infos, pas assez d\'actions','peur':'Peur du regard des autres — se sent illégitime','temps':'Manque de temps — veut aller vite et efficace','idees':'Manque d\'idées et d\'inspiration — ne sait pas quoi poster'}[p.blocker] || 'non précisé'}
+FREIN PRINCIPAL : ${{'start':'Ne sait pas par où commencer — trop d\'infos, pas assez d\'actions','peur':'Peur du regard des autres — se sent illégitime','temps':'Manque de temps — veut aller vite et efficace','idees':'Manque d\'idées et d\'inspiration — ne sait pas quoi poster','growth':'Pas de blocage précis — veut progresser et se développer'}[p.blocker] || 'non précisé'}
 STYLE DE CONTENU : ${{'faceless':'Faceless / voix off — choix STRATÉGIQUE délibéré, ne PAS mentionner la peur de la caméra','camera':'Face caméra — se montre dans ses vidéos','both':'Mix faceless + face caméra'}[p.contentStyle] || 'non précisé'}
 NICHE / CE QU'IL VEND : ${p.niche || 'non précisé — base ton analyse sur le handle et les patterns TikTok classiques de cette niche'}
 REVENUS ACTUELS : ${p.revenue || 'non précisé'}
@@ -3494,7 +3515,7 @@ function selectFunnelLevel(v) {
 
 function selectFunnelBlocker(v) {
   S.blocker = v;
-  ['start','peur','temps','idees'].forEach(k => {
+  ['start','peur','temps','idees','growth'].forEach(k => {
     const b = document.getElementById('fblk-'+k);
     if (b) b.classList.toggle('selected', k === v);
   });
@@ -3525,9 +3546,16 @@ function submitNicheAndAnalyse() {
   showFunnelStep('0e');
 }
 
+function selectFunnelRevenue(key, label) {
+  S.revenue = label;
+  ['zero','low','mid','high','top'].forEach(k => {
+    const b = document.getElementById('frev-'+k);
+    if (b) b.classList.toggle('selected', k === key);
+  });
+  setTimeout(() => submitRevenueAndAnalyse(), 280);
+}
+
 function submitRevenueAndAnalyse() {
-  const inp = document.getElementById('fRevenueInput');
-  S.revenue = inp ? inp.value.trim() : '';
   launchFunnelAnalysis();
 }
 
