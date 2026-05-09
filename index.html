@@ -1874,7 +1874,12 @@ window.onload = () => {
       if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
         await syncSupabaseSession();
         history.replaceState({}, '', window.location.pathname);
-        closeLoginModal();
+        if (event === 'SIGNED_IN') {
+          // Ouvre le modal "Définis ton mot de passe" à la première connexion magic link
+          _openPasswordSetup(session.user.email);
+        } else {
+          closeLoginModal();
+        }
       }
     });
   }
@@ -1898,6 +1903,45 @@ window.onload = () => {
     }
   });
 };
+
+/* ── Ouvre le modal sur le setup mot de passe après magic link ── */
+function _openPasswordSetup(email) {
+  const modal      = document.getElementById('loginModal');
+  const formWrap   = document.getElementById('loginFormWrap');
+  const logoutWrap = document.getElementById('logoutWrap');
+  const setPwForm  = document.getElementById('setPwForm');
+  const setPwMsg   = document.getElementById('setPwMsg');
+  const info       = document.getElementById('loginAccountInfo');
+  const plan       = localStorage.getItem('blowup_access') || '';
+  const planLabel  = { elite:'ÉLITE', pro:'PRO', starter:'STARTER', trial:'TRIAL', free:'GRATUIT' };
+  const planColors = { elite:'#f97316', pro:'#a855f7', starter:'#22c55e', trial:'#22c55e', free:'#6b7280' };
+  const planBgs    = { elite:'rgba(249,115,22,.15)', pro:'rgba(124,58,237,.15)', starter:'rgba(34,197,94,.15)', trial:'rgba(34,197,94,.15)', free:'rgba(107,114,128,.1)' };
+
+  if (!modal) return;
+
+  // Basculer en mode "compte"
+  if (formWrap)   formWrap.style.display   = 'none';
+  if (logoutWrap) logoutWrap.style.display = 'block';
+
+  // Remplir l'info compte avec message de bienvenue
+  if (info) info.innerHTML = `
+    <div style="color:#22c55e;font-weight:700;font-size:14px;margin-bottom:6px">✅ Connecté avec succès !</div>
+    <div style="font-size:13px;color:#9ca3af;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${email || ''}</div>
+    ${plan && plan !== 'free' ? `<span style="font-size:11px;background:${planBgs[plan]||planBgs.free};color:${planColors[plan]||planColors.free};padding:2px 10px;border-radius:99px;font-weight:800;letter-spacing:.5px">${planLabel[plan]||plan.toUpperCase()}</span>` : ''}
+    <div style="margin-top:10px;padding:10px;border-radius:8px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);font-size:12px;color:#a78bfa;line-height:1.5">
+      🔐 Définis un mot de passe ci-dessous pour te connecter instantanément la prochaine fois — sans attendre un email.
+    </div>`;
+
+  // Ouvrir directement le form mot de passe
+  if (setPwForm) setPwForm.style.display = 'block';
+  if (setPwMsg)  { setPwMsg.style.display = 'none'; setPwMsg.textContent = ''; }
+
+  // Afficher le modal
+  modal.style.display = 'flex';
+
+  // Focus sur le champ mot de passe
+  setTimeout(() => document.getElementById('newPwInput')?.focus(), 100);
+}
 
 /* ── Views ── */
 function showView(v) {
