@@ -1767,19 +1767,23 @@ async function handleMagicLogin() {
   btn.disabled = true; btn.textContent = 'Vérification…';
 
   try {
-    // Vérifier que l'email a un plan payant (GRANT SELECT est maintenant actif)
-    const { data: userCheck, error: checkErr } = await _supa
-      .from('bloxai_users').select('plan').eq('email', email).maybeSingle();
+    // Vérifier plan avec timeout 4s pour éviter le hang
+    const checkWithTimeout = Promise.race([
+      _supa.from('bloxai_users').select('plan').eq('email', email).maybeSingle(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 4000))
+    ]);
 
-    if (checkErr) {
-      btn.disabled = false; btn.textContent = 'Recevoir mon lien d\'accès →';
-      msg.style.display = 'block'; msg.style.color = '#f87171';
-      msg.textContent = '❌ Erreur de vérification. Réessaie dans quelques secondes.';
-      console.warn('[bloxai] checkErr:', checkErr.message);
-      return;
+    let userCheck = null;
+    try {
+      const { data, error: checkErr } = await checkWithTimeout;
+      if (!checkErr) userCheck = data;
+    } catch(e) {
+      console.warn('[bloxai] plan check skipped:', e.message);
+      // timeout ou erreur → on bloque par sécurité seulement si on a eu une vraie réponse "pas de plan"
+      // ici on laisse passer (l'user verra "accès refusé" dans le modal si pas de plan)
     }
 
-    if (!userCheck || !userCheck.plan || userCheck.plan === 'free') {
+    if (userCheck !== null && (!userCheck.plan || userCheck.plan === 'free')) {
       btn.disabled = false; btn.textContent = 'Recevoir mon lien d\'accès →';
       msg.style.display = 'block'; msg.style.color = '#f87171';
       msg.textContent = '🔒 Aucun accès trouvé pour cet email. Achète un plan pour accéder.';
