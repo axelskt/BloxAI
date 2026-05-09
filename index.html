@@ -1648,14 +1648,16 @@ window.onload = () => {
   initFunnelEmailListener();
   syncSupabaseSession(); // sync plan depuis Supabase si connecté
 
-  // Écoute le retour magic link (session établie automatiquement)
+  // Écoute le retour magic link → redirige vers l'app si plan actif
   if (_supa) {
     _supa.auth.onAuthStateChange(async (event, session) => {
       if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
         await syncSupabaseSession();
-        // Rafraîchit les modules si on est dans la vue app
-        if (document.getElementById('view-app')?.style.display !== 'none') {
-          updateTabLocks?.();
+        const plan = localStorage.getItem('blowup_access');
+        if (plan && plan !== 'free') {
+          // Nettoie l'URL et bascule vers l'app
+          history.replaceState({}, '', window.location.pathname);
+          showView('app');
         }
       }
     });
