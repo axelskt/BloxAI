@@ -1763,35 +1763,50 @@ async function handleMagicLogin() {
   }
   btn.disabled = true; btn.textContent = 'Vérification…';
 
-  // Vérifier que l'email a un plan payant avant d'envoyer le lien
-  const { data: userCheck } = await _supa
-    .from('bloxai_users').select('plan').eq('email', email).maybeSingle();
-  if (!userCheck || !userCheck.plan || userCheck.plan === 'free') {
-    btn.disabled = false; btn.textContent = 'Recevoir mon lien d\'accès →';
-    msg.style.display = 'block'; msg.style.color = '#f87171';
-    msg.textContent = '🔒 Aucun accès trouvé pour cet email. Achète un plan pour accéder.';
-    return;
-  }
+  try {
+    // Vérifier que l'email a un plan payant avant d'envoyer le lien
+    const { data: userCheck, error: checkErr } = await _supa
+      .from('bloxai_users').select('plan').eq('email', email).maybeSingle();
 
-  btn.textContent = 'Envoi en cours…';
-  const { error } = await _supa.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: window.location.origin + window.location.pathname + '?login=1' }
-  });
-  if (error) {
+    if (checkErr) {
+      // Erreur RLS ou réseau → on refuse par sécurité
+      btn.disabled = false; btn.textContent = 'Recevoir mon lien d\'accès →';
+      msg.style.display = 'block'; msg.style.color = '#f87171';
+      msg.textContent = '❌ Erreur de vérification (' + checkErr.message + '). Réessaie.';
+      return;
+    }
+
+    if (!userCheck || !userCheck.plan || userCheck.plan === 'free') {
+      btn.disabled = false; btn.textContent = 'Recevoir mon lien d\'accès →';
+      msg.style.display = 'block'; msg.style.color = '#f87171';
+      msg.textContent = '🔒 Aucun accès trouvé pour cet email. Achète un plan pour accéder.';
+      return;
+    }
+
+    btn.textContent = 'Envoi en cours…';
+    const { error } = await _supa.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: window.location.origin + window.location.pathname + '?login=1' }
+    });
+    if (error) {
+      btn.disabled = false; btn.textContent = 'Recevoir mon lien d\'accès →';
+      msg.style.display = 'block'; msg.style.color = '#f87171';
+      const friendlyMsg = error.message.includes('rate limit')
+        ? 'Trop de tentatives — réessaie dans 1h.'
+        : error.message.includes('invalid')
+        ? 'Email invalide, vérifie l\'adresse.'
+        : 'Une erreur est survenue, réessaie.';
+      msg.textContent = '❌ ' + friendlyMsg;
+    } else {
+      btn.textContent = 'Lien envoyé ✓';
+      msg.style.display = 'block'; msg.style.color = '#22c55e';
+      msg.textContent = '✅ Vérifie ta boîte mail — le lien expire dans 1h.';
+      if (hint) hint.style.display = 'block';
+    }
+  } catch (e) {
     btn.disabled = false; btn.textContent = 'Recevoir mon lien d\'accès →';
     msg.style.display = 'block'; msg.style.color = '#f87171';
-    const friendlyMsg = error.message.includes('rate limit')
-      ? 'Trop de tentatives — réessaie dans 1h.'
-      : error.message.includes('invalid')
-      ? 'Email invalide, vérifie l\'adresse.'
-      : 'Une erreur est survenue, réessaie.';
-    msg.textContent = '❌ ' + friendlyMsg;
-  } else {
-    btn.textContent = 'Lien envoyé ✓';
-    msg.style.display = 'block'; msg.style.color = '#22c55e';
-    msg.textContent = '✅ Vérifie ta boîte mail — le lien expire dans 1h.';
-    if (hint) hint.style.display = 'block';
+    msg.textContent = '❌ Erreur inattendue : ' + e.message;
   }
 }
 
