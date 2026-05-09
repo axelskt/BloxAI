@@ -294,8 +294,21 @@
 
       <!-- Password field (mode password only) -->
       <div id="loginPassField">
-        <input id="loginPasswordInput" type="password" class="inp" placeholder="Mot de passe" style="margin-bottom:12px"
+        <input id="loginPasswordInput" type="password" class="inp" placeholder="Mot de passe" style="margin-bottom:8px"
           onkeydown="if(event.key==='Enter')_loginSubmit()" />
+        <div style="text-align:right;margin-bottom:12px">
+          <button onclick="_toggleForgotPassword()" id="forgotPwBtn" style="background:none;border:none;color:#6b7280;font-size:12px;cursor:pointer;text-decoration:underline;padding:0">
+            Mot de passe oublié ?
+          </button>
+        </div>
+        <!-- Forgot password sub-form -->
+        <div id="forgotPwForm" style="display:none;padding:12px;border-radius:10px;background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.18);margin-bottom:12px">
+          <p style="font-size:12px;color:#a78bfa;margin-bottom:10px;line-height:1.5">🔑 Entre ton email ci-dessus — on t'envoie un lien pour réinitialiser ton mot de passe.</p>
+          <button onclick="handleForgotPassword()" id="forgotSendBtn" style="width:100%;padding:9px;border-radius:8px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.35);color:#a78bfa;font-weight:700;font-size:13px;cursor:pointer">
+            Envoyer le lien de réinitialisation →
+          </button>
+          <div id="forgotMsg" style="font-size:12px;margin-top:8px;text-align:center;display:none"></div>
+        </div>
       </div>
 
       <!-- Description (mode magic only) -->
@@ -1561,6 +1574,11 @@ function _setLoginMode(mode) {
   const tabMagic   = document.getElementById('tabMagic');
   const msg        = document.getElementById('loginMsg');
   if (msg) { msg.style.display = 'none'; msg.textContent = ''; }
+  // Reset forgot password si on change de mode
+  const forgotForm = document.getElementById('forgotPwForm');
+  if (forgotForm) forgotForm.style.display = 'none';
+  const forgotBtn = document.getElementById('forgotPwBtn');
+  if (forgotBtn) forgotBtn.textContent = 'Mot de passe oublié ?';
   if (mode === 'password') {
     if (passField) passField.style.display = '';
     if (magicDesc) magicDesc.style.display = 'none';
@@ -1689,6 +1707,47 @@ async function handleMagicLogin() {
 }
 
 /* ── Définir / changer le mot de passe ── */
+function _toggleForgotPassword() {
+  const f   = document.getElementById('forgotPwForm');
+  const btn = document.getElementById('forgotPwBtn');
+  const msg = document.getElementById('forgotMsg');
+  if (!f) return;
+  const open = f.style.display === 'none';
+  f.style.display = open ? 'block' : 'none';
+  if (btn) btn.textContent = open ? '← Retour' : 'Mot de passe oublié ?';
+  if (msg) { msg.style.display = 'none'; msg.textContent = ''; }
+  // Reset le bouton send si on ferme
+  const sendBtn = document.getElementById('forgotSendBtn');
+  if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Envoyer le lien de réinitialisation →'; }
+}
+
+async function handleForgotPassword() {
+  if (!_supa) return;
+  const email   = (document.getElementById('loginEmailInput')?.value || '').trim();
+  const sendBtn = document.getElementById('forgotSendBtn');
+  const msg     = document.getElementById('forgotMsg');
+  if (!email || !email.includes('@')) {
+    if (msg) { msg.style.display = 'block'; msg.style.color = '#f87171'; msg.textContent = '❌ Entre ton email dans le champ ci-dessus.'; }
+    return;
+  }
+  if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = 'Envoi en cours…'; }
+  const { error } = await _supa.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname
+  });
+  if (msg) {
+    msg.style.display = 'block';
+    if (error) {
+      msg.style.color = '#f87171';
+      msg.textContent = '❌ ' + (error.message.includes('rate') ? 'Trop de tentatives, réessaie plus tard.' : error.message);
+      if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Envoyer le lien de réinitialisation →'; }
+    } else {
+      msg.style.color = '#22c55e';
+      msg.textContent = '✅ Lien envoyé ! Vérifie ta boîte mail.';
+      if (sendBtn) sendBtn.textContent = 'Lien envoyé ✓';
+    }
+  }
+}
+
 function _toggleSetPassword() {
   const f = document.getElementById('setPwForm');
   if (f) f.style.display = f.style.display === 'none' ? 'block' : 'none';
@@ -1871,7 +1930,11 @@ window.onload = () => {
   // Écoute retour magic link ou connexion password
   if (_supa) {
     _supa.auth.onAuthStateChange(async (event, session) => {
-      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
+      if (event === 'PASSWORD_RECOVERY' && session?.user) {
+        // L'utilisateur arrive depuis le lien "mot de passe oublié" → ouvre le setup
+        history.replaceState({}, '', window.location.pathname);
+        _openPasswordSetup(session.user.email);
+      } else if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
         await syncSupabaseSession();
         history.replaceState({}, '', window.location.pathname);
         if (event === 'SIGNED_IN') {
