@@ -1448,13 +1448,25 @@
     </div>
 
     <!-- Nouvelle analyse -->
-    <div class="card p-6 glow-card mb-8">
+    <div class="card p-6 glow-card mb-4">
       <div style="font-size:11px;font-weight:700;color:#6b7280;letter-spacing:.5px;margin-bottom:12px">🔍 NOUVELLE ANALYSE</div>
       <input id="profileUrlApp" type="text" class="inp mb-4" placeholder="@toncompte ou lien TikTok / Instagram / site" />
       <button onclick="startAnalysisFromApp()" class="btn w-full justify-center glow-btn text-base">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         Analyser mon compte →
       </button>
+    </div>
+
+    <!-- Importer une analyse -->
+    <div style="margin-bottom:24px">
+      <button onclick="_toggleImportAnalysis()" style="width:100%;padding:11px;border-radius:10px;background:transparent;border:1px dashed rgba(255,255,255,.1);color:#6b7280;font-size:12px;font-weight:600;cursor:pointer">
+        ⬆ Importer une analyse existante (JSON)
+      </button>
+      <div id="importAnalysisWrap" style="display:none;margin-top:8px">
+        <textarea id="importAnalysisInput" style="width:100%;height:100px;background:#0d0d1a;border:1px solid rgba(124,58,237,.2);border-radius:10px;color:#e2e8f0;font-size:12px;padding:10px;resize:none;box-sizing:border-box" placeholder="Colle ici le JSON exporté..."></textarea>
+        <button onclick="_doImportAnalysis()" style="width:100%;margin-top:6px;padding:10px;border-radius:10px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#a78bfa;font-weight:700;font-size:12px;cursor:pointer">Charger l'analyse →</button>
+        <div id="importAnalysisMsg" style="font-size:11px;margin-top:6px;text-align:center;display:none"></div>
+      </div>
     </div>
 
     <!-- Modules -->
@@ -1519,7 +1531,11 @@
         <div class="font-bold truncate" id="profileName">Analyse business</div>
         <div class="text-sm text-gray-500 truncate" id="profileMeta">—</div>
       </div>
-      <button onclick="goNewAnalysis()" class="btn-outline text-xs py-2 px-3">+ Nouveau</button>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button onclick="exportAnalysis()" class="btn-outline text-xs py-2 px-3" title="Exporter l'analyse">⬇ Export</button>
+        <button onclick="showView('app')" class="btn-outline text-xs py-2 px-3" title="Retour au dashboard">🏠 Dashboard</button>
+        <button onclick="goNewAnalysis()" class="btn-outline text-xs py-2 px-3">+ Nouveau</button>
+      </div>
     </div>
 
     <!-- Module tabs -->
@@ -2895,6 +2911,69 @@ function restoreLastAnalysis(tab) {
     renderResults();
     if (tab) setTimeout(() => switchTab(tab), 100);
   } catch(e) {}
+}
+
+/* ── Export analyse en JSON ── */
+function exportAnalysis() {
+  try {
+    const data = {
+      url: S.profile.url,
+      platform: S.profile.platform,
+      profile: S.profile,
+      modules: S.modules,
+      exportedAt: new Date().toISOString(),
+      version: '1.0'
+    };
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const name = (S.profile.url || 'analyse').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    a.href = url;
+    a.download = `bloxai_${name}_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch(e) {
+    alert('Erreur export : ' + e.message);
+  }
+}
+
+/* ── Import analyse depuis JSON ── */
+function _toggleImportAnalysis() {
+  const wrap = document.getElementById('importAnalysisWrap');
+  if (wrap) wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
+}
+
+function _doImportAnalysis() {
+  const input = document.getElementById('importAnalysisInput');
+  const msg   = document.getElementById('importAnalysisMsg');
+  if (!input || !msg) return;
+  try {
+    const data = JSON.parse(input.value.trim());
+    if (!data.profile || !data.modules) throw new Error('Format invalide');
+    S.profile  = data.profile;
+    S.modules  = data.modules;
+    S._pendingUrl = data.url || '';
+    // Sauvegarder comme dernière analyse
+    localStorage.setItem('bloxai_last_analysis', JSON.stringify({
+      url: data.url,
+      platform: data.platform,
+      profile: data.profile,
+      modules: data.modules,
+      savedAt: Date.now()
+    }));
+    msg.style.display = 'block';
+    msg.style.color = '#22c55e';
+    msg.textContent = '✅ Analyse chargée !';
+    setTimeout(() => {
+      document.getElementById('importAnalysisWrap').style.display = 'none';
+      renderResults();
+    }, 800);
+  } catch(e) {
+    msg.style.display = 'block';
+    msg.style.color = '#f87171';
+    msg.textContent = '❌ JSON invalide — vérifie le format.';
+  }
 }
 
 function updateTabBadges() {
