@@ -1450,6 +1450,7 @@
               <span id="appWelcomePlan" style="padding:2px 8px;border-radius:20px;font-size:10px"></span>
             </div>
             <div style="font-size:11px;color:#6b7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="appWelcomeEmail"></div>
+            <div id="dashQuotaInfo" style="font-size:10px;color:#9ca3af;margin-top:2px;display:none"></div>
           </div>
         </div>
         <!-- Score cercle -->
@@ -1627,6 +1628,22 @@
 const OWNER_API_KEY = '';  // clé supprimée — le proxy Vercel gère ça
 const PROXY_URL    = 'https://blox-proxy-kappa.vercel.app/api/claude';
 const PROXY_SECRET = [50,97,97,98,99,54,100,56,51,53,57,49,50,98,52,53,57,101,55,54,56,99,51,49,102,51,101,52,51,102,49,53,97,55,48,99,99,101,98,99,51,48,100,51,102,99,54,49,55,49,48,98,56,50,56,101,51,57,97,102,53,100,52,48].map(c=>String.fromCharCode(c)).join('');
+
+/* ── Quotas journaliers par plan ── */
+const DAILY_QUOTAS = { free:0, starter:5, pro:20, elite:999, trial:999 };
+function _quotaKey() {
+  const d = new Date(); return `bloxai_quota_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`;
+}
+function _quotaUsed() { return parseInt(localStorage.getItem(_quotaKey()) || '0', 10); }
+function _quotaIncr() { localStorage.setItem(_quotaKey(), String(_quotaUsed() + 1)); }
+function _quotaCheck() {
+  const plan = localStorage.getItem('blowup_access') || 'free';
+  const limit = DAILY_QUOTAS[plan] ?? 0;
+  const used  = _quotaUsed();
+  if (limit === 999) return { ok: true }; // illimité
+  if (used >= limit) return { ok: false, used, limit, plan };
+  return { ok: true, used, limit, plan };
+}
 
 /* ── Supabase Auth ── */
 const _SB_URL = 'https://pxrtvgnoblavnibulxcr.supabase.co';
@@ -1865,9 +1882,15 @@ async function handlePasswordLogin() {
         msg.textContent = '🔒 Aucun accès trouvé pour cet email. Achète un plan pour continuer.';
         return;
       }
-    } catch(e) {
-      // Timeout ou erreur réseau → réactiver le bouton et laisser onAuthStateChange gérer
+      // Plan OK → fermer la modal directement
       btn.disabled = false; btn.textContent = 'Se connecter →';
+      closeLoginModal();
+      syncSupabaseSession();
+      return;
+    } catch(e) {
+      // Timeout → fermer quand même (onAuthStateChange prendra le relais)
+      btn.disabled = false; btn.textContent = 'Se connecter →';
+      closeLoginModal();
     }
   }
   // Succès → syncSupabaseSession via onAuthStateChange
@@ -2315,7 +2338,7 @@ const _DASH_MODULES = [
   { icon:'💰', label:'Offre & Monétisation', tab:2,  plans:['starter','pro','elite','trial'] },
   { icon:'🎬', label:'Scripts viraux',       tab:3,  plans:['starter','pro','elite','trial'] },
   { icon:'🔗', label:'Funnel & Conversion',  tab:4,  plans:['elite','trial'] },
-  { icon:'🌐', label:'Site web',             tab:5,  plans:['pro','elite','trial'] },
+  { icon:'🌐', label:'Site web',             tab:5,  plans:['elite','trial'] },
   { icon:'📅', label:'Calendrier 30j',       tab:6,  plans:['starter','pro','elite','trial'] },
   { icon:'🕵️', label:'Spy concurrents',      tab:7,  plans:['pro','elite','trial'] },
   { icon:'🤖', label:'AvatarAds',            tab:8,  plans:['elite','trial'] },
@@ -2349,6 +2372,22 @@ function _dashInit() {
     el.style.border = '1px solid ' + accent + '44';
   }
   if (em) em.textContent = email;
+
+  /* Quota journalier */
+  const quotaEl = document.getElementById('dashQuotaInfo');
+  if (quotaEl) {
+    const q = _quotaCheck();
+    const limit = DAILY_QUOTAS[plan] ?? 0;
+    if (limit === 999) {
+      quotaEl.textContent = '∞ analyses / jour';
+      quotaEl.style.color = '#22c55e';
+    } else {
+      const remaining = Math.max(0, limit - _quotaUsed());
+      quotaEl.textContent = `${remaining}/${limit} analyses restantes aujourd'hui`;
+      quotaEl.style.color = remaining === 0 ? '#f87171' : remaining <= 2 ? '#f97316' : '#9ca3af';
+    }
+    quotaEl.style.display = 'block';
+  }
 
   /* Avatar initiale */
   const av = document.getElementById('dashAvatar');
@@ -2988,6 +3027,16 @@ async function runAnalysis() {
     setTimeout(() => openApiModal(), 100);
     return;
   }
+
+  // ── Vérification quota journalier ──────────────────────────────────────────
+  const quota = _quotaCheck();
+  if (!quota.ok) {
+    closeFunnel();
+    const plan = quota.plan || 'free';
+    const planNames = { free:'Gratuit', starter:'Starter', pro:'Pro', elite:'Elite', trial:'Trial' };
+    alert(`⛔ Quota atteint — ${quota.used}/${quota.limit} analyses aujourd'hui (plan ${planNames[plan] || plan}).\n\nReviens demain ou passe à un plan supérieur pour plus d'analyses.`);
+    return;
+  }
   const url  = S._pendingUrl || '';
   const desc = '';
   S.profile = { url, desc, platform: S.platform, contentStyle: S.contentStyle, level: S.level, blocker: S.blocker, contentType: S.contentType, niche: S.niche, revenue: S.revenue };
@@ -3025,8 +3074,8 @@ async function switchTab(n) {
 async function generateModule(n) {
   if (S.generating) return;
   const needsStarter = n === 2 || n === 3 || n === 6;
-  const needsPro     = n === 5 || n === 7 || n === 10 || n === 11 || n === 12;
-  const needsElite   = n === 4 || n === 8 || n === 9;
+  const needsPro     = n === 7 || n === 10 || n === 11 || n === 12;
+  const needsElite   = n === 4 || n === 5 || n === 8 || n === 9;
   if (needsStarter && !hasStarterAccess()) { openPaywall(); return; }
   if (needsPro     && !hasProAccess())     { openPaywall(); return; }
   if (needsElite   && !hasEliteAccess())   { openPaywall(); return; }
@@ -3069,6 +3118,9 @@ function renderResults() {
 
   const emojis = { instagram:'📸', tiktok:'🎵', youtube:'▶', site:'🌐' };
   document.getElementById('profileEmoji').textContent = emojis[S.profile.platform] || '📊';
+
+  // Incrémenter le quota journalier
+  _quotaIncr();
 
   // Sauvegarder la dernière analyse pour la reprendre plus tard
   try {
@@ -3956,9 +4008,19 @@ function renderModule5(d) {
       <p class="text-gray-400 text-xs leading-relaxed">${esc(d.meta_description)}</p>
     </div>` : ''}
 
-    <!-- Export hint -->
-    <div class="r-purple text-center">
-      ✦ Copie ces éléments directement dans Webflow, Framer, Notion ou ton éditeur de site
+    <!-- Export / systeme.io hint -->
+    <div class="card p-5" style="border-color:rgba(168,85,247,.3);background:rgba(168,85,247,.06)">
+      <div class="section-lbl" style="color:#a855f7;margin-bottom:8px">🚀 Comment mettre en ligne ce site ?</div>
+      <p class="text-gray-300 text-sm mb-3">La méthode la plus rapide : <strong style="color:#c084fc">systeme.io</strong> (gratuit jusqu'à 2 000 contacts).</p>
+      <ol class="text-gray-400 text-xs space-y-1" style="padding-left:16px;list-style:decimal">
+        <li>Va sur <a href="https://systeme.io" target="_blank" style="color:#a855f7;text-decoration:none">systeme.io</a> → crée un compte gratuit</li>
+        <li>Dans le menu, clique <strong style="color:#fff">Tunnels de vente → Créer un nouveau tunnel</strong></li>
+        <li>Choisis un modèle de page vierge ou un template proche de ton offre</li>
+        <li>Dans l'éditeur, clique sur <strong style="color:#fff">Paramètres → Code personnalisé / HTML</strong></li>
+        <li>Copie-colle le contenu ci-dessus section par section (hero, CTA, FAQ…) dans les blocs texte</li>
+        <li>Publie → tu as un site qui vend en moins de 30 minutes ✅</li>
+      </ol>
+      <p class="text-gray-500 text-xs mt-3">Tu peux aussi utiliser <strong style="color:#d1d5db">Webflow</strong>, <strong style="color:#d1d5db">Framer</strong>, <strong style="color:#d1d5db">Carrd</strong> ou tout éditeur no-code — la structure reste identique.</p>
     </div>
   </div>`;
 }
