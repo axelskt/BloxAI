@@ -740,7 +740,7 @@
         </div>
       </div>
 
-      <button class="f-btn" onclick="funnelStep(3)">Construire mon plan complet →</button>
+      <button class="f-btn" id="fStep2CTA" onclick="funnelCTAStep2()">Construire mon plan complet →</button>
     </div>
 
     <!-- ── STEP 3: Type de contenu ── -->
@@ -1630,7 +1630,7 @@ const PROXY_URL    = 'https://blox-proxy-kappa.vercel.app/api/claude';
 const PROXY_SECRET = [50,97,97,98,99,54,100,56,51,53,57,49,50,98,52,53,57,101,55,54,56,99,51,49,102,51,101,52,51,102,49,53,97,55,48,99,99,101,98,99,51,48,100,51,102,99,54,49,55,49,48,98,56,50,56,101,51,57,97,102,53,100,52,48].map(c=>String.fromCharCode(c)).join('');
 
 /* ── Quotas journaliers par plan ── */
-const DAILY_QUOTAS = { free:0, starter:5, pro:20, elite:999, trial:999 };
+const DAILY_QUOTAS = { free:0, starter:5, pro:20, elite:50, trial:50 };
 function _quotaKey() {
   const d = new Date(); return `bloxai_quota_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`;
 }
@@ -1640,7 +1640,6 @@ function _quotaCheck() {
   const plan = localStorage.getItem('blowup_access') || 'free';
   const limit = DAILY_QUOTAS[plan] ?? 0;
   const used  = _quotaUsed();
-  if (limit === 999) return { ok: true }; // illimité
   if (used >= limit) return { ok: false, used, limit, plan };
   return { ok: true, used, limit, plan };
 }
@@ -2376,16 +2375,10 @@ function _dashInit() {
   /* Quota journalier */
   const quotaEl = document.getElementById('dashQuotaInfo');
   if (quotaEl) {
-    const q = _quotaCheck();
     const limit = DAILY_QUOTAS[plan] ?? 0;
-    if (limit === 999) {
-      quotaEl.textContent = '∞ analyses / jour';
-      quotaEl.style.color = '#22c55e';
-    } else {
-      const remaining = Math.max(0, limit - _quotaUsed());
-      quotaEl.textContent = `${remaining}/${limit} analyses restantes aujourd'hui`;
-      quotaEl.style.color = remaining === 0 ? '#f87171' : remaining <= 2 ? '#f97316' : '#9ca3af';
-    }
+    const remaining = Math.max(0, limit - _quotaUsed());
+    quotaEl.textContent = `${remaining}/${limit} analyses restantes aujourd'hui`;
+    quotaEl.style.color = remaining === 0 ? '#f87171' : remaining <= 3 ? '#f97316' : '#9ca3af';
     quotaEl.style.display = 'block';
   }
 
@@ -4871,6 +4864,20 @@ function populateFreeAudit() {
   // AvatarAds teaser — toujours visible après l'audit
   const avatarTeaser = document.getElementById('fAvatarAdsTeaser');
   if (avatarTeaser) avatarTeaser.style.display = 'block';
+
+  // Adapter le bouton CTA selon si l'utilisateur est connecté
+  const ctaBtn = document.getElementById('fStep2CTA');
+  if (ctaBtn) {
+    const plan = localStorage.getItem('blowup_access') || '';
+    const isLoggedIn = plan && plan !== 'free';
+    if (isLoggedIn) {
+      ctaBtn.textContent = '🚀 Voir comment améliorer mon compte →';
+      ctaBtn.style.background = 'linear-gradient(135deg,#7c3aed,#a855f7)';
+    } else {
+      ctaBtn.textContent = 'Construire mon plan complet →';
+      ctaBtn.style.background = '';
+    }
+  }
 }
 
 async function launchFunnelAnalysis() {
@@ -4889,6 +4896,20 @@ async function launchFunnelAnalysis() {
   showFunnelStep('1');
   runFunnelLoading();
   await runAnalysis();
+}
+
+/* CTA du step 2 du funnel — intelligent selon login */
+function funnelCTAStep2() {
+  const plan = localStorage.getItem('blowup_access') || '';
+  const isLoggedIn = plan && plan !== 'free';
+  if (isLoggedIn) {
+    // Membre connecté → fermer le funnel et aller aux résultats complets
+    closeFunnel();
+    renderResults();
+  } else {
+    // Visiteur LP → continuer le tunnel de vente
+    funnelStep(3);
+  }
 }
 
 function openFunnel() {
