@@ -1503,7 +1503,12 @@ async function handleMagicLogin() {
   if (error) {
     btn.disabled = false; btn.textContent = 'Recevoir mon lien d\'accès →';
     msg.style.display = 'block'; msg.style.color = '#f87171';
-    msg.textContent = '❌ ' + error.message;
+    const friendlyMsg = error.message.includes('rate limit')
+      ? 'Trop de tentatives — réessaie dans 1h.'
+      : error.message.includes('invalid')
+      ? 'Email invalide, vérifie l\'adresse.'
+      : 'Une erreur est survenue, réessaie.';
+    msg.textContent = '❌ ' + friendlyMsg;
   } else {
     btn.textContent = 'Lien envoyé ✓';
     msg.style.display = 'block'; msg.style.color = '#22c55e';
