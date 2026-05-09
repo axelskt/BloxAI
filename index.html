@@ -1648,6 +1648,19 @@ window.onload = () => {
   initFunnelEmailListener();
   syncSupabaseSession(); // sync plan depuis Supabase si connecté
 
+  // Écoute le retour magic link (session établie automatiquement)
+  if (_supa) {
+    _supa.auth.onAuthStateChange(async (event, session) => {
+      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
+        await syncSupabaseSession();
+        // Rafraîchit les modules si on est dans la vue app
+        if (document.getElementById('view-app')?.style.display !== 'none') {
+          updateTabLocks?.();
+        }
+      }
+    });
+  }
+
   // Bind bouton analyser
   const analyzeBtn = document.getElementById('analyzeBtn');
   if (analyzeBtn) analyzeBtn.addEventListener('click', startAnalysis);
