@@ -1424,34 +1424,37 @@
 
 <!-- ═══════════════════════════════════════════════════════════ APP VIEW (logged-in) -->
 <div id="view-app" class="content" style="display:none">
-  <div class="max-w-2xl mx-auto px-5 pt-16 pb-20">
+  <div class="max-w-2xl mx-auto px-5 pt-12 pb-20">
 
     <!-- Welcome header -->
-    <div class="text-center mb-10">
-      <div class="inline-flex items-center gap-2 mb-5 px-4 py-1.5 rounded-full text-xs font-semibold" style="background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.25);color:#a855f7">
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full text-xs font-semibold" style="background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.25);color:#a855f7">
         <span class="w-1.5 h-1.5 rounded-full bg-purple-500 pulse inline-block"></span>
         <span id="appWelcomePlan">Espace membre</span>
       </div>
-      <h2 class="text-4xl font-black mb-3">Prêt à <span class="grad">analyser</span> ? 🚀</h2>
-      <p class="text-gray-500 text-base" id="appWelcomeEmail">Connecté</p>
+      <h2 class="text-3xl font-black mb-2">Bonjour <span class="grad">👋</span></h2>
+      <p class="text-gray-500 text-sm" id="appWelcomeEmail">Connecté</p>
     </div>
 
-    <!-- Form card -->
-    <div class="card p-7 glow-card">
-      <label class="section-lbl">Entre ton @ ou lien TikTok</label>
-      <input id="profileUrlApp" type="text" class="inp mb-5" placeholder="@toncompte" />
+    <!-- Dernière analyse (cachée si aucune) -->
+    <div id="lastAnalysisBanner" style="display:none;margin-bottom:18px;padding:14px 16px;border-radius:12px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);cursor:pointer" onclick="restoreLastAnalysis()">
+      <div style="font-size:12px;color:#a78bfa;font-weight:700;margin-bottom:4px">📊 DERNIÈRE ANALYSE</div>
+      <div style="font-size:14px;color:#e2e8f0;font-weight:600" id="lastAnalysisLabel">—</div>
+      <div style="font-size:11px;color:#6b7280;margin-top:4px">Clique pour revoir les résultats →</div>
+    </div>
+
+    <!-- New analysis form -->
+    <div class="card p-6 glow-card mb-6">
+      <label class="section-lbl">Nouvelle analyse</label>
+      <input id="profileUrlApp" type="text" class="inp mb-4" placeholder="@toncompte ou lien TikTok/Instagram" />
       <button onclick="startAnalysisFromApp()" class="btn w-full justify-center glow-btn text-base">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        Analyser mon TikTok →
+        Analyser mon compte →
       </button>
     </div>
 
-    <!-- Quick stats -->
-    <div class="flex items-center justify-center gap-6 mt-8 text-sm text-gray-600 flex-wrap">
-      <div>🔍 Audit IA complet</div>
-      <div>🎬 Scripts viraux</div>
-      <div>📅 Calendrier 30 jours</div>
-    </div>
+    <!-- Features selon le plan -->
+    <div id="appFeatureGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
 
   </div>
 </div>
@@ -2205,6 +2208,39 @@ function _refreshAppHeader() {
   const em = document.getElementById('appWelcomeEmail');
   if (el) el.textContent = planLabels[plan] || 'Espace membre';
   if (em && email) em.textContent = 'Connecté · ' + email;
+
+  // Dernière analyse
+  try {
+    const last = JSON.parse(localStorage.getItem('bloxai_last_analysis') || 'null');
+    const banner = document.getElementById('lastAnalysisBanner');
+    const lbl = document.getElementById('lastAnalysisLabel');
+    if (last && banner && lbl) {
+      lbl.textContent = (last.url || 'Analyse précédente') + (last.platform ? ' · ' + last.platform : '');
+      banner.style.display = 'block';
+    }
+  } catch(e) {}
+
+  // Feature grid selon plan
+  const grid = document.getElementById('appFeatureGrid');
+  if (!grid) return;
+  const features = [
+    { icon:'🔍', label:'Audit IA complet',       desc:'Diagnostic de ton profil',    plans:['starter','pro','elite','trial'] },
+    { icon:'🎬', label:'Scripts viraux',          desc:'5 scripts prêts à poster',    plans:['starter','pro','elite','trial'] },
+    { icon:'📅', label:'Calendrier 30 jours',     desc:'Plan de contenu mensuel',     plans:['starter','pro','elite','trial'] },
+    { icon:'💰', label:'Stratégie monétisation',  desc:'Ton plan de revenus',         plans:['pro','elite','trial'] },
+    { icon:'📊', label:'Analyse concurrents',     desc:'Espionner ta niche',          plans:['pro','elite','trial'] },
+    { icon:'🎯', label:'Optimisation funnel',     desc:'Convertir tes vues en €',     plans:['pro','elite','trial'] },
+    { icon:'🤖', label:'AvatarAds',               desc:'Pubs IA sans caméra',         plans:['elite','trial'] },
+    { icon:'✂️',  label:'Clip cutter IA',          desc:'Découper tes longs formats',  plans:['elite','trial'] },
+  ];
+  grid.innerHTML = features.map(f => {
+    const unlocked = f.plans.includes(plan);
+    return `<div style="padding:14px;border-radius:12px;background:${unlocked?'rgba(124,58,237,.08)':'rgba(255,255,255,.02)'};border:1px solid ${unlocked?'rgba(124,58,237,.2)':'rgba(255,255,255,.05)'};opacity:${unlocked?'1':'0.45'}">
+      <div style="font-size:22px;margin-bottom:6px">${f.icon}</div>
+      <div style="font-size:13px;font-weight:700;color:${unlocked?'#e2e8f0':'#6b7280'};margin-bottom:2px">${f.label}</div>
+      <div style="font-size:11px;color:#6b7280">${unlocked?f.desc:'🔒 Plan supérieur'}</div>
+    </div>`;
+  }).join('');
 }
 
 /* ── Start analysis from view-app ── */
@@ -2428,6 +2464,7 @@ RÈGLES ABSOLUES :
 - Utilise TOUJOURS les infos déclarées par l'utilisateur (niche, offre, niveau, frein, revenus) — ne les invente pas
 - Si l'utilisateur dit qu'il a une offre → mentionne-le, ne prétends pas qu'il n'en a pas
 - Sois court, percutant, bullshit-free — style "coach qui te dit la vérité en face"
+- INTERDICTION ABSOLUE d'utiliser "probablement", "peut-être", "il se peut que", "possiblement", "sans doute" — sois AFFIRMATIF et direct, comme si tu avais analysé le compte en détail
 - Pas de généralités creuses : chaque point doit être spécifique à leur situation déclarée
 - RÈGLE CRITIQUE FACELESS : Si contentStyle = 'faceless', c'est un choix STRATÉGIQUE délibéré. Ne mentionne JAMAIS la peur de la caméra, la timidité ou l'absence de visage comme problème.
 - LANGUE : Réponds TOUJOURS en français simple et clair. Si tu utilises un terme technique ou anglais (ex: hook, CTA, rétention, swipe rate…), explique-le en français entre parenthèses juste après — comme ça : "hook (= l'accroche des 2 premières secondes de ta vidéo)".
@@ -2805,9 +2842,31 @@ function renderResults() {
   const emojis = { instagram:'📸', tiktok:'🎵', youtube:'▶', site:'🌐' };
   document.getElementById('profileEmoji').textContent = emojis[S.profile.platform] || '📊';
 
+  // Sauvegarder la dernière analyse pour la reprendre plus tard
+  try {
+    localStorage.setItem('bloxai_last_analysis', JSON.stringify({
+      url: S.profile.url,
+      platform: S.profile.platform,
+      profile: S.profile,
+      modules: S.modules,
+      savedAt: Date.now()
+    }));
+  } catch(e) {}
+
   updateTabBadges();
   showView('results');
   switchTab(1);
+}
+
+function restoreLastAnalysis() {
+  try {
+    const last = JSON.parse(localStorage.getItem('bloxai_last_analysis') || 'null');
+    if (!last) return;
+    S.profile  = last.profile  || S.profile;
+    S.modules  = last.modules  || S.modules;
+    S._pendingUrl = last.url || '';
+    renderResults();
+  } catch(e) {}
 }
 
 function updateTabBadges() {
@@ -4516,8 +4575,12 @@ async function submitFunnelEmail() {
   // Start 3-day free trial at email capture
   startTrial();
 
-  // Small pause so user sees the confirm, then advance
-  setTimeout(() => { funnelStep(5); initPayStep(); }, 1000);
+  // Si déjà payant → skip le paywall, afficher résultats directement
+  if (hasStarterAccess()) {
+    setTimeout(() => { closeFunnelAndShow(); }, 800);
+  } else {
+    setTimeout(() => { funnelStep(5); initPayStep(); }, 1000);
+  }
 }
 
 function closeFunnelAndShow() {
