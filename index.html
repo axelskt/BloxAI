@@ -1654,9 +1654,11 @@ if (_supa) {
       setTimeout(() => _openPasswordSetup(session.user.email), 80);
 
     } else if (event === 'SIGNED_IN' && session?.user && !_fromEmailLink) {
-      // Login via formulaire → juste sync + fermer modal
-      await syncSupabaseSession();
-      setTimeout(() => closeLoginModal(), 50);
+      // Login via formulaire → fermer modal IMMÉDIATEMENT, sync en arrière-plan
+      const loginBtn = document.getElementById('loginSendBtn');
+      if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = 'Se connecter →'; }
+      closeLoginModal();
+      syncSupabaseSession(); // sans await — tourne en arrière-plan
 
     } else if (event === 'TOKEN_REFRESHED' && session?.user) {
       await syncSupabaseSession();
@@ -2312,7 +2314,7 @@ const _DASH_MODULES = [
   { icon:'🔍', label:'Audit IA',            tab:1,  plans:['starter','pro','elite','trial'] },
   { icon:'💰', label:'Offre & Monétisation', tab:2,  plans:['starter','pro','elite','trial'] },
   { icon:'🎬', label:'Scripts viraux',       tab:3,  plans:['starter','pro','elite','trial'] },
-  { icon:'🔗', label:'Funnel & Conversion',  tab:4,  plans:['pro','elite','trial'] },
+  { icon:'🔗', label:'Funnel & Conversion',  tab:4,  plans:['elite','trial'] },
   { icon:'🌐', label:'Site web',             tab:5,  plans:['pro','elite','trial'] },
   { icon:'📅', label:'Calendrier 30j',       tab:6,  plans:['starter','pro','elite','trial'] },
   { icon:'🕵️', label:'Spy concurrents',      tab:7,  plans:['pro','elite','trial'] },
@@ -3022,9 +3024,9 @@ async function switchTab(n) {
 /* ── Generate module ── */
 async function generateModule(n) {
   if (S.generating) return;
-  const needsStarter = n === 2 || n === 3;
-  const needsPro     = (n >= 4 && n <= 7) || n === 10 || n === 12;
-  const needsElite   = n === 8 || n === 9 || n === 11;
+  const needsStarter = n === 2 || n === 3 || n === 6;
+  const needsPro     = n === 5 || n === 7 || n === 10 || n === 11 || n === 12;
+  const needsElite   = n === 4 || n === 8 || n === 9;
   if (needsStarter && !hasStarterAccess()) { openPaywall(); return; }
   if (needsPro     && !hasProAccess())     { openPaywall(); return; }
   if (needsElite   && !hasEliteAccess())   { openPaywall(); return; }
