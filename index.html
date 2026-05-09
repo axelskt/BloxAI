@@ -1769,12 +1769,10 @@ async function handleMagicLogin() {
       .from('bloxai_users').select('plan').eq('email', email).maybeSingle();
 
     if (checkErr) {
-      // Erreur RLS ou réseau → on refuse par sécurité
-      btn.disabled = false; btn.textContent = 'Recevoir mon lien d\'accès →';
-      msg.style.display = 'block'; msg.style.color = '#f87171';
-      msg.textContent = '❌ Erreur de vérification (' + checkErr.message + '). Réessaie.';
-      return;
-    }
+      // Erreur permission/réseau → on log mais on continue (protection dans le modal)
+      console.warn('[bloxai] check plan error:', checkErr.message);
+      // fall through to signInWithOtp
+    } else
 
     if (!userCheck || !userCheck.plan || userCheck.plan === 'free') {
       btn.disabled = false; btn.textContent = 'Recevoir mon lien d\'accès →';
@@ -2099,11 +2097,18 @@ function _openPasswordSetup(email) {
   const setPwMsg   = document.getElementById('setPwMsg');
   const info       = document.getElementById('loginAccountInfo');
   const plan       = localStorage.getItem('blowup_access') || '';
+
+  if (!modal) return;
+
+  // Vérification plan : si pas de plan payant après sync → accès refusé
+  if (!plan || plan === 'free') {
+    _showNoAccessModal(email || '');
+    return;
+  }
+
   const planLabel  = { elite:'ÉLITE', pro:'PRO', starter:'STARTER', trial:'TRIAL', free:'GRATUIT' };
   const planColors = { elite:'#f97316', pro:'#a855f7', starter:'#22c55e', trial:'#22c55e', free:'#6b7280' };
   const planBgs    = { elite:'rgba(249,115,22,.15)', pro:'rgba(124,58,237,.15)', starter:'rgba(34,197,94,.15)', trial:'rgba(34,197,94,.15)', free:'rgba(107,114,128,.1)' };
-
-  if (!modal) return;
 
   // Basculer en mode "compte"
   if (formWrap)   formWrap.style.display   = 'none';
