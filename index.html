@@ -1581,17 +1581,59 @@ async function syncSupabaseSession() {
   try {
     const { data: { user } } = await _supa.auth.getUser();
     if (!user) return;
-    const { data } = await _supa
+    const { data, error } = await _supa
       .from('bloxai_users')
       .select('plan')
       .eq('email', user.email)
-      .single();
-    if (data?.plan && data.plan !== 'free') {
-      localStorage.setItem('blowup_access', data.plan);
-      localStorage.setItem('blowup_user_email', user.email);
+      .maybeSingle();
+
+    const plan = data?.plan || '';
+    const hasPaid = plan && plan !== 'free';
+
+    if (!hasPaid && !error) {
+      // Authentifié dans Supabase mais aucun plan payant → déconnexion forcée
+      try { await _supa.auth.signOut(); } catch(e) {}
+      localStorage.removeItem('blowup_access');
+      localStorage.removeItem('blowup_user_email');
+      // Afficher message dans le modal
+      _showNoAccessModal(user.email);
+      return;
     }
-    _updateNavUser(user.email, data?.plan || localStorage.getItem('blowup_access') || 'free');
+
+    if (hasPaid) {
+      localStorage.setItem('blowup_access', plan);
+      localStorage.setItem('blowup_user_email', user.email);
+      _updateNavUser(user.email, plan);
+    }
   } catch(e) { console.log('[supa] sync:', e.message); }
+}
+
+function _showNoAccessModal(email) {
+  const modal    = document.getElementById('loginModal');
+  const formWrap = document.getElementById('loginFormWrap');
+  const logoutWrap = document.getElementById('logoutWrap');
+  const info     = document.getElementById('loginAccountInfo');
+  if (!modal) return;
+  if (formWrap)   formWrap.style.display   = 'none';
+  if (logoutWrap) logoutWrap.style.display = 'none';
+  // Afficher un message d'accès refusé
+  const inner = modal.querySelector('div');
+  if (inner) {
+    const noAccess = document.createElement('div');
+    noAccess.id = 'noAccessMsg';
+    noAccess.innerHTML = `
+      <button onclick="closeLoginModal()" style="position:absolute;top:12px;right:16px;background:none;border:none;color:#6b7280;font-size:20px;cursor:pointer">✕</button>
+      <div style="font-size:26px;margin-bottom:12px">🔒</div>
+      <h3 style="font-size:18px;font-weight:800;color:#e2e8f0;margin-bottom:8px">Accès non autorisé</h3>
+      <p style="font-size:13px;color:#9ca3af;margin-bottom:16px;line-height:1.6">Aucun plan actif trouvé pour <strong style="color:#e2e8f0">${email}</strong>.</p>
+      <a href="#pricing" onclick="closeLoginModal()" style="display:block;width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font-weight:800;font-size:14px;text-align:center;text-decoration:none;box-sizing:border-box">
+        Voir les offres →
+      </a>`;
+    // Remplacer le contenu du modal
+    while (inner.firstChild) inner.removeChild(inner.firstChild);
+    inner.appendChild(noAccess);
+  }
+  modal.style.display = 'flex';
 }
 
 /* ── Login mode toggle ── */
@@ -1695,7 +1737,7 @@ async function handlePasswordLogin() {
   btn.disabled = true; btn.textContent = 'Connexion…';
   // Marque que ce login vient du formulaire (pas d'un lien email)
   sessionStorage.removeItem('_supa_link_login');
-  const { error } = await _supa.auth.signInWithPassword({ email, password });
+  const { data: signInData, error } = await _supa.auth.signInWithPassword({ email, password });
   if (error) {
     btn.disabled = false; btn.textContent = 'Se connecter →';
     msg.style.display = 'block'; msg.style.color = '#f87171';
@@ -1704,8 +1746,20 @@ async function handlePasswordLogin() {
       : error.message.includes('rate') ? 'Trop de tentatives — réessaie plus tard.'
       : 'Erreur de connexion, réessaie.';
     msg.textContent = '❌ ' + friendly;
+    return;
   }
-  // Succès géré par onAuthStateChange
+  // Vérifier que l'utilisateur a un plan payant
+  if (signInData?.user) {
+    const { data: userData } = await _supa.from('bloxai_users').select('plan').eq('email', email).maybeSingle();
+    if (!userData?.plan || userData.plan === 'free') {
+      try { await _supa.auth.signOut(); } catch(e) {}
+      btn.disabled = false; btn.textContent = 'Se connecter →';
+      msg.style.display = 'block'; msg.style.color = '#f87171';
+      msg.textContent = '🔒 Aucun accès trouvé pour cet email. Achète un plan pour continuer.';
+      return;
+    }
+  }
+  // Succès → syncSupabaseSession via onAuthStateChange
 }
 
 async function handleMagicLogin() {
@@ -1961,7 +2015,17 @@ window.onload = () => {
   initFunnelEmailListener();
   syncSupabaseSession(); // sync plan depuis Supabase si déjà connecté
 
-  // onAuthStateChange déjà enregistré au-dessus de window.onload (voir _supa init)
+  // onAuthStateChange déjà enregistré au-dessus (voir _supa init)
+  // Fallback : si URL contient un token email, vérifier la session après chargement complet
+  if (_fromEmailLink && _supa) {
+    setTimeout(async () => {
+      const { data: { session } } = await _supa.auth.getSession();
+      if (session?.user && document.getElementById('loginModal')?.style.display !== 'flex') {
+        history.replaceState({}, '', window.location.pathname);
+        _openPasswordSetup(session.user.email);
+      }
+    }, 400);
+  }
 
   // Bind bouton analyser
   const analyzeBtn = document.getElementById('analyzeBtn');
