@@ -1544,6 +1544,38 @@ const _SB_URL = 'https://pxrtvgnoblavnibulxcr.supabase.co';
 const _SB_KEY = 'sb_publishable_ZVQP5fJSiZB5tkYFUHcVlg_cvmEtfH-';
 const _supa   = window.supabase?.createClient(_SB_URL, _SB_KEY);
 
+// Détection immédiate : l'utilisateur vient-il d'un lien email ?
+const _fromEmailLink = (
+  window.location.hash.includes('access_token') ||
+  new URLSearchParams(window.location.search).get('login') === '1'
+);
+
+// !! Enregistré ICI, pas dans window.onload, pour ne jamais rater SIGNED_IN/PASSWORD_RECOVERY
+if (_supa) {
+  _supa.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'PASSWORD_RECOVERY' && session?.user) {
+      // Arrive depuis "mot de passe oublié" → ouvre setup
+      history.replaceState({}, '', window.location.pathname);
+      setTimeout(() => _openPasswordSetup(session.user.email), 50);
+
+    } else if (event === 'SIGNED_IN' && session?.user) {
+      await syncSupabaseSession();
+      history.replaceState({}, '', window.location.pathname);
+      // Si le login vient d'un clic sur lien email → setup mot de passe
+      // Si le login vient d'un formulaire password → juste fermer le modal
+      if (_fromEmailLink || sessionStorage.getItem('_supa_link_login')) {
+        sessionStorage.removeItem('_supa_link_login');
+        setTimeout(() => _openPasswordSetup(session.user.email), 50);
+      } else {
+        setTimeout(() => closeLoginModal(), 50);
+      }
+
+    } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+      await syncSupabaseSession();
+    }
+  });
+}
+
 async function syncSupabaseSession() {
   if (!_supa) return;
   try {
@@ -1661,6 +1693,8 @@ async function handlePasswordLogin() {
     msg.textContent = '❌ Remplis les deux champs.'; return;
   }
   btn.disabled = true; btn.textContent = 'Connexion…';
+  // Marque que ce login vient du formulaire (pas d'un lien email)
+  sessionStorage.removeItem('_supa_link_login');
   const { error } = await _supa.auth.signInWithPassword({ email, password });
   if (error) {
     btn.disabled = false; btn.textContent = 'Se connecter →';
@@ -1927,25 +1961,7 @@ window.onload = () => {
   initFunnelEmailListener();
   syncSupabaseSession(); // sync plan depuis Supabase si déjà connecté
 
-  // Écoute retour magic link ou connexion password
-  if (_supa) {
-    _supa.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'PASSWORD_RECOVERY' && session?.user) {
-        // L'utilisateur arrive depuis le lien "mot de passe oublié" → ouvre le setup
-        history.replaceState({}, '', window.location.pathname);
-        _openPasswordSetup(session.user.email);
-      } else if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
-        await syncSupabaseSession();
-        history.replaceState({}, '', window.location.pathname);
-        if (event === 'SIGNED_IN') {
-          // Ouvre le modal "Définis ton mot de passe" à la première connexion magic link
-          _openPasswordSetup(session.user.email);
-        } else {
-          closeLoginModal();
-        }
-      }
-    });
-  }
+  // onAuthStateChange déjà enregistré au-dessus de window.onload (voir _supa init)
 
   // Bind bouton analyser
   const analyzeBtn = document.getElementById('analyzeBtn');
