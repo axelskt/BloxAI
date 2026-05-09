@@ -276,17 +276,66 @@
 <div id="loginModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
   <div style="background:#0c0c16;border:1px solid #1e1e30;border-radius:20px;padding:32px;max-width:400px;width:90%;position:relative">
     <button onclick="closeLoginModal()" style="position:absolute;top:12px;right:16px;background:none;border:none;color:#6b7280;font-size:20px;cursor:pointer;line-height:1">✕</button>
-    <div style="font-size:26px;margin-bottom:8px">⚡</div>
-    <h3 style="font-size:18px;font-weight:800;color:#e2e8f0;margin-bottom:6px">Accède à ton espace</h3>
-    <p style="font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.6">Entre l'email utilisé lors de ton achat — tu recevras un lien de connexion instantané.</p>
-    <input id="loginEmailInput" type="email" class="inp" placeholder="ton@email.com" style="margin-bottom:12px" onkeydown="if(event.key==='Enter')handleMagicLogin()" />
-    <button id="loginSendBtn" onclick="handleMagicLogin()" style="width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font-weight:800;font-size:14px;cursor:pointer;border:none">
-      Recevoir mon lien d'accès →
-    </button>
-    <div id="loginMsg" style="font-size:12px;margin-top:12px;text-align:center;display:none"></div>
-    <div id="logoutWrap" style="display:none;margin-top:14px;text-align:center">
-      <button onclick="supaLogout()" style="font-size:12px;color:#6b7280;background:none;border:none;cursor:pointer;text-decoration:underline">Se déconnecter</button>
+
+    <!-- ── Logged-out: form ── -->
+    <div id="loginFormWrap">
+      <div style="font-size:26px;margin-bottom:8px">⚡</div>
+      <h3 style="font-size:18px;font-weight:800;color:#e2e8f0;margin-bottom:16px">Se connecter</h3>
+
+      <!-- Mode tabs -->
+      <div style="display:flex;gap:6px;margin-bottom:18px;background:#0a0a14;border-radius:10px;padding:4px">
+        <button id="tabPass" onclick="_setLoginMode('password')" style="flex:1;padding:8px;border-radius:8px;border:none;font-size:13px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;transition:all .2s">Mot de passe</button>
+        <button id="tabMagic" onclick="_setLoginMode('magic')" style="flex:1;padding:8px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:#6b7280;transition:all .2s">Lien magique</button>
+      </div>
+
+      <!-- Shared email -->
+      <input id="loginEmailInput" type="email" class="inp" placeholder="ton@email.com" style="margin-bottom:10px"
+        onkeydown="if(event.key==='Enter')_loginSubmit()" />
+
+      <!-- Password field (mode password only) -->
+      <div id="loginPassField">
+        <input id="loginPasswordInput" type="password" class="inp" placeholder="Mot de passe" style="margin-bottom:12px"
+          onkeydown="if(event.key==='Enter')_loginSubmit()" />
+      </div>
+
+      <!-- Description (mode magic only) -->
+      <p id="loginMagicDesc" style="display:none;font-size:12px;color:#6b7280;margin-bottom:12px;line-height:1.5">Entre l'email utilisé lors de ton achat — tu recevras un lien de connexion instantané.</p>
+
+      <button id="loginSendBtn" onclick="_loginSubmit()" style="width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font-weight:800;font-size:14px;cursor:pointer;border:none">
+        Se connecter →
+      </button>
+      <div id="loginMsg" style="font-size:12px;margin-top:12px;text-align:center;display:none"></div>
+
+      <!-- Set password hint (mode magic, after send) -->
+      <div id="loginSetPwHint" style="display:none;margin-top:14px;padding:12px;border-radius:10px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2)">
+        <p style="font-size:12px;color:#a78bfa;margin-bottom:8px">🔐 Première connexion ? Après avoir cliqué le lien, définis un mot de passe pour te connecter instantanément la prochaine fois.</p>
+      </div>
     </div>
+
+    <!-- ── Logged-in: account panel ── -->
+    <div id="logoutWrap" style="display:none">
+      <div style="font-size:26px;margin-bottom:8px">⚡</div>
+      <div id="loginAccountInfo" style="padding:12px;border-radius:10px;background:#141422;border:1px solid #1e1e30;margin-bottom:14px;font-size:13px;color:#9ca3af"></div>
+
+      <!-- Set / change password -->
+      <div id="setPasswordWrap" style="margin-bottom:10px">
+        <button onclick="_toggleSetPassword()" style="width:100%;padding:11px;border-radius:10px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);color:#a78bfa;font-weight:700;font-size:13px;cursor:pointer">
+          🔐 Définir / changer mon mot de passe
+        </button>
+        <div id="setPwForm" style="display:none;margin-top:8px">
+          <input id="newPwInput" type="password" class="inp" placeholder="Nouveau mot de passe (8 car. min)" style="margin-bottom:8px" />
+          <button onclick="handleSetPassword()" style="width:100%;padding:10px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font-weight:700;font-size:13px;cursor:pointer;border:none">
+            Enregistrer →
+          </button>
+          <div id="setPwMsg" style="font-size:12px;margin-top:8px;text-align:center;display:none"></div>
+        </div>
+      </div>
+
+      <button onclick="supaLogout()" style="width:100%;padding:11px;border-radius:10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#f87171;font-weight:700;font-size:13px;cursor:pointer">
+        Se déconnecter
+      </button>
+    </div>
+
   </div>
 </div>
 
@@ -1482,7 +1531,7 @@ const _SB_URL = 'https://pxrtvgnoblavnibulxcr.supabase.co';
 const _SB_KEY = 'sb_publishable_ZVQP5fJSiZB5tkYFUHcVlg_cvmEtfH-';
 const _supa   = window.supabase?.createClient(_SB_URL, _SB_KEY);
 
-async function syncSupabaseSession(redirectToApp = false) {
+async function syncSupabaseSession() {
   if (!_supa) return;
   try {
     const { data: { user } } = await _supa.auth.getUser();
@@ -1497,44 +1546,115 @@ async function syncSupabaseSession(redirectToApp = false) {
       localStorage.setItem('blowup_user_email', user.email);
     }
     _updateNavUser(user.email, data?.plan || localStorage.getItem('blowup_access') || 'free');
-    // Si l'utilisateur est déjà connecté au chargement de la page, affiche l'app
-    const plan = localStorage.getItem('blowup_access');
-    if (redirectToApp && plan && plan !== 'free') {
-      history.replaceState({}, '', window.location.pathname);
-      showView('app');
-    }
   } catch(e) { console.log('[supa] sync:', e.message); }
+}
+
+/* ── Login mode toggle ── */
+let _loginMode = 'password';
+function _setLoginMode(mode) {
+  _loginMode = mode;
+  const passField  = document.getElementById('loginPassField');
+  const magicDesc  = document.getElementById('loginMagicDesc');
+  const hint       = document.getElementById('loginSetPwHint');
+  const btn        = document.getElementById('loginSendBtn');
+  const tabPass    = document.getElementById('tabPass');
+  const tabMagic   = document.getElementById('tabMagic');
+  const msg        = document.getElementById('loginMsg');
+  if (msg) { msg.style.display = 'none'; msg.textContent = ''; }
+  if (mode === 'password') {
+    if (passField) passField.style.display = '';
+    if (magicDesc) magicDesc.style.display = 'none';
+    if (hint)      hint.style.display = 'none';
+    if (btn)       btn.textContent = 'Se connecter →';
+    if (tabPass)   { tabPass.style.background = 'linear-gradient(135deg,#7c3aed,#db2777)'; tabPass.style.color = '#fff'; tabPass.style.fontWeight = '700'; }
+    if (tabMagic)  { tabMagic.style.background = 'transparent'; tabMagic.style.color = '#6b7280'; tabMagic.style.fontWeight = '600'; }
+  } else {
+    if (passField) passField.style.display = 'none';
+    if (magicDesc) magicDesc.style.display = 'block';
+    if (hint)      hint.style.display = 'none';
+    if (btn)       btn.textContent = 'Recevoir mon lien d\'accès →';
+    if (tabMagic)  { tabMagic.style.background = 'linear-gradient(135deg,#7c3aed,#db2777)'; tabMagic.style.color = '#fff'; tabMagic.style.fontWeight = '700'; }
+    if (tabPass)   { tabPass.style.background = 'transparent'; tabPass.style.color = '#6b7280'; tabPass.style.fontWeight = '600'; }
+  }
+}
+
+function _loginSubmit() {
+  if (_loginMode === 'password') handlePasswordLogin();
+  else handleMagicLogin();
 }
 
 function _updateNavUser(email, plan) {
   const colors = { elite:'#f97316', pro:'#a855f7', starter:'#22c55e', trial:'#22c55e' };
   const bgs    = { elite:'rgba(249,115,22,.15)', pro:'rgba(124,58,237,.15)', starter:'rgba(34,197,94,.15)', trial:'rgba(34,197,94,.15)' };
+  const planLabels = { elite:'ÉLITE', pro:'PRO', starter:'STARTER', trial:'TRIAL' };
   const el = document.getElementById('navUserInfo');
   const loginBtn = document.getElementById('navLoginBtn');
-  const logoutWrap = document.getElementById('logoutWrap');
   if (el) {
-    el.innerHTML = `<span style="font-size:11px;color:#6b7280;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${email}</span><span style="font-size:10px;background:${bgs[plan]||bgs.starter};color:${colors[plan]||colors.starter};padding:2px 8px;border-radius:99px;font-weight:800;letter-spacing:.5px;text-transform:uppercase">${plan}</span>`;
+    el.innerHTML = `<span style="font-size:11px;color:#6b7280;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${email}</span><span style="font-size:10px;background:${bgs[plan]||bgs.starter};color:${colors[plan]||colors.starter};padding:2px 8px;border-radius:99px;font-weight:800;letter-spacing:.5px">${planLabels[plan]||plan.toUpperCase()}</span>`;
     el.style.display = 'flex';
   }
   if (loginBtn) loginBtn.style.display = 'none';
-  if (logoutWrap) logoutWrap.style.display = 'block';
+  // Remplir le panel compte dans le modal
+  const info = document.getElementById('loginAccountInfo');
+  if (info) info.innerHTML = `<div style="margin-bottom:4px;font-weight:600;color:#e2e8f0">${email}</div><div style="font-size:11px;background:${bgs[plan]||bgs.starter};color:${colors[plan]||colors.starter};display:inline-block;padding:2px 8px;border-radius:99px;font-weight:800;letter-spacing:.5px">${planLabels[plan]||plan.toUpperCase()}</div>`;
 }
 
 function openLoginModal() {
   const modal = document.getElementById('loginModal');
-  if (modal) { modal.style.display = 'flex'; document.getElementById('loginEmailInput')?.focus(); }
+  if (!modal) return;
+  const isLoggedIn = !!localStorage.getItem('blowup_user_email');
+  const formWrap   = document.getElementById('loginFormWrap');
+  const logoutWrap = document.getElementById('logoutWrap');
+  if (isLoggedIn) {
+    if (formWrap)   formWrap.style.display = 'none';
+    if (logoutWrap) logoutWrap.style.display = 'block';
+  } else {
+    if (formWrap)   formWrap.style.display = 'block';
+    if (logoutWrap) logoutWrap.style.display = 'none';
+    document.getElementById('loginEmailInput')?.focus();
+  }
+  modal.style.display = 'flex';
 }
+
 function closeLoginModal() {
   const modal = document.getElementById('loginModal');
   if (modal) modal.style.display = 'none';
 }
 
+async function handlePasswordLogin() {
+  if (!_supa) return;
+  const email    = (document.getElementById('loginEmailInput')?.value || '').trim();
+  const password = (document.getElementById('loginPasswordInput')?.value || '');
+  const btn = document.getElementById('loginSendBtn');
+  const msg = document.getElementById('loginMsg');
+  if (!email || !email.includes('@') || !password) {
+    msg.style.display = 'block'; msg.style.color = '#f87171';
+    msg.textContent = '❌ Remplis les deux champs.'; return;
+  }
+  btn.disabled = true; btn.textContent = 'Connexion…';
+  const { error } = await _supa.auth.signInWithPassword({ email, password });
+  if (error) {
+    btn.disabled = false; btn.textContent = 'Se connecter →';
+    msg.style.display = 'block'; msg.style.color = '#f87171';
+    const friendly = error.message.includes('Invalid') || error.message.includes('credentials')
+      ? 'Email ou mot de passe incorrect. Première fois ? Utilise le lien magique →'
+      : error.message.includes('rate') ? 'Trop de tentatives — réessaie plus tard.'
+      : 'Erreur de connexion, réessaie.';
+    msg.textContent = '❌ ' + friendly;
+  }
+  // Succès géré par onAuthStateChange
+}
+
 async function handleMagicLogin() {
   if (!_supa) return;
   const email = (document.getElementById('loginEmailInput')?.value || '').trim();
-  if (!email || !email.includes('@')) return;
   const btn = document.getElementById('loginSendBtn');
   const msg = document.getElementById('loginMsg');
+  const hint = document.getElementById('loginSetPwHint');
+  if (!email || !email.includes('@')) {
+    msg.style.display = 'block'; msg.style.color = '#f87171';
+    msg.textContent = '❌ Entre un email valide.'; return;
+  }
   btn.disabled = true; btn.textContent = 'Envoi en cours…';
   const { error } = await _supa.auth.signInWithOtp({
     email,
@@ -1553,6 +1673,33 @@ async function handleMagicLogin() {
     btn.textContent = 'Lien envoyé ✓';
     msg.style.display = 'block'; msg.style.color = '#22c55e';
     msg.textContent = '✅ Vérifie ta boîte mail — le lien expire dans 1h.';
+    if (hint) hint.style.display = 'block';
+  }
+}
+
+/* ── Définir / changer le mot de passe ── */
+function _toggleSetPassword() {
+  const f = document.getElementById('setPwForm');
+  if (f) f.style.display = f.style.display === 'none' ? 'block' : 'none';
+}
+
+async function handleSetPassword() {
+  if (!_supa) return;
+  const pw  = (document.getElementById('newPwInput')?.value || '').trim();
+  const msg = document.getElementById('setPwMsg');
+  if (pw.length < 8) {
+    msg.style.display = 'block'; msg.style.color = '#f87171';
+    msg.textContent = '❌ 8 caractères minimum.'; return;
+  }
+  const { error } = await _supa.auth.updateUser({ password: pw });
+  msg.style.display = 'block';
+  if (error) {
+    msg.style.color = '#f87171';
+    msg.textContent = '❌ ' + error.message;
+  } else {
+    msg.style.color = '#22c55e';
+    msg.textContent = '✅ Mot de passe enregistré ! Tu peux maintenant te connecter directement.';
+    document.getElementById('newPwInput').value = '';
   }
 }
 
@@ -1691,19 +1838,15 @@ window.onload = () => {
 
   selectPlan('yearly');
   initFunnelEmailListener();
-  syncSupabaseSession(true); // sync plan + redirige vers l'app si déjà connecté
+  syncSupabaseSession(); // sync plan depuis Supabase si déjà connecté
 
-  // Écoute le retour magic link → redirige vers l'app si plan actif
+  // Écoute retour magic link ou connexion password
   if (_supa) {
     _supa.auth.onAuthStateChange(async (event, session) => {
       if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
-        await syncSupabaseSession(false);
-        const plan = localStorage.getItem('blowup_access');
-        if (plan && plan !== 'free') {
-          history.replaceState({}, '', window.location.pathname);
-          closeLoginModal();
-          showView('app');
-        }
+        await syncSupabaseSession();
+        history.replaceState({}, '', window.location.pathname);
+        closeLoginModal();
       }
     });
   }
@@ -1730,24 +1873,17 @@ window.onload = () => {
 
 /* ── Views ── */
 function showView(v) {
-  ['landing','app','loading','results'].forEach(x =>
-    document.getElementById('view-'+x).style.display = x===v ? '' : 'none'
-  );
-  // Met à jour le contenu du header app si on affiche view-app
-  if (v === 'app') _refreshAppHeader();
+  ['landing','loading','results'].forEach(x => {
+    const el = document.getElementById('view-'+x);
+    if (el) el.style.display = x===v ? '' : 'none';
+  });
 }
 
-/* ── Nouveau : retourne à l'app si connecté, sinon à la LP ── */
+/* ── Nouveau : retourne à la LP pour une nouvelle analyse ── */
 function goNewAnalysis() {
-  const plan = localStorage.getItem('blowup_access');
-  if (plan && plan !== 'free') {
-    // Vider l'input app pour une nouvelle analyse
-    const inp = document.getElementById('profileUrlApp');
-    if (inp) inp.value = '';
-    showView('app');
-  } else {
-    showView('landing');
-  }
+  showView('landing');
+  // Scroll vers le form
+  setTimeout(() => document.getElementById('profileUrl')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
 }
 
 /* ── App header refresh ── */
