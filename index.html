@@ -2031,19 +2031,43 @@ window.onload = () => {
   initFunnelEmailListener();
   syncSupabaseSession(); // sync plan depuis Supabase si déjà connecté
 
-  // Fallback robuste : si URL a un token email, forcer le setup modal après chargement
+  // Fallback robuste : arrivée depuis lien email → ouvrir modal immédiatement puis attendre session
   if (_fromEmailLink && _supa) {
+    // 1. Ouvrir le modal tout de suite avec état "chargement"
+    const modal      = document.getElementById('loginModal');
+    const formWrap   = document.getElementById('loginFormWrap');
+    const logoutWrap = document.getElementById('logoutWrap');
+    const info       = document.getElementById('loginAccountInfo');
+    const setPwForm  = document.getElementById('setPwForm');
+    if (modal) {
+      if (formWrap)   formWrap.style.display   = 'none';
+      if (logoutWrap) logoutWrap.style.display = 'block';
+      if (info) info.innerHTML = `<div style="color:#a78bfa;font-size:13px;text-align:center;padding:10px">⏳ Connexion en cours…</div>`;
+      if (setPwForm)  setPwForm.style.display  = 'none';
+      modal.style.display = 'flex';
+    }
+
+    // 2. Attendre la session (jusqu'à 20 × 500ms = 10 secondes)
     const _tryOpenSetup = async (attempt) => {
-      const { data: { session } } = await _supa.auth.getSession();
-      if (session?.user) {
-        history.replaceState({}, '', window.location.pathname);
-        _openPasswordSetup(session.user.email);
-      } else if (attempt < 5) {
-        // Session pas encore prête → réessaye jusqu'à 5 fois
-        setTimeout(() => _tryOpenSetup(attempt + 1), 300);
+      try {
+        const { data: { session } } = await _supa.auth.getSession();
+        if (session?.user) {
+          await syncSupabaseSession();
+          history.replaceState({}, '', window.location.pathname);
+          _openPasswordSetup(session.user.email);
+        } else if (attempt < 20) {
+          setTimeout(() => _tryOpenSetup(attempt + 1), 500);
+        } else {
+          // Timeout — afficher message d'erreur dans le modal
+          if (info) info.innerHTML = `<div style="color:#f87171;font-size:13px;text-align:center;padding:10px">❌ Lien expiré ou déjà utilisé.<br/>Demande un nouveau lien.</div>`;
+          if (formWrap) formWrap.style.display = 'block';
+          if (logoutWrap) logoutWrap.style.display = 'none';
+        }
+      } catch(e) {
+        if (attempt < 20) setTimeout(() => _tryOpenSetup(attempt + 1), 500);
       }
     };
-    setTimeout(() => _tryOpenSetup(0), 200);
+    setTimeout(() => _tryOpenSetup(0), 300);
   }
 
   // Bind bouton analyser
