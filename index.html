@@ -1469,6 +1469,27 @@
       </div>
     </div>
 
+    <!-- Générateur de script viral -->
+    <div class="card p-6 glow-card mb-8" style="border-color:rgba(219,39,119,.3);background:rgba(219,39,119,.04)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="font-size:28px">✍️</div>
+        <div>
+          <div style="font-weight:800;font-size:15px;color:#f1f5f9">Générer un script viral</div>
+          <div style="font-size:12px;color:#9ca3af;margin-top:2px">Colle un mot-clé → l'IA crée un script structuré pour percer</div>
+        </div>
+      </div>
+      <input id="scriptKeywordInput" type="text" class="inp mb-3" placeholder="Ex: faire 10k€/mois avec TikTok, perte de poids rapide…" />
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <button onclick="_setScriptStyle('hook')" id="sstyle-hook" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(219,39,119,.3);background:rgba(219,39,119,.12);color:#f9a8d4;font-size:11px;font-weight:700;cursor:pointer">🎯 Hook choc</button>
+        <button onclick="_setScriptStyle('story')" id="sstyle-story" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:transparent;color:#6b7280;font-size:11px;font-weight:700;cursor:pointer">📖 Storytelling</button>
+        <button onclick="_setScriptStyle('tips')" id="sstyle-tips" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:transparent;color:#6b7280;font-size:11px;font-weight:700;cursor:pointer">💡 Tips liste</button>
+      </div>
+      <button onclick="generateViralScript()" id="generateScriptBtn" class="btn w-full justify-center" style="background:linear-gradient(135deg,#db2777,#7c3aed)">
+        ✨ Générer mon script →
+      </button>
+      <div id="scriptResult" style="display:none;margin-top:16px"></div>
+    </div>
+
     <!-- Modules -->
     <div style="font-size:11px;font-weight:700;color:#6b7280;letter-spacing:.5px;margin-bottom:12px">⚡ MES OUTILS</div>
     <div id="appFeatureGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
@@ -2911,6 +2932,125 @@ function restoreLastAnalysis(tab) {
     renderResults();
     if (tab) setTimeout(() => switchTab(tab), 100);
   } catch(e) {}
+}
+
+/* ── Générateur de script viral ── */
+let _scriptStyle = 'hook';
+function _setScriptStyle(s) {
+  _scriptStyle = s;
+  ['hook','story','tips'].forEach(k => {
+    const b = document.getElementById('sstyle-'+k);
+    if (!b) return;
+    if (k === s) {
+      b.style.background = 'rgba(219,39,119,.12)';
+      b.style.borderColor = 'rgba(219,39,119,.3)';
+      b.style.color = '#f9a8d4';
+    } else {
+      b.style.background = 'transparent';
+      b.style.borderColor = 'rgba(255,255,255,.08)';
+      b.style.color = '#6b7280';
+    }
+  });
+}
+
+async function generateViralScript() {
+  const keyword = (document.getElementById('scriptKeywordInput')?.value || '').trim();
+  const btn     = document.getElementById('generateScriptBtn');
+  const result  = document.getElementById('scriptResult');
+  if (!keyword) {
+    document.getElementById('scriptKeywordInput').style.borderColor = '#f87171';
+    setTimeout(() => { document.getElementById('scriptKeywordInput').style.borderColor = ''; }, 1500);
+    return;
+  }
+  if (!PROXY_URL && !S.apiKey) { result.style.display='block'; result.innerHTML='<p style="color:#f87171;font-size:13px">❌ Configure ta clé API d\'abord.</p>'; return; }
+
+  btn.disabled = true; btn.textContent = '⏳ Génération en cours…';
+  result.style.display = 'none';
+
+  const stylePrompts = {
+    hook:  'Style : hook choc en première phrase (arrête le scroll en 2 secondes), révélation surprenante, CTA fort en fin.',
+    story: 'Style : storytelling émotionnel — situation de départ, problème, transformation, résultat chiffré, leçon.',
+    tips:  'Style : liste de 3-5 tips actionnables, chaque tip en 1-2 phrases courtes, commence par un chiffre ou emoji.'
+  };
+
+  const systemPrompt = `Tu es un expert en création de scripts TikTok/Reels viraux pour créateurs francophones.
+Tu crées des scripts courts (30-60 secondes), ultra-percutants, qui arrêtent le scroll immédiatement.
+RÈGLES :
+- Commence par un hook de choc (2-3 secondes max) — la première phrase doit créer la curiosité ou la surprise
+- Sois AFFIRMATIF, direct, jamais "probablement" ou "peut-être"
+- Langage simple, conversationnel, comme si tu parlais à un ami
+- Inclus les indications [PAUSE], [EFFET SONORE], [TEXTE À L'ÉCRAN] quand pertinent
+- Termine par un CTA (appel à l'action) fort
+- Réponds en JSON uniquement`;
+
+  const userPrompt = `Crée un script TikTok viral pour ce mot-clé : "${keyword}"
+${stylePrompts[_scriptStyle] || stylePrompts.hook}
+
+Réponds UNIQUEMENT avec ce JSON :
+{
+  "titre": "Titre accrocheur du script (max 8 mots)",
+  "duree": "Durée estimée (ex: 45 secondes)",
+  "hook": "La première phrase du script — arrête le scroll",
+  "script": "Le script complet ligne par ligne, avec les indications de mise en scène entre [crochets]",
+  "cta": "L'appel à l'action en fin de vidéo",
+  "hashtags": ["hashtag1", "hashtag2", "hashtag3", "hashtag4", "hashtag5"]
+}`;
+
+  try {
+    const apiKey = OWNER_API_KEY || S.apiKey || localStorage.getItem('blowup_api_key') || '';
+    const res = await fetch(PROXY_URL || 'https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: PROXY_URL
+        ? { 'Content-Type': 'application/json' }
+        : { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-3-5-haiku-20241022',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }]
+      })
+    });
+    const json = await res.json();
+    const raw  = json?.content?.[0]?.text || '';
+    const data = JSON.parse(raw.replace(/```json|```/g,'').trim());
+
+    result.style.display = 'block';
+    result.innerHTML = `
+      <div style="background:#0d0d1a;border:1px solid rgba(219,39,119,.2);border-radius:12px;padding:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="font-weight:800;font-size:14px;color:#f9a8d4">🎬 ${data.titre || 'Script viral'}</div>
+          <div style="font-size:11px;color:#6b7280">⏱ ${data.duree || '~45s'}</div>
+        </div>
+        <div style="margin-bottom:10px;padding:10px;background:rgba(219,39,119,.08);border-radius:8px;border-left:3px solid #db2777">
+          <div style="font-size:10px;font-weight:700;color:#db2777;margin-bottom:4px;letter-spacing:.5px">🎯 HOOK</div>
+          <div style="font-size:13px;color:#e2e8f0;font-weight:600">"${data.hook || ''}"</div>
+        </div>
+        <div style="margin-bottom:10px;padding:10px;background:rgba(124,58,237,.08);border-radius:8px">
+          <div style="font-size:10px;font-weight:700;color:#a78bfa;margin-bottom:8px;letter-spacing:.5px">📝 SCRIPT COMPLET</div>
+          <div style="font-size:12px;color:#d1d5db;line-height:1.7;white-space:pre-line">${(data.script||'').replace(/\[([^\]]+)\]/g,'<span style="color:#a78bfa;font-size:11px;font-weight:600">[$1]</span>')}</div>
+        </div>
+        <div style="margin-bottom:12px;padding:10px;background:rgba(34,197,94,.08);border-radius:8px;border-left:3px solid #22c55e">
+          <div style="font-size:10px;font-weight:700;color:#22c55e;margin-bottom:4px;letter-spacing:.5px">📣 CTA</div>
+          <div style="font-size:13px;color:#e2e8f0">${data.cta || ''}</div>
+        </div>
+        <div style="margin-bottom:12px">
+          ${(data.hashtags||[]).map(h=>`<span style="display:inline-block;margin:2px;font-size:11px;background:rgba(168,85,247,.12);color:#a855f7;padding:3px 8px;border-radius:6px">#${h.replace('#','')}</span>`).join('')}
+        </div>
+        <button onclick="_copyScript(this)" data-script="${encodeURIComponent((data.hook||'')+'\n\n'+(data.script||'')+'\n\n'+(data.cta||'')+'\n\n'+(data.hashtags||[]).map(h=>'#'+h.replace('#','')).join(' '))}" style="width:100%;padding:9px;border-radius:8px;background:rgba(219,39,119,.12);border:1px solid rgba(219,39,119,.25);color:#f9a8d4;font-weight:700;font-size:12px;cursor:pointer">📋 Copier le script complet</button>
+      </div>`;
+  } catch(e) {
+    result.style.display = 'block';
+    result.innerHTML = `<p style="color:#f87171;font-size:13px">❌ Erreur : ${e.message}</p>`;
+  }
+  btn.disabled = false; btn.textContent = '✨ Générer mon script →';
+}
+
+function _copyScript(btn) {
+  const text = decodeURIComponent(btn.dataset.script || '');
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✅ Copié !';
+    setTimeout(() => { btn.textContent = '📋 Copier le script complet'; }, 2000);
+  });
 }
 
 /* ── Export analyse en JSON ── */
