@@ -1550,25 +1550,24 @@ const _fromEmailLink = (
   new URLSearchParams(window.location.search).get('login') === '1'
 );
 
-// !! Enregistré ICI, pas dans window.onload, pour ne jamais rater SIGNED_IN/PASSWORD_RECOVERY
+// !! Enregistré ICI, avant window.onload, pour ne jamais rater les événements
 if (_supa) {
   _supa.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'PASSWORD_RECOVERY' && session?.user) {
-      // Arrive depuis "mot de passe oublié" → ouvre setup
-      history.replaceState({}, '', window.location.pathname);
-      setTimeout(() => _openPasswordSetup(session.user.email), 50);
 
-    } else if (event === 'SIGNED_IN' && session?.user) {
+    if (event === 'PASSWORD_RECOVERY' && session?.user) {
+      history.replaceState({}, '', window.location.pathname);
+      setTimeout(() => _openPasswordSetup(session.user.email), 80);
+
+    } else if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user && _fromEmailLink) {
+      // Arrivée depuis un lien email (magic link ou reset) → setup mot de passe
       await syncSupabaseSession();
       history.replaceState({}, '', window.location.pathname);
-      // Si le login vient d'un clic sur lien email → setup mot de passe
-      // Si le login vient d'un formulaire password → juste fermer le modal
-      if (_fromEmailLink || sessionStorage.getItem('_supa_link_login')) {
-        sessionStorage.removeItem('_supa_link_login');
-        setTimeout(() => _openPasswordSetup(session.user.email), 50);
-      } else {
-        setTimeout(() => closeLoginModal(), 50);
-      }
+      setTimeout(() => _openPasswordSetup(session.user.email), 80);
+
+    } else if (event === 'SIGNED_IN' && session?.user && !_fromEmailLink) {
+      // Login via formulaire → juste sync + fermer modal
+      await syncSupabaseSession();
+      setTimeout(() => closeLoginModal(), 50);
 
     } else if (event === 'TOKEN_REFRESHED' && session?.user) {
       await syncSupabaseSession();
@@ -1581,29 +1580,19 @@ async function syncSupabaseSession() {
   try {
     const { data: { user } } = await _supa.auth.getUser();
     if (!user) return;
-    const { data, error } = await _supa
+    const { data } = await _supa
       .from('bloxai_users')
       .select('plan')
       .eq('email', user.email)
       .maybeSingle();
-
     const plan = data?.plan || '';
-    const hasPaid = plan && plan !== 'free';
-
-    if (!hasPaid && !error) {
-      // Authentifié dans Supabase mais aucun plan payant → déconnexion forcée
-      try { await _supa.auth.signOut(); } catch(e) {}
-      localStorage.removeItem('blowup_access');
-      localStorage.removeItem('blowup_user_email');
-      // Afficher message dans le modal
-      _showNoAccessModal(user.email);
-      return;
-    }
-
-    if (hasPaid) {
+    if (plan && plan !== 'free') {
       localStorage.setItem('blowup_access', plan);
       localStorage.setItem('blowup_user_email', user.email);
       _updateNavUser(user.email, plan);
+    } else if (user.email) {
+      // Plan pas encore chargé (RLS ou timing) → on garde ce qu'on a en localStorage
+      _updateNavUser(user.email, localStorage.getItem('blowup_access') || 'free');
     }
   } catch(e) { console.log('[supa] sync:', e.message); }
 }
@@ -1772,7 +1761,19 @@ async function handleMagicLogin() {
     msg.style.display = 'block'; msg.style.color = '#f87171';
     msg.textContent = '❌ Entre un email valide.'; return;
   }
-  btn.disabled = true; btn.textContent = 'Envoi en cours…';
+  btn.disabled = true; btn.textContent = 'Vérification…';
+
+  // Vérifier que l'email a un plan payant avant d'envoyer le lien
+  const { data: userCheck } = await _supa
+    .from('bloxai_users').select('plan').eq('email', email).maybeSingle();
+  if (!userCheck || !userCheck.plan || userCheck.plan === 'free') {
+    btn.disabled = false; btn.textContent = 'Recevoir mon lien d\'accès →';
+    msg.style.display = 'block'; msg.style.color = '#f87171';
+    msg.textContent = '🔒 Aucun accès trouvé pour cet email. Achète un plan pour accéder.';
+    return;
+  }
+
+  btn.textContent = 'Envoi en cours…';
   const { error } = await _supa.auth.signInWithOtp({
     email,
     options: { emailRedirectTo: window.location.origin + window.location.pathname + '?login=1' }
@@ -2015,16 +2016,19 @@ window.onload = () => {
   initFunnelEmailListener();
   syncSupabaseSession(); // sync plan depuis Supabase si déjà connecté
 
-  // onAuthStateChange déjà enregistré au-dessus (voir _supa init)
-  // Fallback : si URL contient un token email, vérifier la session après chargement complet
+  // Fallback robuste : si URL a un token email, forcer le setup modal après chargement
   if (_fromEmailLink && _supa) {
-    setTimeout(async () => {
+    const _tryOpenSetup = async (attempt) => {
       const { data: { session } } = await _supa.auth.getSession();
-      if (session?.user && document.getElementById('loginModal')?.style.display !== 'flex') {
+      if (session?.user) {
         history.replaceState({}, '', window.location.pathname);
         _openPasswordSetup(session.user.email);
+      } else if (attempt < 5) {
+        // Session pas encore prête → réessaye jusqu'à 5 fois
+        setTimeout(() => _tryOpenSetup(attempt + 1), 300);
       }
-    }, 400);
+    };
+    setTimeout(() => _tryOpenSetup(0), 200);
   }
 
   // Bind bouton analyser
