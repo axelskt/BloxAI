@@ -1357,6 +1357,40 @@
 
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════ APP VIEW (logged-in) -->
+<div id="view-app" class="content" style="display:none">
+  <div class="max-w-2xl mx-auto px-5 pt-16 pb-20">
+
+    <!-- Welcome header -->
+    <div class="text-center mb-10">
+      <div class="inline-flex items-center gap-2 mb-5 px-4 py-1.5 rounded-full text-xs font-semibold" style="background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.25);color:#a855f7">
+        <span class="w-1.5 h-1.5 rounded-full bg-purple-500 pulse inline-block"></span>
+        <span id="appWelcomePlan">Espace membre</span>
+      </div>
+      <h2 class="text-4xl font-black mb-3">Prêt à <span class="grad">analyser</span> ? 🚀</h2>
+      <p class="text-gray-500 text-base" id="appWelcomeEmail">Connecté</p>
+    </div>
+
+    <!-- Form card -->
+    <div class="card p-7 glow-card">
+      <label class="section-lbl">Entre ton @ ou lien TikTok</label>
+      <input id="profileUrlApp" type="text" class="inp mb-5" placeholder="@toncompte" />
+      <button onclick="startAnalysisFromApp()" class="btn w-full justify-center glow-btn text-base">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Analyser mon TikTok →
+      </button>
+    </div>
+
+    <!-- Quick stats -->
+    <div class="flex items-center justify-center gap-6 mt-8 text-sm text-gray-600 flex-wrap">
+      <div>🔍 Audit IA complet</div>
+      <div>🎬 Scripts viraux</div>
+      <div>📅 Calendrier 30 jours</div>
+    </div>
+
+  </div>
+</div>
+
 <!-- ═══════════════════════════════════════════════════════════ LOADING VIEW -->
 <div id="view-loading" class="content" style="display:none">
   <div class="max-w-lg mx-auto px-5 pt-24 pb-20 text-center">
@@ -1412,7 +1446,7 @@
         <div class="font-bold truncate" id="profileName">Analyse business</div>
         <div class="text-sm text-gray-500 truncate" id="profileMeta">—</div>
       </div>
-      <button onclick="showView('landing')" class="btn-outline text-xs py-2 px-3">+ Nouveau</button>
+      <button onclick="goNewAnalysis()" class="btn-outline text-xs py-2 px-3">+ Nouveau</button>
     </div>
 
     <!-- Module tabs -->
@@ -1448,7 +1482,7 @@ const _SB_URL = 'https://pxrtvgnoblavnibulxcr.supabase.co';
 const _SB_KEY = 'sb_publishable_ZVQP5fJSiZB5tkYFUHcVlg_cvmEtfH-';
 const _supa   = window.supabase?.createClient(_SB_URL, _SB_KEY);
 
-async function syncSupabaseSession() {
+async function syncSupabaseSession(redirectToApp = false) {
   if (!_supa) return;
   try {
     const { data: { user } } = await _supa.auth.getUser();
@@ -1463,6 +1497,12 @@ async function syncSupabaseSession() {
       localStorage.setItem('blowup_user_email', user.email);
     }
     _updateNavUser(user.email, data?.plan || localStorage.getItem('blowup_access') || 'free');
+    // Si l'utilisateur est déjà connecté au chargement de la page, affiche l'app
+    const plan = localStorage.getItem('blowup_access');
+    if (redirectToApp && plan && plan !== 'free') {
+      history.replaceState({}, '', window.location.pathname);
+      showView('app');
+    }
   } catch(e) { console.log('[supa] sync:', e.message); }
 }
 
@@ -1651,17 +1691,17 @@ window.onload = () => {
 
   selectPlan('yearly');
   initFunnelEmailListener();
-  syncSupabaseSession(); // sync plan depuis Supabase si connecté
+  syncSupabaseSession(true); // sync plan + redirige vers l'app si déjà connecté
 
   // Écoute le retour magic link → redirige vers l'app si plan actif
   if (_supa) {
     _supa.auth.onAuthStateChange(async (event, session) => {
       if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
-        await syncSupabaseSession();
+        await syncSupabaseSession(false);
         const plan = localStorage.getItem('blowup_access');
         if (plan && plan !== 'free') {
-          // Nettoie l'URL et bascule vers l'app
           history.replaceState({}, '', window.location.pathname);
+          closeLoginModal();
           showView('app');
         }
       }
@@ -1690,9 +1730,62 @@ window.onload = () => {
 
 /* ── Views ── */
 function showView(v) {
-  ['landing','loading','results'].forEach(x =>
+  ['landing','app','loading','results'].forEach(x =>
     document.getElementById('view-'+x).style.display = x===v ? '' : 'none'
   );
+  // Met à jour le contenu du header app si on affiche view-app
+  if (v === 'app') _refreshAppHeader();
+}
+
+/* ── Nouveau : retourne à l'app si connecté, sinon à la LP ── */
+function goNewAnalysis() {
+  const plan = localStorage.getItem('blowup_access');
+  if (plan && plan !== 'free') {
+    // Vider l'input app pour une nouvelle analyse
+    const inp = document.getElementById('profileUrlApp');
+    if (inp) inp.value = '';
+    showView('app');
+  } else {
+    showView('landing');
+  }
+}
+
+/* ── App header refresh ── */
+function _refreshAppHeader() {
+  const email = localStorage.getItem('blowup_user_email') || '';
+  const plan  = localStorage.getItem('blowup_access') || '';
+  const planLabels = { elite:'⚡ Élite', pro:'✦ Pro', starter:'🚀 Starter', trial:'🎯 Trial' };
+  const el = document.getElementById('appWelcomePlan');
+  const em = document.getElementById('appWelcomeEmail');
+  if (el) el.textContent = planLabels[plan] || 'Espace membre';
+  if (em && email) em.textContent = 'Connecté · ' + email;
+}
+
+/* ── Start analysis from view-app ── */
+function startAnalysisFromApp() {
+  const appInput = document.getElementById('profileUrlApp');
+  const url = appInput ? appInput.value.trim() : '';
+  if (!url) {
+    if (appInput) {
+      appInput.focus();
+      appInput.placeholder = '⚠️ Entre ton @compte TikTok d\'abord !';
+      appInput.style.borderColor = '#a855f7';
+      appInput.style.boxShadow = '0 0 0 3px rgba(168,85,247,0.25)';
+      setTimeout(() => {
+        appInput.placeholder = '@toncompte';
+        appInput.style.borderColor = '';
+        appInput.style.boxShadow = '';
+      }, 2500);
+    }
+    return;
+  }
+  // Sync value to the main profileUrl input then trigger normal flow
+  const mainInput = document.getElementById('profileUrl');
+  if (mainInput) mainInput.value = url;
+  S._pendingUrl = url;
+  const modal = document.getElementById('funnelModal');
+  if (modal) modal.style.display = 'block';
+  showFunnelStep('0a');
 }
 
 /* ── Platform ── */
@@ -2180,7 +2273,7 @@ async function runAnalysis() {
   // Avec proxy Vercel : pas besoin de clé perso — on continue directement
   if (!PROXY_URL && !S.apiKey) {
     closeFunnel();
-    showView('landing');
+    goNewAnalysis();
     setTimeout(() => openApiModal(), 100);
     return;
   }
@@ -2203,7 +2296,7 @@ async function runAnalysis() {
   } catch(e) {
     stopLoading();
     closeFunnel();
-    showView('landing');
+    goNewAnalysis();
     if (e.message !== 'no_key') alert('Erreur API : ' + e.message);
   }
 }
