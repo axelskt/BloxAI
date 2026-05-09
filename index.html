@@ -327,24 +327,27 @@
 
     <!-- ── Logged-in: account panel ── -->
     <div id="logoutWrap" style="display:none">
-      <div style="font-size:26px;margin-bottom:8px">⚡</div>
-      <div id="loginAccountInfo" style="padding:12px;border-radius:10px;background:#141422;border:1px solid #1e1e30;margin-bottom:14px;font-size:13px;color:#9ca3af"></div>
 
-      <!-- Set / change password -->
-      <div id="setPasswordWrap" style="margin-bottom:10px">
-        <button onclick="_toggleSetPassword()" style="width:100%;padding:11px;border-radius:10px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);color:#a78bfa;font-weight:700;font-size:13px;cursor:pointer">
-          🔐 Définir / changer mon mot de passe
-        </button>
-        <div id="setPwForm" style="display:none;margin-top:8px">
-          <input id="newPwInput" type="password" class="inp" placeholder="Nouveau mot de passe (8 car. min)" style="margin-bottom:8px" />
-          <button onclick="handleSetPassword()" style="width:100%;padding:10px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font-weight:700;font-size:13px;cursor:pointer;border:none">
-            Enregistrer →
-          </button>
-          <div id="setPwMsg" style="font-size:12px;margin-top:8px;text-align:center;display:none"></div>
+      <!-- Header compte -->
+      <div id="loginAccountInfo" style="margin-bottom:18px;text-align:center"></div>
+
+      <!-- Setup mot de passe -->
+      <div id="setPwForm">
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:12px;color:#9ca3af;margin-bottom:6px;font-weight:600;letter-spacing:.4px">NOUVEAU MOT DE PASSE</label>
+          <input id="newPwInput" type="password" class="inp" placeholder="8 caractères minimum" style="margin-bottom:0" />
         </div>
+        <div style="margin-bottom:18px">
+          <label style="display:block;font-size:12px;color:#9ca3af;margin-bottom:6px;font-weight:600;letter-spacing:.4px">CONFIRMER LE MOT DE PASSE</label>
+          <input id="confirmPwInput" type="password" class="inp" placeholder="Répète ton mot de passe" style="margin-bottom:0" />
+        </div>
+        <button onclick="handleSetPassword()" style="width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font-weight:800;font-size:14px;cursor:pointer;border:none;letter-spacing:.3px">
+          Enregistrer mon mot de passe →
+        </button>
+        <div id="setPwMsg" style="font-size:12px;margin-top:10px;text-align:center;display:none"></div>
       </div>
 
-      <button onclick="supaLogout()" style="width:100%;padding:11px;border-radius:10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#f87171;font-weight:700;font-size:13px;cursor:pointer">
+      <button onclick="supaLogout()" style="width:100%;margin-top:12px;padding:10px;border-radius:10px;background:transparent;border:1px solid rgba(239,68,68,.2);color:#f87171;font-weight:600;font-size:12px;cursor:pointer">
         Se déconnecter
       </button>
     </div>
@@ -1858,19 +1861,26 @@ function _toggleSetPassword() {
 }
 
 async function handleSetPassword() {
-  const pw  = (document.getElementById('newPwInput')?.value || '').trim();
-  const msg = document.getElementById('setPwMsg');
+  const pw      = (document.getElementById('newPwInput')?.value || '').trim();
+  const pwConf  = (document.getElementById('confirmPwInput')?.value || '').trim();
+  const msg     = document.getElementById('setPwMsg');
+  const btn     = document.querySelector('#setPwForm button[onclick="handleSetPassword()"]');
   if (!msg) return;
   msg.style.display = 'block';
   if (pw.length < 8) {
     msg.style.color = '#f87171';
     msg.textContent = '❌ 8 caractères minimum.'; return;
   }
+  if (pw !== pwConf) {
+    msg.style.color = '#f87171';
+    msg.textContent = '❌ Les mots de passe ne correspondent pas.'; return;
+  }
   if (!_supa) {
     msg.style.color = '#f87171';
     msg.textContent = '❌ Service non disponible — recharge la page.'; return;
   }
-  msg.style.color = '#6b7280'; msg.textContent = '⏳ Enregistrement…';
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Enregistrement…'; }
+  msg.style.color = '#6b7280'; msg.textContent = '';
   try {
     const { error } = await _supa.auth.updateUser({ password: pw });
     if (error) {
@@ -1878,15 +1888,20 @@ async function handleSetPassword() {
       msg.textContent = error.message.includes('session') || error.message.includes('Auth')
         ? '❌ Session expirée — reconnecte-toi d\'abord via lien magique.'
         : '❌ ' + error.message;
+      if (btn) { btn.disabled = false; btn.textContent = 'Enregistrer mon mot de passe →'; }
     } else {
       msg.style.color = '#22c55e';
-      msg.textContent = '✅ Mot de passe enregistré ! Prochaine connexion : email + mot de passe.';
+      msg.textContent = '✅ Mot de passe enregistré ! Tu peux maintenant te connecter avec email + mot de passe.';
+      if (btn) { btn.disabled = false; btn.textContent = '✅ Enregistré !'; }
       const inp = document.getElementById('newPwInput');
+      const conf = document.getElementById('confirmPwInput');
       if (inp) inp.value = '';
+      if (conf) conf.value = '';
     }
   } catch(e) {
     msg.style.color = '#f87171';
     msg.textContent = '❌ Erreur inattendue — réessaie.';
+    if (btn) { btn.disabled = false; btn.textContent = 'Enregistrer mon mot de passe →'; }
   }
 }
 
@@ -2042,7 +2057,7 @@ window.onload = () => {
     if (modal) {
       if (formWrap)   formWrap.style.display   = 'none';
       if (logoutWrap) logoutWrap.style.display = 'block';
-      if (info) info.innerHTML = `<div style="color:#a78bfa;font-size:13px;text-align:center;padding:10px">⏳ Connexion en cours…</div>`;
+      if (info) info.innerHTML = `<div style="font-size:28px;margin-bottom:8px">⏳</div><div style="font-weight:700;font-size:14px;color:#a78bfa;margin-bottom:4px">Connexion en cours…</div><div style="font-size:12px;color:#6b7280">Patiente quelques secondes</div>`;
       if (setPwForm)  setPwForm.style.display  = 'none';
       modal.style.display = 'flex';
     }
@@ -2095,7 +2110,6 @@ function _openPasswordSetup(email) {
   const modal      = document.getElementById('loginModal');
   const formWrap   = document.getElementById('loginFormWrap');
   const logoutWrap = document.getElementById('logoutWrap');
-  const setPwForm  = document.getElementById('setPwForm');
   const setPwMsg   = document.getElementById('setPwMsg');
   const info       = document.getElementById('loginAccountInfo');
   const plan       = localStorage.getItem('blowup_access') || '';
@@ -2116,24 +2130,27 @@ function _openPasswordSetup(email) {
   if (formWrap)   formWrap.style.display   = 'none';
   if (logoutWrap) logoutWrap.style.display = 'block';
 
-  // Remplir l'info compte avec message de bienvenue
+  // Header : email + badge plan
   if (info) info.innerHTML = `
-    <div style="color:#22c55e;font-weight:700;font-size:14px;margin-bottom:6px">✅ Connecté avec succès !</div>
-    <div style="font-size:13px;color:#9ca3af;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${email || ''}</div>
-    ${plan && plan !== 'free' ? `<span style="font-size:11px;background:${planBgs[plan]||planBgs.free};color:${planColors[plan]||planColors.free};padding:2px 10px;border-radius:99px;font-weight:800;letter-spacing:.5px">${planLabel[plan]||plan.toUpperCase()}</span>` : ''}
-    <div style="margin-top:10px;padding:10px;border-radius:8px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);font-size:12px;color:#a78bfa;line-height:1.5">
-      🔐 Définis un mot de passe ci-dessous pour te connecter instantanément la prochaine fois — sans attendre un email.
-    </div>`;
+    <div style="font-size:28px;margin-bottom:8px">🔐</div>
+    <div style="font-weight:800;font-size:16px;color:#f1f5f9;margin-bottom:4px">Définis ton mot de passe</div>
+    <div style="font-size:12px;color:#6b7280;margin-bottom:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${email || ''}</div>
+    ${plan && plan !== 'free' ? `<span style="font-size:11px;background:${planBgs[plan]||planBgs.free};color:${planColors[plan]||planColors.free};padding:3px 12px;border-radius:99px;font-weight:800;letter-spacing:.5px">${planLabel[plan]||plan.toUpperCase()}</span>` : ''}
+    <div style="margin-top:12px;font-size:12px;color:#6b7280;line-height:1.5">Pour te connecter instantanément la prochaine fois, sans attendre un email.</div>`;
 
-  // Ouvrir directement le form mot de passe
-  if (setPwForm) setPwForm.style.display = 'block';
-  if (setPwMsg)  { setPwMsg.style.display = 'none'; setPwMsg.textContent = ''; }
+  if (setPwMsg) { setPwMsg.style.display = 'none'; setPwMsg.textContent = ''; }
+
+  // Reset champs
+  const newPw = document.getElementById('newPwInput');
+  const confirmPw = document.getElementById('confirmPwInput');
+  if (newPw) newPw.value = '';
+  if (confirmPw) confirmPw.value = '';
 
   // Afficher le modal
   modal.style.display = 'flex';
 
   // Focus sur le champ mot de passe
-  setTimeout(() => document.getElementById('newPwInput')?.focus(), 100);
+  setTimeout(() => newPw?.focus(), 100);
 }
 
 /* ── Views ── */
