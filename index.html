@@ -1140,7 +1140,7 @@
 <!-- ═══════════════════════════════════════════════════════════ NAV -->
 <nav class="sticky top-0 z-40" style="background:rgba(6,6,12,.85);backdrop-filter:blur(12px)">
   <div class="max-w-5xl mx-auto px-5 h-16 flex items-center justify-between">
-    <div class="flex items-center gap-2 cursor-pointer" onclick="showView('landing')">
+    <div class="flex items-center gap-2 cursor-pointer" onclick="showView(localStorage.getItem('blowup_access')&&localStorage.getItem('blowup_access')!=='free'?'app':'landing')">
       <span class="font-black text-xl tracking-tight grad">⚡ BloxAI</span>
       <span style="font-size:11px;font-weight:400;color:#4a4a70;letter-spacing:.3px">by IA MANAGER</span>
     </div>
@@ -2050,6 +2050,13 @@ window.onload = () => {
 
   selectPlan('yearly');
   initFunnelEmailListener();
+
+  // Si déjà connecté en localStorage → aller direct sur le dashboard
+  const _initPlan = localStorage.getItem('blowup_access') || '';
+  if (_initPlan && _initPlan !== 'free' && !_fromEmailLink) {
+    showView('app');
+  }
+
   syncSupabaseSession(); // sync plan depuis Supabase si déjà connecté
 
   // Fallback robuste : arrivée depuis lien email → ouvrir modal immédiatement puis attendre session
@@ -2164,6 +2171,10 @@ function _openPasswordSetup(email) {
 
 /* ── Views ── */
 function showView(v) {
+  const plan = localStorage.getItem('blowup_access') || '';
+  const isLoggedIn = plan && plan !== 'free';
+  // Si connecté, impossible de retourner sur la LP
+  if (v === 'landing' && isLoggedIn) v = 'app';
   ['landing','app','loading','results'].forEach(x => {
     const el = document.getElementById('view-'+x);
     if (el) el.style.display = x===v ? '' : 'none';
@@ -2176,9 +2187,13 @@ function showView(v) {
 
 /* ── Nouveau : retourne à la LP pour une nouvelle analyse ── */
 function goNewAnalysis() {
-  showView('landing');
-  // Scroll vers le form
-  setTimeout(() => document.getElementById('profileUrl')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+  const plan = localStorage.getItem('blowup_access') || '';
+  if (plan && plan !== 'free') {
+    showView('app');
+  } else {
+    showView('landing');
+    setTimeout(() => document.getElementById('profileUrl')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+  }
 }
 
 /* ── App header refresh ── */
