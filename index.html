@@ -1703,12 +1703,23 @@ function openLoginModal() {
   if (isLoggedIn) {
     if (formWrap)   formWrap.style.display = 'none';
     if (logoutWrap) logoutWrap.style.display = 'block';
+    // Cacher le form mot de passe — c'est le mode "compte", pas le mode "setup"
+    const setPwForm = document.getElementById('setPwForm');
+    const setPwMsg  = document.getElementById('setPwMsg');
+    if (setPwForm) setPwForm.style.display = 'none';
+    if (setPwMsg)  { setPwMsg.style.display = 'none'; setPwMsg.textContent = ''; }
     // Peupler l'info compte directement depuis localStorage (sans attendre syncSupabase)
     const colors    = { elite:'#f97316', pro:'#a855f7', starter:'#22c55e', trial:'#22c55e', free:'#6b7280' };
     const bgs       = { elite:'rgba(249,115,22,.15)', pro:'rgba(124,58,237,.15)', starter:'rgba(34,197,94,.15)', trial:'rgba(34,197,94,.15)', free:'rgba(107,114,128,.1)' };
     const planLabel = { elite:'ÉLITE', pro:'PRO', starter:'STARTER', trial:'TRIAL', free:'GRATUIT' };
     const info = document.getElementById('loginAccountInfo');
-    if (info) info.innerHTML = `<div style="margin-bottom:6px;font-weight:600;color:#e2e8f0;font-size:14px">${email}</div><span style="font-size:11px;background:${bgs[plan]||bgs.free};color:${colors[plan]||colors.free};display:inline-block;padding:2px 10px;border-radius:99px;font-weight:800;letter-spacing:.5px">${planLabel[plan]||plan.toUpperCase()||'—'}</span>`;
+    if (info) info.innerHTML = `
+      <div style="text-align:center;padding:8px 0 12px">
+        <div style="font-size:28px;margin-bottom:8px">👤</div>
+        <div style="font-weight:700;font-size:15px;color:#e2e8f0;margin-bottom:6px">${email}</div>
+        <span style="font-size:11px;background:${bgs[plan]||bgs.free};color:${colors[plan]||colors.free};display:inline-block;padding:3px 12px;border-radius:99px;font-weight:800;letter-spacing:.5px">${planLabel[plan]||plan.toUpperCase()||'—'}</span>
+      </div>
+      <button onclick="_toggleSetPassword()" style="width:100%;margin-bottom:10px;padding:10px;border-radius:10px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);color:#a78bfa;font-weight:600;font-size:12px;cursor:pointer">🔐 Changer mon mot de passe</button>`;
   } else {
     if (formWrap)   formWrap.style.display = 'block';
     if (logoutWrap) logoutWrap.style.display = 'none';
