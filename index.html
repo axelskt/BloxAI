@@ -1871,12 +1871,27 @@ async function handleSetPassword() {
       if (btn) { btn.disabled = false; btn.textContent = 'Enregistrer mon mot de passe →'; }
     } else {
       msg.style.color = '#22c55e';
-      msg.textContent = '✅ Mot de passe enregistré ! Tu peux maintenant te connecter avec email + mot de passe.';
-      if (btn) { btn.disabled = false; btn.textContent = '✅ Enregistré !'; }
-      const inp = document.getElementById('newPwInput');
-      const conf = document.getElementById('confirmPwInput');
-      if (inp) inp.value = '';
-      if (conf) conf.value = '';
+      msg.textContent = '✅ Mot de passe enregistré ! Redirection…';
+      if (btn) { btn.disabled = true; btn.textContent = '✅ Enregistré !'; }
+      // Après 1.5s → basculer vers onglet "Mot de passe" pour se connecter
+      setTimeout(() => {
+        // Récupérer l'email connecté
+        const currentEmail = localStorage.getItem('blowup_user_email') || '';
+        // Déconnecter Supabase (session magic link terminée)
+        if (_supa) _supa.auth.signOut().catch(() => {});
+        // Afficher le formulaire mot de passe
+        const logoutWrap = document.getElementById('logoutWrap');
+        const formWrap   = document.getElementById('loginFormWrap');
+        if (logoutWrap) logoutWrap.style.display = 'none';
+        if (formWrap)   formWrap.style.display   = 'block';
+        // Switcher sur l'onglet "Mot de passe"
+        _setLoginMode('password');
+        // Pré-remplir l'email
+        const emailInp = document.getElementById('loginEmailInput');
+        if (emailInp && currentEmail) emailInp.value = currentEmail;
+        // Focus sur le champ mot de passe
+        setTimeout(() => document.getElementById('loginPasswordInput')?.focus(), 80);
+      }, 1500);
     }
   } catch(e) {
     msg.style.color = '#f87171';
