@@ -1593,6 +1593,12 @@ async function syncSupabaseSession() {
       localStorage.setItem('blowup_access', plan);
       localStorage.setItem('blowup_user_email', user.email);
       _updateNavUser(user.email, plan);
+      // Si on est encore sur la LP → aller sur le dashboard
+      const appView = document.getElementById('view-app');
+      const landingView = document.getElementById('view-landing');
+      if (landingView && landingView.style.display !== 'none' && appView) {
+        showView('app');
+      }
     } else if (user.email) {
       // Plan pas encore chargé (RLS ou timing) → on garde ce qu'on a en localStorage
       _updateNavUser(user.email, localStorage.getItem('blowup_access') || 'free');
@@ -1714,6 +1720,11 @@ function openLoginModal() {
 function closeLoginModal() {
   const modal = document.getElementById('loginModal');
   if (modal) modal.style.display = 'none';
+  // Si l'user a un plan → aller sur le dashboard
+  const plan = localStorage.getItem('blowup_access') || '';
+  if (plan && plan !== 'free') {
+    showView('app');
+  }
 }
 
 async function handlePasswordLogin() {
@@ -2153,10 +2164,14 @@ function _openPasswordSetup(email) {
 
 /* ── Views ── */
 function showView(v) {
-  ['landing','loading','results'].forEach(x => {
+  ['landing','app','loading','results'].forEach(x => {
     const el = document.getElementById('view-'+x);
     if (el) el.style.display = x===v ? '' : 'none';
   });
+  if (v === 'app') {
+    _refreshAppHeader();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 }
 
 /* ── Nouveau : retourne à la LP pour une nouvelle analyse ── */
