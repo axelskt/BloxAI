@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://bloxai.fr/sitemap.xml
+
+# Block app states (dynamic JS views — not indexable)
+Disallow: /*?login=*
+Disallow: /*#access_token*
