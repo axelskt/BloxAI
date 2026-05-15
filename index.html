@@ -2182,14 +2182,15 @@ async function handleSetPassword() {
   }
 }
 
-function supaLogout() {
+async function supaLogout() {
   // Vider le state local immédiatement
   localStorage.removeItem('blowup_access');
   localStorage.removeItem('blowup_user_email');
   localStorage.removeItem('blowup_api_key');
-  // Supabase signOut en fire-and-forget (pas d'await — ça ne bloque pas)
-  try { if (_supa) _supa.auth.signOut(); } catch(e) {}
-  // Forcer la navigation — aucun async pour éviter tout blocage
+  // IMPORTANT : await obligatoire — sans ça, syncSupabaseSession() au rechargement
+  // détecte encore la session active et re-connecte l'utilisateur automatiquement
+  try { if (_supa) await _supa.auth.signOut(); } catch(e) {}
+  // Recharger seulement après que Supabase ait invalidé la session
   window.location.replace(window.location.pathname);
 }
 
