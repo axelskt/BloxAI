@@ -856,6 +856,19 @@
         <p id="fAuditRecommandationText" style="font-size:14px;color:#86efac;line-height:1.6;font-weight:500"></p>
       </div>
 
+      <!-- AvatarAds cross-promo — visible si faceless -->
+      <div id="fAvatarAdsCrossPromo" style="display:none;background:linear-gradient(135deg,rgba(249,115,22,.08),rgba(239,68,68,.05));border:1px solid rgba(249,115,22,.3);border-radius:14px;padding:16px 18px;margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#f97316,#ef4444);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🤖</div>
+          <div>
+            <div style="font-size:12px;font-weight:800;color:#f97316;text-transform:uppercase;letter-spacing:.7px">Tu restes faceless ?</div>
+            <div style="font-size:11px;color:#6b7280;margin-top:1px">Transforme tes scripts en vidéos sans te filmer</div>
+          </div>
+        </div>
+        <p style="font-size:13px;color:#d1d5db;line-height:1.6;margin-bottom:12px">BloxAI génère tes scripts — <strong style="color:#f97316">AvatarAds</strong> les transforme en pubs vidéo pro avec un avatar IA en 5 minutes. Pas de caméra, pas de montage.</p>
+        <a href="https://avatarads.fr" target="_blank" rel="noopener" style="display:block;text-align:center;padding:11px;border-radius:10px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-weight:800;font-size:13px;text-decoration:none">Découvrir AvatarAds →</a>
+      </div>
+
       <button class="f-btn" id="fStep2CTA" onclick="funnelCTAStep2()">Construire mon plan complet →</button>
     </div>
 
@@ -3770,6 +3783,18 @@ function renderPaywallTeaser(n) {
       <button onclick="openPaywall()" class="btn glow-btn">Débloquer le système complet →</button>
       <p class="text-xs text-gray-700 mt-3">Code formation disponible si tu fais partie de la formation</p>
     </div>
+
+    <!-- AvatarAds cross-promo dans le paywall -->
+    <div style="margin-top:16px;padding:14px 16px;border:1px solid rgba(249,115,22,.2);border-radius:12px;background:rgba(249,115,22,.04);display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">🤖</span>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:#f97316">Aussi : transforme tes scripts en vidéos IA</div>
+          <div style="font-size:11px;color:#6b7280">Sans caméra, sans montage — avatar IA en 5 min</div>
+        </div>
+      </div>
+      <a href="https://avatarads.fr" target="_blank" rel="noopener" style="font-size:11px;font-weight:800;color:#f97316;white-space:nowrap;text-decoration:none;flex-shrink:0">AvatarAds →</a>
+    </div>
   </div>`;
 }
 
@@ -3839,6 +3864,26 @@ function renderModule1(d) {
       <div class="section-lbl" style="color:#4ade80">💡 Recommandation</div>
       <p class="text-green-300 text-sm leading-relaxed font-medium">${esc(d.recommandation||d.opportunite_cachee||'—')}</p>
     </div>
+
+    <!-- AvatarAds cross-promo — si stratégie faceless ou mixte -->
+    ${(S.profile.contentStyle === 'faceless' || S.profile.contentStyle === 'both') ? `
+    <a href="https://avatarads.fr" target="_blank" rel="noopener" style="display:block;text-decoration:none">
+      <div style="background:linear-gradient(135deg,rgba(249,115,22,.08),rgba(239,68,68,.05));border:1px solid rgba(249,115,22,.3);border-radius:16px;padding:20px 22px;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(249,115,22,.6)'" onmouseout="this.style.borderColor='rgba(249,115,22,.3)'">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#f97316,#ef4444);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🤖</div>
+            <div>
+              <div style="font-size:12px;font-weight:800;color:#f97316;text-transform:uppercase;letter-spacing:.7px">Stratégie Faceless détectée</div>
+              <div style="font-size:11px;color:#6b7280;margin-top:1px">Transforme tes scripts en vidéos sans te filmer</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:#f97316;font-weight:700;white-space:nowrap">avatarads.fr →</div>
+        </div>
+        <p style="font-size:13px;color:#d1d5db;line-height:1.6">
+          Tes scripts BloxAI + un avatar IA = des pubs vidéo pro en 5 min. <strong style="color:#f97316">AvatarAds</strong> prend tes scripts et génère la vidéo complète — sans caméra, sans montage.
+        </p>
+      </div>
+    </a>` : ''}
 
   </div>`;
 }
@@ -3959,6 +4004,18 @@ function renderModule3(d) {
         ${angles.map((a,i)=>`<div class="r-blue">→ ${esc(a)}</div>`).join('') || '<p class="text-gray-500 text-sm">—</p>'}
       </div>
     </div>
+
+    <!-- AvatarAds cross-promo — transformer les scripts en vidéos -->
+    <a href="https://avatarads.fr" target="_blank" rel="noopener" style="display:block;text-decoration:none">
+      <div style="background:linear-gradient(135deg,rgba(249,115,22,.06),rgba(239,68,68,.04));border:1px solid rgba(249,115,22,.25);border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:14px;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(249,115,22,.55)'" onmouseout="this.style.borderColor='rgba(249,115,22,.25)'">
+        <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#f97316,#ef4444);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🎬</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:2px">Tes scripts sont prêts — transforme-les en vidéos</div>
+          <div style="font-size:12px;color:#9ca3af;line-height:1.4">Colle un script dans <strong style="color:#f97316">AvatarAds</strong> → un avatar IA tourne la vidéo en 5 min, sans caméra.</div>
+        </div>
+        <div style="font-size:12px;color:#f97316;font-weight:800;flex-shrink:0">Essayer →</div>
+      </div>
+    </a>
   </div>`;
 }
 
@@ -4798,6 +4855,13 @@ function populateFreeAudit() {
   if (recEl) recEl.textContent = recommandation;
   const recWrap = document.getElementById('fAuditRecommandation');
   if (recWrap) recWrap.style.display = recommandation ? 'block' : 'none';
+
+  // AvatarAds cross-promo — si faceless ou no-camera
+  const crossPromo = document.getElementById('fAvatarAdsCrossPromo');
+  if (crossPromo) {
+    const isFaceless = S.profile.contentStyle === 'faceless' || S.profile.contentStyle === 'both';
+    crossPromo.style.display = isFaceless ? 'block' : 'none';
+  }
 
   // Adapter le bouton CTA selon si l'utilisateur est connecté
   const ctaBtn = document.getElementById('fStep2CTA');
