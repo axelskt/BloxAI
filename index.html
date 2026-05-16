@@ -1701,6 +1701,15 @@
       </div>
     </div>
 
+    <!-- AvatarAds dashboard banner -->
+    <div id="avatarAdsBanner" style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,rgba(249,115,22,.1),rgba(239,68,68,.07));border:1px solid rgba(249,115,22,.3);border-radius:12px;padding:10px 16px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:10px;min-width:0">
+        <span style="font-size:18px;flex-shrink:0">🤖</span>
+        <a href="https://avatarads.fr" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;color:#f97316;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Crée des vidéos avatar UGC avec AvatarAds →</a>
+      </div>
+      <button onclick="document.getElementById('avatarAdsBanner').style.display='none';localStorage.setItem('aa_banner_dismissed','1')" style="background:none;border:none;color:#4b5563;cursor:pointer;font-size:16px;flex-shrink:0;padding:0 4px;line-height:1">✕</button>
+    </div>
+
     <!-- Module tabs -->
     <div class="flex gap-2 overflow-x-auto pb-3 mb-6" style="scrollbar-width:none">
       <button class="tab tab-active" id="tab-1" onclick="switchTab(1)">🔍 Audit</button>
@@ -2457,6 +2466,10 @@ function _dashInit() {
   const email = localStorage.getItem('blowup_user_email') || '';
   const plan  = localStorage.getItem('blowup_access') || '';
 
+  // AvatarAds banner — hide if already dismissed
+  const aaBanner = document.getElementById('avatarAdsBanner');
+  if (aaBanner && localStorage.getItem('aa_banner_dismissed') === '1') aaBanner.style.display = 'none';
+
   /* Plan badge */
   const planColors = { elite:'#f97316', pro:'#a855f7', starter:'#22c55e', trial:'#3b82f6' };
   const planLabels = { elite:'⚡ Élite', pro:'✦ Pro', starter:'🚀 Starter', trial:'🎯 Trial' };
@@ -2872,7 +2885,8 @@ Réponds UNIQUEMENT avec ce JSON (sans markdown) :
     "string — action #2",
     "string — action #3"
   ],
-  "recommandation": "string — LA recommandation concrète #1 pour décoller dans les 30 prochains jours, spécifique à leur niche et revenus, en français simple"
+  "recommandation": "string — LA recommandation concrète #1 pour décoller dans les 30 prochains jours, spécifique à leur niche et revenus, en français simple",
+  "besoin_contenu_video": "boolean — true si le compte manque clairement de contenu vidéo publicitaire, de pubs, de contenu vidéo court format pour convertir (vs. juste du contenu organique)"
 }`
   },
 
@@ -3199,6 +3213,9 @@ async function generateModule(n) {
 
   S.generating = false;
   renderModuleContent();
+
+  // AvatarAds post-generation nudge (modules 1, 2, 3)
+  if ([1, 2, 3].includes(n) && S.modules[n]) showAvatarAdsNudge(n);
 }
 
 /* ── Render results view ── */
@@ -3421,6 +3438,49 @@ function _doImportAnalysis() {
     msg.style.color = '#f87171';
     msg.textContent = '❌ JSON invalide — vérifie le format.';
   }
+}
+
+/* ── AvatarAds post-generation nudge toast ── */
+function showAvatarAdsNudge(moduleNum) {
+  const existing = document.getElementById('aaToast');
+  if (existing) existing.remove();
+
+  const labels = { 1: 'ton audit', 2: 'ton offre', 3: 'tes scripts' };
+  const label = labels[moduleNum] || 'ça';
+
+  const toast = document.createElement('div');
+  toast.id = 'aaToast';
+  toast.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:22px;flex-shrink:0">🤖</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:2px">Transforme ${label} en vidéo avatar publicitaire</div>
+        <div style="font-size:11px;color:#9ca3af">Script → vidéo pro en 5 min avec AvatarAds</div>
+      </div>
+      <a href="https://avatarads.fr" target="_blank" rel="noopener" style="background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-weight:800;font-size:12px;padding:8px 14px;border-radius:8px;text-decoration:none;white-space:nowrap;flex-shrink:0">Essayer →</a>
+      <button onclick="document.getElementById('aaToast').remove()" style="background:none;border:none;color:#6b7280;cursor:pointer;font-size:18px;padding:0;flex-shrink:0;line-height:1">✕</button>
+    </div>`;
+  Object.assign(toast.style, {
+    position:'fixed', bottom:'24px', left:'50%', transform:'translateX(-50%)',
+    background:'#111120', border:'1px solid rgba(249,115,22,.4)', borderRadius:'14px',
+    padding:'14px 18px', boxShadow:'0 8px 32px rgba(0,0,0,.6)', zIndex:'9999',
+    width:'calc(100% - 48px)', maxWidth:'520px', boxSizing:'border-box',
+    animation:'fadeInUp .35s ease', opacity:'0',
+  });
+
+  // CSS animation
+  if (!document.getElementById('aaToastStyle')) {
+    const s = document.createElement('style');
+    s.id = 'aaToastStyle';
+    s.textContent = `@keyframes fadeInUp{from{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}`;
+    document.head.appendChild(s);
+  }
+
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => toast.style.opacity = '1');
+
+  // Auto-dismiss after 8s
+  setTimeout(() => { if (toast.parentNode) toast.style.transition = 'opacity .4s'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 400); }, 8000);
 }
 
 function updateTabBadges() {
@@ -3864,6 +3924,17 @@ function renderModule1(d) {
       <div class="section-lbl" style="color:#4ade80">💡 Recommandation</div>
       <p class="text-green-300 text-sm leading-relaxed font-medium">${esc(d.recommandation||d.opportunite_cachee||'—')}</p>
     </div>
+
+    <!-- Solution recommandée AvatarAds si besoin contenu vidéo détecté -->
+    ${d.besoin_contenu_video ? `
+    <div style="background:linear-gradient(135deg,rgba(249,115,22,.1),rgba(239,68,68,.07));border:2px solid rgba(249,115,22,.4);border-radius:16px;padding:22px 24px">
+      <div style="font-size:10px;font-weight:900;color:#f97316;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">💡 Solution recommandée</div>
+      <div style="font-size:16px;font-weight:900;color:#fff;margin-bottom:8px">AvatarAds</div>
+      <p style="font-size:13px;color:#d1d5db;line-height:1.6;margin-bottom:16px">
+        Crée des vidéos publicitaires avec un avatar IA en 5 minutes — sans caméra, sans montage. Tu fournis ton script, l'avatar tourne la pub.
+      </p>
+      <a href="https://avatarads.fr" target="_blank" rel="noopener" style="display:inline-block;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-weight:800;font-size:13px;padding:11px 22px;border-radius:10px;text-decoration:none">Essayer gratuitement →</a>
+    </div>` : ''}
 
     <!-- AvatarAds cross-promo — si stratégie faceless ou mixte -->
     ${(S.profile.contentStyle === 'faceless' || S.profile.contentStyle === 'both') ? `
@@ -5295,6 +5366,8 @@ async function sendRecapEmail(email, auditData, profile) {
             PLATFORM: profile?.platform || '',
             AUDIT_DATE: new Date().toISOString().split('T')[0],
             PROFILE_URL: profile?.url || '',
+            CONTENT_STYLE: profile?.contentStyle || '',
+            AVATARADS_LEAD: (profile?.contentStyle === 'faceless' || profile?.contentStyle === 'both' || auditData?.besoin_contenu_video) ? 'YES' : 'NO',
           },
         }),
       });
@@ -5428,6 +5501,25 @@ function buildRecapEmailHTML(email, d, profile) {
         <div style="font-size:10px;color:#4a4a70;margin-top:2px">Source : résultats clients BloxAI — 30 jours après activation</div>
       </div>
     </div>
+  </td></tr>
+
+  <!-- AvatarAds cross-promo -->
+  <tr><td style="background:#0c0c16;border-left:1px solid #1e1e30;border-right:1px solid #1e1e30;padding:0 32px 20px">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,rgba(249,115,22,.08),rgba(239,68,68,.05));border:1px solid rgba(249,115,22,.3);border-radius:14px;padding:20px 24px">
+    <tr><td>
+      <div style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:#f97316;margin-bottom:10px">🤖 Et si tes scripts devenaient des vidéos ?</div>
+      <div style="font-size:15px;font-weight:900;color:#fff;margin-bottom:8px">AvatarAds — Vidéos publicitaires IA en 5 min</div>
+      <div style="font-size:12px;color:#d1d5db;line-height:1.6;margin-bottom:16px">
+        Ton audit BloxAI t'a donné les scripts. <strong style="color:#f97316">AvatarAds</strong> les transforme en pubs vidéo pro avec un avatar IA — sans caméra, sans montage, sans studio.
+      </div>
+      <table cellpadding="0" cellspacing="0">
+        <tr><td>
+          <a href="https://avatarads.fr" style="display:inline-block;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-weight:900;font-size:13px;padding:12px 24px;border-radius:10px;text-decoration:none">
+            Essayer AvatarAds gratuitement →
+          </a>
+        </td></tr>
+      </table>
+    </td></tr></table>
   </td></tr>
 
   <!-- CTA — Push Starter -->
