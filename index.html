@@ -1578,19 +1578,6 @@
         </button>
       </div>
 
-      <!-- Config Resend -->
-      <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.06)">
-        <button onclick="_toggleResendConfig()" style="width:100%;padding:8px;border-radius:9px;background:transparent;border:1px dashed rgba(255,255,255,.08);color:#4b5563;font-size:11px;font-weight:600;cursor:pointer;text-align:left">
-          ⚙ Config email
-        </button>
-        <div id="resendConfigWrap" style="display:none;margin-top:8px;display:flex;flex-direction:column;gap:6px">
-          <input id="dashResendKey" type="password" class="inp" style="font-size:11px;padding:9px 12px" placeholder="Clé API Resend (re_...)" />
-          <input id="dashResendSender" type="text" class="inp" style="font-size:11px;padding:9px 12px" placeholder="Ex: BloxAI <axel@bloxai.fr>" />
-          <button onclick="_saveResendConfig()" style="width:100%;padding:8px;border-radius:8px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#a78bfa;font-weight:700;font-size:11px;cursor:pointer">Sauvegarder</button>
-          <div id="resendConfigMsg" style="font-size:11px;text-align:center;display:none;color:#4ade80"></div>
-        </div>
-      </div>
-
       <!-- Import -->
       <div style="margin-top:8px">
         <button onclick="_toggleImportAnalysis()" style="width:100%;padding:9px;border-radius:9px;background:transparent;border:1px dashed rgba(255,255,255,.1);color:#6b7280;font-size:11px;font-weight:600;cursor:pointer">
@@ -5361,25 +5348,15 @@ function savePayConfig() {
 /* ═══════════════════ RESEND — EMAIL RECAP ═══════════════════ */
 
 async function sendRecapEmail(email, auditData, profile) {
-  const apiKey = localStorage.getItem('resend_api_key') || '';
-  if (!apiKey) throw new Error('Resend non configuré');
-
-  const sender = localStorage.getItem('resend_sender') || 'BloxAI <axel@iamanager.fr>';
-
   const html = buildRecapEmailHTML(email, auditData, profile);
-  const res = await fetch('https://api.resend.com/emails', {
+  const res = await fetch('https://blox-proxy-kappa.vercel.app/api/send-email', {
     method: 'POST',
-    headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from:    sender,
-      to:      [email],
-      subject: '🔍 Ton audit BloxAI est prêt — voici ton plan',
-      html,
-    }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ to: email, html }),
   });
   if (!res.ok) {
     const e = await res.json().catch(()=>({}));
-    throw new Error(e.message || 'Resend error ' + res.status);
+    throw new Error(e.error || 'Erreur envoi email');
   }
 }
 
