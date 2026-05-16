@@ -78,7 +78,7 @@
             "name": "Élite",
             "price": "97",
             "priceCurrency": "EUR",
-            "description": "Tout Pro + Funnel conversion, Site web, AvatarAds, Analyse Vidéo, Audit Concurrent"
+            "description": "Tout Pro + Funnel conversion, Site web, Audit Concurrent, Analyse Vidéo, ShortClip"
           }
         ],
         "aggregateRating": {
@@ -124,14 +124,6 @@
             "acceptedAnswer": {
               "@type": "Answer",
               "text": "Oui, sans engagement sur les formules mensuelles. Tu annules en 1 clic depuis ton espace Lemon Squeezy. Sur les formules annuelles, tu bénéficies d'une garantie satisfait ou remboursé de 14 jours."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Qu'est-ce qu'AvatarAds ?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "AvatarAds (Élite) est le module qui génère des scripts de publicité vidéo sans que tu aies besoin de te filmer. L'IA crée le script complet, le brief créatif pour un avatar IA, et des variantes A/B prêtes pour TikTok Ads et Meta Ads. Tu produis des pubs pro sans studio, sans te montrer."
             }
           },
           {
@@ -335,12 +327,6 @@
     .pay-skip { color:#3f3f5a; font-size:12px; text-align:center; cursor:pointer; margin-top:8px; transition:color .2s; }
     .pay-skip:hover { color:#6b7280; }
 
-    /* AvatarAds teaser (in Elite card) */
-    .avatar-teaser { background:#111120; border:1px solid rgba(249,115,22,.2); border-radius:10px; padding:12px 14px; margin-top:12px; }
-    .avatar-teaser-title { font-size:10px; font-weight:800; color:#f97316; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
-    .avatar-teaser-line  { font-size:11px; color:#6b7280; padding:3px 0; border-bottom:1px solid #1e1e30; line-height:1.4; }
-    .avatar-teaser-line:last-child { border-bottom:none; }
-    .avatar-teaser-blur  { filter:blur(3px); pointer-events:none; }
 
     /* Circular progress */
     .circ-wrap { position:relative; display:inline-flex; align-items:center; justify-content:center; }
@@ -870,17 +856,6 @@
         <p id="fAuditRecommandationText" style="font-size:14px;color:#86efac;line-height:1.6;font-weight:500"></p>
       </div>
 
-      <!-- AvatarAds teaser (uniquement si faceless ou pas de caméra) -->
-      <div id="fAvatarAdsTeaser" style="display:none;background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px 16px;margin-bottom:20px">
-        <div style="display:flex;align-items:center;gap:10px">
-          <span style="font-size:22px;flex-shrink:0">🤖</span>
-          <div>
-            <div style="font-size:11px;font-weight:800;color:#f97316;margin-bottom:3px">Et si ton avatar IA parlait à ta place ?</div>
-            <div style="font-size:12px;color:#9ca3af;line-height:1.5">Génère des pubs vidéo professionnelles avec un avatar IA — sans caméra, sans montage, en 5 minutes. Inclus dans <strong style="color:#f97316">AvatarAds</strong>.</div>
-          </div>
-        </div>
-      </div>
-
       <button class="f-btn" id="fStep2CTA" onclick="funnelCTAStep2()">Construire mon plan complet →</button>
     </div>
 
@@ -1056,13 +1031,6 @@
             </div>
           </div>
           <div class="feat-card" style="border-color:rgba(249,115,22,.25);background:rgba(249,115,22,.04)">
-            <div class="feat-icon" style="border-color:rgba(249,115,22,.3)">🤖</div>
-            <div>
-              <div style="font-weight:700;font-size:14px;color:#fff;margin-bottom:4px">AvatarAds</div>
-              <div style="font-size:13px;color:#6b7280;line-height:1.5">Génère des scripts de pubs vidéo pour ton business avec avatar IA — sans te filmer, sans studio, en 5 minutes.</div>
-            </div>
-          </div>
-          <div class="feat-card" style="border-color:rgba(249,115,22,.25);background:rgba(249,115,22,.04)">
             <div class="feat-icon" style="border-color:rgba(249,115,22,.3)">🔬</div>
             <div>
               <div style="font-weight:700;font-size:14px;color:#fff;margin-bottom:4px">Audit Concurrent</div>
@@ -1109,7 +1077,7 @@
               <li class="fi-on"><span class="fi">✓</span>Scripts viraux + 10 hooks</li>
               <li class="fi-off"><span class="fi">✗</span>Funnel · Site web · Calendrier 30j</li>
               <li class="fi-off"><span class="fi">✗</span>Spy Concurrent</li>
-              <li class="fi-off"><span class="fi">✗</span>AvatarAds · Audit Concurrent · ShortClip</li>
+              <li class="fi-off"><span class="fi">✗</span>Audit Concurrent · ShortClip</li>
             </ul>
           </div>
 
@@ -1131,7 +1099,7 @@
               <li class="fi-on"><span class="fi" style="color:#a855f7;margin-top:3px">✓</span><div class="fi-label"><strong>Calendrier éditorial 30 jours</strong><em>Un post par jour, clé en main</em></div></li>
               <li class="fi-on"><span class="fi" style="color:#a855f7;margin-top:3px">✓</span><div class="fi-label"><strong>Spy Concurrent</strong><em>Analyse 3 comptes, extrais leurs hooks</em></div></li>
               <li class="fi-on"><span class="fi" style="color:#a855f7;margin-top:3px">✓</span><div class="fi-label"><strong>Analyse Vidéo Virale</strong><em>Décode ce qui cartonne dans ta niche</em></div></li>
-              <li class="fi-off"><span class="fi">✗</span>AvatarAds · Audit Concurrent · ShortClip</li>
+              <li class="fi-off"><span class="fi">✗</span>Audit Concurrent · ShortClip</li>
             </ul>
           </div>
 
@@ -1148,25 +1116,12 @@
             <button class="plan-cta plan-cta-elite" onclick="startPlanCheckout('elite')">Choisir Élite →</button>
             <ul class="plan-features">
               <li class="fi-on"><span class="fi">✓</span>Tout le Pro</li>
-              <li class="fi-elite"><span class="fi" style="margin-top:3px">🤖</span><div class="fi-label"><strong>AvatarAds</strong><em>Scripts pubs vidéo avec avatar IA, sans te filmer</em></div></li>
               <li class="fi-elite"><span class="fi" style="margin-top:3px">🔬</span><div class="fi-label"><strong>Audit Concurrent</strong><em>Décortique un concurrent, scripts à adapter</em></div></li>
               <li class="fi-elite"><span class="fi" style="margin-top:3px">✂️</span><div class="fi-label"><strong>ShortClip</strong><em>Vidéo longue → shorts découpés automatiquement</em></div></li>
               <li class="fi-elite"><span class="fi" style="margin-top:3px">🌐</span><div class="fi-label"><strong>Site Web IA</strong><em>Landing page complète générée pour ton business</em></div></li>
               <li class="fi-elite"><span class="fi" style="margin-top:3px">⚡</span><div class="fi-label"><strong>Support prioritaire</strong><em>Accès bêta aux nouvelles features</em></div></li>
             </ul>
 
-            <!-- AvatarAds teaser -->
-            <div class="avatar-teaser" style="margin-top:16px">
-              <div class="avatar-teaser-title">🤖 AvatarAds — Exemple de pub générée</div>
-              <div style="border-radius:10px;overflow:hidden;margin-bottom:10px;background:#000;aspect-ratio:9/16;max-height:220px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(249,115,22,.2)">
-                <div style="text-align:center;padding:20px">
-                  <div style="font-size:28px;margin-bottom:6px">▶️</div>
-                  <div style="font-size:11px;color:#f97316;font-weight:700">Vidéo démo AvatarAds</div>
-                  <div style="font-size:10px;color:#4a4a70;margin-top:3px">Pub vidéo générée par IA en 5 min</div>
-                </div>
-              </div>
-              <div style="text-align:center;font-size:11px;color:#f97316;font-weight:700">✓ Débloqué avec Élite — génère tes scripts en 5 min</div>
-            </div>
           </div>
 
           </div><!-- end pricingGrid -->
@@ -1426,11 +1381,6 @@
           <div class="text-gray-500 text-sm">Pourquoi ça cartonne + sous-titres Hormozi / MrBeast.</div>
         </div>
         <div class="lp-feat" style="border-color:rgba(249,115,22,.2)">
-          <div class="lp-feat-icon" style="border-color:rgba(249,115,22,.25)">🤖</div>
-          <div class="font-bold text-white mb-1">AvatarAds <span style="background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-size:10px;padding:1px 8px;border-radius:99px;font-weight:800;margin-left:4px;vertical-align:middle">ÉLITE</span></div>
-          <div class="text-gray-500 text-sm">Pubs vidéo sans te filmer. Scripts + brief A/B.</div>
-        </div>
-        <div class="lp-feat" style="border-color:rgba(249,115,22,.2)">
           <div class="lp-feat-icon" style="border-color:rgba(249,115,22,.25)">🔬</div>
           <div class="font-bold text-white mb-1">Audit Concurrent <span style="background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-size:10px;padding:1px 8px;border-radius:99px;font-weight:800;margin-left:4px;vertical-align:middle">ÉLITE</span></div>
           <div class="text-gray-500 text-sm">Décortique un concurrent. Scripts adaptés à toi.</div>
@@ -1524,11 +1474,7 @@
       </details>
       <details class="faq-det">
         <summary>Je peux annuler quand je veux ? <span class="faq-ico">▾</span></summary>
-        <div class="faq-body">Oui, sans engagement sur les formules mensuelles. Tu annules en 1 clic depuis ton espace Lemon Squeezy. Sur les formules annuelles, tu bénéficies d'une <strong>garantie satisfait ou remboursé de 14 jours</strong>.</div>
-      </details>
-      <details class="faq-det">
-        <summary>Qu'est-ce qu'AvatarAds ? <span class="faq-ico">▾</span></summary>
-        <div class="faq-body">AvatarAds (Élite) est le module qui génère des scripts de publicité vidéo sans que tu aies besoin de te filmer. L'IA crée le script complet, le brief créatif pour un avatar IA, et des variantes A/B prêtes pour TikTok Ads et Meta Ads. Tu produis des pubs pro sans studio, sans te montrer.</div>
+        <div class="faq-body">Oui, sans engagement sur les formules mensuelles. Tu annules en 1 clic depuis ton espace client. Sur les formules annuelles, tu bénéficies d'une <strong>garantie satisfait ou remboursé de 14 jours</strong>.</div>
       </details>
       <details class="faq-det">
         <summary>BloxAI fonctionne pour quelle niche ? <span class="faq-ico">▾</span></summary>
@@ -1751,7 +1697,6 @@
       <button class="tab" id="tab-5" onclick="switchTab(5)">🌐 Site web</button>
       <button class="tab" id="tab-6" onclick="switchTab(6)" style="white-space:nowrap">📅 Calendrier</button>
       <button class="tab" id="tab-7" onclick="switchTab(7)" style="white-space:nowrap">🕵️ Spy</button>
-      <button class="tab" id="tab-8" onclick="switchTab(8)" style="white-space:nowrap">🤖 AvatarAds</button>
       <button class="tab" id="tab-9" onclick="switchTab(9)" style="white-space:nowrap">🔬 Audit Concurrent</button>
       <button class="tab" id="tab-10" onclick="switchTab(10)" style="white-space:nowrap">🎬 Analyse Vidéo</button>
       <button class="tab" id="tab-11" onclick="switchTab(11)" style="white-space:nowrap">✂️ ShortClip</button>
@@ -2264,7 +2209,7 @@ const FORMATION_CODE       = 'BLOWUP2024';   // free full access (internal/test)
    'starter' → paid Starter (modules 1-3: Audit, Offre, Scripts)
    'trial'   → 3-day full access (all modules)
    'pro'     → paid Pro (modules 1-7 incl. Spy Concurrent)
-   'elite'   → paid Élite (all modules incl. AvatarAds + Audit Concurrent + ShortClip)
+   'elite'   → paid Élite (all modules incl. Audit Concurrent + ShortClip)
 */
 function getAccessLevel() {
   const stored = localStorage.getItem('blowup_access') || '';
@@ -2290,8 +2235,8 @@ function startTrial() {
 }
 
 /* ── Module labels ── */
-const MOD_LABELS = { 1:'Audit', 2:'Offre', 3:'Scripts', 4:'Funnel', 5:'Site web', 6:'Calendrier 30j', 7:'Spy Concurrent', 8:'AvatarAds', 9:'Audit Concurrent', 10:'Analyse Vidéo', 11:'ShortClip', 12:'Hashtags' };
-const MOD_EMOJI  = { 1:'🔍', 2:'💰', 3:'🎬', 4:'🔗', 5:'🌐', 6:'📅', 7:'🕵️', 8:'🤖', 9:'🔬', 10:'🎬', 11:'✂️', 12:'#️⃣' };
+const MOD_LABELS = { 1:'Audit', 2:'Offre', 3:'Scripts', 4:'Funnel', 5:'Site web', 6:'Calendrier 30j', 7:'Spy Concurrent', 9:'Audit Concurrent', 10:'Analyse Vidéo', 11:'ShortClip', 12:'Hashtags' };
+const MOD_EMOJI  = { 1:'🔍', 2:'💰', 3:'🎬', 4:'🔗', 5:'🌐', 6:'📅', 7:'🕵️', 9:'🔬', 10:'🎬', 11:'✂️', 12:'#️⃣' };
 
 /* ── Boot ── */
 window.onload = () => {
@@ -2482,7 +2427,6 @@ const _DASH_MODULES = [
   { icon:'🌐', label:'Site web',             tab:5,  plans:['elite','trial'] },
   { icon:'📅', label:'Calendrier 30j',       tab:6,  plans:['starter','pro','elite','trial'] },
   { icon:'🕵️', label:'Spy concurrents',      tab:7,  plans:['pro','elite','trial'] },
-  { icon:'🤖', label:'AvatarAds',            tab:8,  plans:['elite','trial'] },
   { icon:'🔬', label:'Audit Concurrent',     tab:9,  plans:['elite','trial'] },
   { icon:'🎬', label:'Analyse Vidéo',        tab:10, plans:['elite','trial'] },
   { icon:'✂️',  label:'ShortClip IA',         tab:11, plans:['pro','elite','trial'] },
@@ -2492,8 +2436,8 @@ const _DASH_MODULES = [
 const _DASH_DEFAULTS = {
   starter: [1,3,6],
   pro:     [1,2,3,6,12],
-  elite:   [1,2,3,4,5,6,7,8,9,10,11,12],
-  trial:   [1,2,3,4,5,6,7,8,9,10,11,12],
+  elite:   [1,2,3,4,5,6,7,9,10,11,12],
+  trial:   [1,2,3,4,5,6,7,9,10,11,12],
 };
 
 function _dashInit() {
@@ -3227,7 +3171,6 @@ async function generateModule(n) {
     if (n === 5) prevData = S.modules[4] || S.modules[2] || S.modules[1];
     if (n === 6) prevData = S.modules[1];                  // audit → calendrier
     if (n === 7) prevData = S.modules[1];                  // audit → spy concurrent
-    if (n === 8) prevData = S.modules[2] || S.modules[1];  // offre or audit → avatarads
     if (n === 9) prevData = S.modules[1];                  // audit → audit concurrent
     if (n === 10) prevData = S.modules[1];                 // audit → analyse vidéo
     if (n === 11) prevData = S.modules[1];                 // audit → shortclip
@@ -3475,9 +3418,9 @@ function updateTabBadges() {
     if (!tab) continue;
     let locked = false;
     if ((i >= 2 && i <= 7) || i === 10 || i === 12) locked = !pro   && !S.modules[i];
-    if (i === 8 || i === 9 || i === 11)              locked = !elite && !S.modules[i];
+    if (i === 9 || i === 11)              locked = !elite && !S.modules[i];
     tab.classList.toggle('tab-locked', locked);
-    if (i === 8 || i === 9 || i === 11) {
+    if (i === 9 || i === 11) {
       tab.style.color = tab.classList.contains('tab-active') ? '#fff' : (elite ? '#f97316' : '');
     }
   }
@@ -3529,7 +3472,6 @@ function renderModuleContent(loading=false) {
     case 5: el.innerHTML = renderModule5(data); break;
     case 6: el.innerHTML = renderModule6(data); break;
     case 7: el.innerHTML = renderModule7(data); break;
-    case 8: el.innerHTML = renderModule8(data); break;
     case 9:  el.innerHTML = renderModule9(data); break;
     case 10: el.innerHTML = renderModule10(data); break;
     case 11: renderModule11(el); break;
@@ -3898,38 +3840,6 @@ function renderModule1(d) {
       <p class="text-green-300 text-sm leading-relaxed font-medium">${esc(d.recommandation||d.opportunite_cachee||'—')}</p>
     </div>
 
-    <!-- AvatarAds promo — paid users only -->
-    ${hasProAccess() ? `
-    <div style="background:linear-gradient(135deg,rgba(249,115,22,.08),rgba(239,68,68,.05));border:1px solid rgba(249,115,22,.3);border-radius:16px;padding:22px 24px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#f97316,#ef4444);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🤖</div>
-        <div>
-          <div style="font-size:13px;font-weight:800;color:#f97316;text-transform:uppercase;letter-spacing:.8px">Le type de contenu qui cartonne en ce moment</div>
-          <div style="font-size:11px;color:#6b7280;margin-top:1px">Utilisé par les créateurs qui scalent le plus vite</div>
-        </div>
-      </div>
-      <p style="font-size:14px;color:#e2e8f0;line-height:1.7;margin-bottom:14px">
-        Les <strong style="color:#f97316">pubs vidéo avec avatar IA</strong> convertissent 2 à 3× mieux que les contenus organiques classiques — et tu n'as pas besoin de te filmer. Tu fournis le script, l'avatar fait la vidéo. Résultat : des pubs pro en quelques minutes, à moindre coût, qui tournent pendant que tu dors.
-      </p>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
-        <div style="background:#111120;border:1px solid #1e1e30;border-radius:10px;padding:10px 12px;text-align:center">
-          <div style="font-size:18px;font-weight:900;color:#f97316">2-3×</div>
-          <div style="font-size:11px;color:#6b7280;margin-top:2px">meilleur taux de conversion</div>
-        </div>
-        <div style="background:#111120;border:1px solid #1e1e30;border-radius:10px;padding:10px 12px;text-align:center">
-          <div style="font-size:18px;font-weight:900;color:#f97316">0€</div>
-          <div style="font-size:11px;color:#6b7280;margin-top:2px">de studio ou de caméra</div>
-        </div>
-        <div style="background:#111120;border:1px solid #1e1e30;border-radius:10px;padding:10px 12px;text-align:center">
-          <div style="font-size:18px;font-weight:900;color:#f97316">5 min</div>
-          <div style="font-size:11px;color:#6b7280;margin-top:2px">pour générer une pub complète</div>
-        </div>
-      </div>
-      ${hasEliteAccess()
-        ? `<button onclick="switchTab(8)" style="width:100%;padding:13px;border-radius:11px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-weight:800;font-size:14px;cursor:pointer;border:none">Générer mes AvatarAds →</button>`
-        : `<button onclick="openPaywall()" style="width:100%;padding:13px;border-radius:11px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-weight:800;font-size:14px;cursor:pointer;border:none">Débloquer AvatarAds — Élite →</button>`
-      }
-    </div>` : ''}
   </div>`;
 }
 
@@ -4256,60 +4166,6 @@ Réponds UNIQUEMENT avec ce JSON :
 }`
   },
 
-  8: {
-    system: `Tu es un expert en AvatarAds — publicités vidéo IA avec avatars numériques pour TikTok et Meta Reels.
-OBJECTIF : Scripts faceless ultra-percutants lus par un avatar IA, qui convertissent sans que le créateur apparaisse.
-STYLE OBLIGATOIRE (inspiré des top creators TikTok monétisation) :
-- Hook visuel fort dès la 1ère seconde (chiffre choc, promesse, question qui intrigue)
-- Corps : 3-4 bullet points bénéfices concrets (pas de blabla)
-- Ton : direct, accessible, chaleureux — parle à des 18-30 ans qui veulent de la liberté financière
-- CTA : "Commente [MOT CLÉ]" ou "Clique sur le lien en bio"
-- Durée : 15-20 secondes max (format TikTok court)
-- Brief avatar précis pour l'outil IA (Heygen, Synthesia, D-ID…)
-- Réponds en JSON uniquement`,
-
-    user: (p, prev) => `Crée des AvatarAds pour ce profil.
-
-HANDLE : ${p.url}
-NICHE / OFFRE : ${p.niche || p.desc || 'voir offre ci-dessous'}
-PLATEFORME : ${p.platform}
-OFFRE : ${JSON.stringify(prev)}
-
-Style de script attendu :
-"Personne ne t'en parle mais c'est le business le plus rentable en 2026 / ✓ 0 stock / ✓ 0 expérience / ✓ 100% en ligne / Commente PLAN je t'envoie tout"
-
-Génère 3 AvatarAds prêts à tourner avec un avatar IA.
-
-Réponds UNIQUEMENT avec ce JSON :
-{
-  "concept_avatar": {
-    "type": "string — profil avatar recommandé (ex: homme/femme 22-30 ans, ton coach accessible, souriant)",
-    "style_visuel": "string — background épuré, tenue décontractée, lumière naturelle",
-    "ton": "string — débit rapide mais clair, enthousiaste, direct, chaleureux"
-  },
-  "ads": [
-    {
-      "nom": "string — nom de la pub",
-      "plateforme": "TikTok Ads",
-      "duree": "string — ex: 17 sec",
-      "hook_visuel": "string — ce que l'avatar dit/fait dans la 1ère seconde (accroche visuelle + orale)",
-      "script_complet": "string — script mot pour mot, max 60 mots, inclut les bullet points bénéfices",
-      "cta_final": "string — CTA exact (ex: Commente PLAN en dessous, je t'envoie tout)",
-      "brief_avatar": "string — instructions précises pour Heygen/Synthesia (ton, rythme, regard caméra, gestes)"
-    },
-    { "nom":"","plateforme":"Meta Reels","duree":"","hook_visuel":"","script_complet":"","cta_final":"","brief_avatar":"" },
-    { "nom":"","plateforme":"TikTok Ads","duree":"","hook_visuel":"","script_complet":"","cta_final":"","brief_avatar":"" }
-  ],
-  "variantes_ab": [
-    { "element": "string — élément testé (hook / CTA / bénéfice mis en avant)", "version_a": "string", "version_b": "string" },
-    { "element": "", "version_a": "", "version_b": "" }
-  ],
-  "mots_cles_cta": ["string — ex: PLAN","string — GUIDE","string — INFO"],
-  "outils_recommandes": ["Heygen — heygen.com", "Synthesia — synthesia.io", "D-ID — d-id.com"],
-  "budget_test_recommande": "string — ex: 5€/jour × 3 jours par variante avant de scaler"
-}`
-  },
-
   9: {
     system: `Tu es un expert en analyse concurrentielle approfondie pour créateurs TikTok/Instagram.
 OBJECTIF : Faire un audit stratégique complet d'un concurrent direct, extraire ses patterns, identifier les gaps d'opportunité, et générer des scripts adaptés.
@@ -4604,66 +4460,6 @@ function renderModule7(d) {
       <div class="section-lbl" style="color:#22c55e">💡 Comment te différencier</div>
       <p style="color:#e2e8f0;font-size:14px;line-height:1.7">${esc(d.conseil_differentiation)}</p>
     </div>` : ''}
-  </div>`;
-}
-
-/* ── Module 8 render : AvatarAds ── */
-function renderModule8(d) {
-  const concept = d.concept_avatar || {};
-  const ads = d.ads || [];
-  const ab = d.variantes_ab || [];
-  const outils = d.outils_recommandes || [];
-
-  return `<div class="fade-up space-y-5">
-    <!-- Concept avatar -->
-    <div class="card p-6" style="border-color:rgba(249,115,22,.3);background:rgba(249,115,22,.04)">
-      <div class="section-lbl" style="color:#f97316">🤖 Concept Avatar IA</div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div class="r-yellow"><strong>Type</strong><br/><span class="opacity-80">${esc(concept.type||'—')}</span></div>
-        <div class="r-yellow"><strong>Style visuel</strong><br/><span class="opacity-80">${esc(concept.style_visuel||'—')}</span></div>
-        <div class="r-yellow"><strong>Ton</strong><br/><span class="opacity-80">${esc(concept.ton||'—')}</span></div>
-      </div>
-    </div>
-
-    <!-- Ads scripts -->
-    <div>
-      <div class="section-lbl">🎬 Scripts publicitaires (prêts pour avatar IA)</div>
-      ${ads.map((ad,i) => `
-      <div class="script-card" style="border-color:rgba(249,115,22,.2)">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <span class="hook-tag" style="background:rgba(249,115,22,.15);color:#f97316;border-color:rgba(249,115,22,.3)">${esc(ad.plateforme||'Ad')} · ${esc(ad.duree||'')}</span>
-          <span style="font-weight:700;font-size:14px;color:#e2e8f0">${esc(ad.nom||'Ad '+(i+1))}</span>
-        </div>
-        <div class="r-yellow mb-2"><strong>⚡ Hook visuel</strong><br/>${esc(ad.hook_visuel||'—')}</div>
-        <div style="background:#0c0c16;border:1px solid #1e1e30;border-radius:10px;padding:14px;margin-bottom:10px">
-          <div class="section-lbl" style="margin-bottom:6px">Script complet</div>
-          <p style="font-size:13px;color:#e2e8f0;line-height:1.7">${esc(ad.script_complet||'—')}</p>
-        </div>
-        <div class="r-green mb-2"><strong>CTA</strong> — ${esc(ad.cta_final||'—')}</div>
-        <div class="r-purple"><strong>Brief Avatar IA</strong> — ${esc(ad.brief_avatar||'—')}</div>
-      </div>`).join('')}
-    </div>
-
-    <!-- A/B variants -->
-    ${ab.length ? `<div class="card p-6">
-      <div class="section-lbl">🔬 Variantes A/B à tester</div>
-      ${ab.map(v => `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-        <div class="r-blue"><strong>${esc(v.element||'')} — A</strong><br/><span class="opacity-80">${esc(v.version_a||'')}</span></div>
-        <div class="r-purple"><strong>${esc(v.element||'')} — B</strong><br/><span class="opacity-80">${esc(v.version_b||'')}</span></div>
-      </div>`).join('')}
-    </div>` : ''}
-
-    <!-- Tools + budget -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      ${outils.length ? `<div class="card p-5">
-        <div class="section-lbl">🛠 Outils recommandés</div>
-        ${outils.map(o => `<div class="r-yellow mb-1">${esc(o)}</div>`).join('')}
-      </div>` : ''}
-      ${d.budget_test_recommande ? `<div class="card p-5" style="border-color:rgba(34,197,94,.2)">
-        <div class="section-lbl" style="color:#22c55e">💸 Budget test recommandé</div>
-        <p class="text-green-300 font-bold">${esc(d.budget_test_recommande)}</p>
-      </div>` : ''}
-    </div>
   </div>`;
 }
 
@@ -5003,10 +4799,6 @@ function populateFreeAudit() {
   const recWrap = document.getElementById('fAuditRecommandation');
   if (recWrap) recWrap.style.display = recommandation ? 'block' : 'none';
 
-  // AvatarAds teaser — toujours visible après l'audit
-  const avatarTeaser = document.getElementById('fAvatarAdsTeaser');
-  if (avatarTeaser) avatarTeaser.style.display = 'block';
-
   // Adapter le bouton CTA selon si l'utilisateur est connecté
   const ctaBtn = document.getElementById('fStep2CTA');
   if (ctaBtn) {
@@ -5270,9 +5062,6 @@ function initPayStep() {
   // Default billing = yearly, update prices
   setBilling('yearly');
 
-  // Populate AvatarAds teaser with audit data if available
-  populateAvatarTeaser();
-
   // Start countdown (10 minutes)
   startPayCountdown(10 * 60);
 
@@ -5394,19 +5183,6 @@ function startPayCheckout() {
   let email = localStorage.getItem('blowup_email') || '';
   if (email) { const sep = url.includes('?') ? '&' : '?'; url += sep + 'checkout[email]=' + encodeURIComponent(email); }
   window.open(url, '_blank');
-}
-
-function populateAvatarTeaser() {
-  // Personalise the AvatarAds teaser with their actual audit data
-  const d = S.modules[1];
-  if (!d) return;
-  const prob   = d.diagnostic?.probleme_principal || '';
-  const wins   = (d.quick_wins || [])[0] || '';
-  const plat   = S.profile.platform || 'TikTok';
-  const hookEl = document.getElementById('avatarTeaserHook');
-  const scrEl  = document.getElementById('avatarTeaserScript');
-  if (hookEl && prob) hookEl.innerHTML = `<em>Hook : "${prob.slice(0,80)}... — et voilà comment le corriger."</em>`;
-  if (scrEl  && wins) scrEl.innerHTML  = `Script : Avatar présente le problème "${wins.slice(0,60)}..." en 3 phrases, puis CTA vers le lien en bio. Durée : 18 sec.`;
 }
 
 function savePayConfig() {
